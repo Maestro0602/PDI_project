@@ -1,4 +1,4 @@
-package Backend.src;
+package Backend.src.database;
 
 import java.sql.*;
 import java.security.MessageDigest;

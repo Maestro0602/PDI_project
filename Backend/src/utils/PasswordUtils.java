@@ -1,4 +1,4 @@
-package Backend.src;
+package Backend.src.utils;
 
 public class PasswordUtils {
 

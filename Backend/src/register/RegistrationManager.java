@@ -1,8 +1,17 @@
-package Backend.src;
+package Backend.src.register;
 
 import java.util.Scanner;
+import Backend.src.utils.PasswordUtils;
+import Backend.src.database.DatabaseManager;
 
 public class RegistrationManager {
+
+    /**
+     * Public method to start registration process
+     */
+    public static void startRegistration(Scanner scanner) {
+        handleRegistration(scanner);
+    }
 
     /**
      * Handle user registration
@@ -29,19 +38,19 @@ public class RegistrationManager {
 
             // Validate password match
             if (!newPassword.equals(confirmPassword)) {
-                System.out.println("\n✗ Passwords don't match!");
+                System.out.println("\n Passwords don't match!");
                 continue;
             }
 
             // Validate password length
             if (newPassword.length() < 8) {
-                System.out.println("\n✗ Password must be at least 8 characters long!");
+                System.out.println("\n Password must be at least 8 characters long!");
                 continue;
             }
 
             // Validate email format
             if (!isValidEmail(newEmail)) {
-                System.out.println("\n✗ Invalid email format!");
+                System.out.println("\n Invalid email format!");
                 continue;
             }
 
@@ -49,12 +58,12 @@ public class RegistrationManager {
             boolean success = DatabaseManager.registerUser(newUsername, newEmail, newPassword);
 
             if (success) {
-                System.out.println("\n✓ Registration successful!");
+                System.out.println("\n Registration successful!");
                 System.out.println("Data saved to MySQL database:");
                 System.out.println("\nYou can now login with your credentials.");
                 registrationSuccess = true;
             } else {
-                System.out.println("\n✗ Registration failed! Account already exists.");
+                System.out.println("\n Registration failed! Account already exists.");
                 System.out.print("\nWould you like to try again with different details? (yes/no): ");
                 String tryAgain = scanner.nextLine().toLowerCase();
 

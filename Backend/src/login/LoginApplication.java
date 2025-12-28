@@ -1,13 +1,25 @@
-package Backend.src;
+package Backend.src.login;
 
 import java.util.Scanner;
+import Backend.src.utils.PasswordUtils;
+import Backend.src.database.DatabaseManager;
+import Backend.src.register.RegistrationManager;
 
 public class LoginApplication {
 
     private static Scanner globalScanner;
 
     public static void main(String[] args) {
-        globalScanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
+        startLogin(scanner);
+        scanner.close();
+    }
+
+    /**
+     * Public method to start login process
+     */
+    public static void startLogin(Scanner scanner) {
+        globalScanner = scanner;
 
         // Initialize database
         DatabaseManager.createUserTable();
@@ -108,31 +120,31 @@ public class LoginApplication {
         System.out.println("\n========================================");
         System.out.println("          PASSWORD RESET");
         System.out.println("========================================");
-        
+
         System.out.print("Enter your registered email: ");
         String email = globalScanner.nextLine();
-        
+
         // Verify email exists in database
         if (DatabaseManager.checkEmailExists(email)) {
             System.out.print("Enter new password (min 8 characters): ");
             String newPassword = PasswordUtils.readMaskedPassword();
-            
+
             if (newPassword.length() < 8) {
                 System.out.println("✗ Password must be at least 8 characters long!");
                 return;
             }
-            
+
             System.out.print("Confirm new password: ");
             String confirmPassword = PasswordUtils.readMaskedPassword();
-            
+
             if (!newPassword.equals(confirmPassword)) {
                 System.out.println(" Passwords don't match!");
                 return;
             }
-            
+
             // Update password in database
             boolean success = DatabaseManager.resetPassword(email, newPassword);
-            
+
             if (success) {
                 System.out.println("\n Password reset successful!");
                 System.out.println("You can now login with your new password.");
@@ -140,7 +152,7 @@ public class LoginApplication {
                 System.out.println("\n Password reset failed. Please try again.");
             }
         } else {
-            System.out.println(" Email not found in our records!");
+            System.out.println("✗ Email not found in the system!");
         }
     }
 }
