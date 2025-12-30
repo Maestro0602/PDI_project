@@ -41,7 +41,7 @@ public class TeacherManager {
                 return;
         }
 
-        System.out.println("\n👨‍🏫 Teachers in " + selectedDepartment + " Department:");
+        System.out.println("\n Teachers in " + selectedDepartment + " Department:");
         boolean found = false;
         for (int i = 0; i < teachers.size(); i++) {
             if (teachers.get(i).getDepartment() != null &&
@@ -63,7 +63,7 @@ public class TeacherManager {
             return;
         }
 
-        System.out.println("👨‍🏫 Available Teachers:");
+        System.out.println(" Available Teachers:");
         for (int i = 0; i < teachers.size(); i++) {
             System.out.println((i + 1) + ". " + teachers.get(i));
         }
@@ -109,7 +109,7 @@ public class TeacherManager {
             return;
         }
 
-        System.out.println("👨‍🏫 Available Teachers:");
+        System.out.println(" Available Teachers:");
         for (int i = 0; i < teachers.size(); i++) {
             System.out.println((i + 1) + ". " + teachers.get(i));
         }
@@ -139,7 +139,7 @@ public class TeacherManager {
             return;
         }
 
-        System.out.println("👨‍🏫 Available Teachers:");
+        System.out.println("Available Teachers:");
         for (int i = 0; i < teachers.size(); i++) {
             System.out.println((i + 1) + ". " + teachers.get(i));
         }

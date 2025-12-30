@@ -48,7 +48,6 @@ public class DatabaseManager {
 
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
-                    System.out.println("Database table ready!\n");
                 }
             } catch (SQLException e) {
                 System.out.println("Error creating table: " + e.getMessage());

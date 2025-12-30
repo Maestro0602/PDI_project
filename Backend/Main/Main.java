@@ -1,4 +1,3 @@
-
 import Backend.src.login.LoginApplication;
 import Backend.src.register.RegistrationManager;
 import Backend.src.database.DatabaseManager;
