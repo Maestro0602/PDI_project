@@ -8,6 +8,7 @@ import Backend.src.register.RegistrationManager;
 public class LoginApplication {
 
     private static Scanner globalScanner;
+    public static String loggedInUser; 
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -31,14 +32,14 @@ public class LoginApplication {
             System.out.println("          LOGIN SYSTEM");
             System.out.println("========================================");
 
-            System.out.print("Enter username or email: ");
-            String usernameOrEmail = globalScanner.nextLine();
+            System.out.print("Enter your name: ");
+            String name = globalScanner.nextLine();
 
             System.out.print("Enter password: ");
             String password = PasswordUtils.readMaskedPassword();
 
             // Check if user exists
-            if (!DatabaseManager.checkUserExists(usernameOrEmail)) {
+            if (!DatabaseManager.checkUserExists(name)) {
                 System.out.println("\n✗ User not found!");
                 System.out.println("You need to register first.");
 
@@ -49,7 +50,7 @@ public class LoginApplication {
                     RegistrationManager.handleRegistration(globalScanner);
                 }
             } else {
-                loggedIn = handleLogin(usernameOrEmail, password);
+                loggedIn = handleLogin(name, password);
             }
         }
 
@@ -61,7 +62,7 @@ public class LoginApplication {
      * Returns true if login successful, false otherwise
      */
     private static boolean handleLogin(String usernameOrEmail, String password) {
-        String loggedInUser = DatabaseManager.verifyLogin(usernameOrEmail, password);
+        loggedInUser = DatabaseManager.verifyLogin(usernameOrEmail, password);
 
         if (loggedInUser != null) {
             System.out.println("\n✓ Login successful!");
@@ -85,14 +86,14 @@ public class LoginApplication {
                     case "1":
                         System.out.print("Enter password again: ");
                         String newPassword = PasswordUtils.readMaskedPassword();
-                        String retryUser = DatabaseManager.verifyLogin(usernameOrEmail, newPassword);
-                        if (retryUser != null) {
-                            System.out.println("\n✓ Login successful!");
-                            System.out.println("Welcome, " + retryUser + "!");
+                        loggedInUser = DatabaseManager.verifyLogin(usernameOrEmail, newPassword);
+                        if (loggedInUser != null) {
+                            System.out.println("\n Login successful!");
+                            System.out.println("Welcome, " + loggedInUser + "!");
                             System.out.println("\nYou are now logged in to the system.");
                             return true;
                         } else {
-                            System.out.println("\n✗ Password is still incorrect!");
+                            System.out.println("\n Password is still incorrect!");
                         }
                         break;
 
@@ -116,43 +117,35 @@ public class LoginApplication {
     /**
      * Handle forgot password functionality
      */
-    private static void handleForgotPassword(String usernameOrEmail) {
+    private static void handleForgotPassword(String name) {
         System.out.println("\n========================================");
         System.out.println("          PASSWORD RESET");
         System.out.println("========================================");
 
-        System.out.print("Enter your registered email: ");
-        String email = globalScanner.nextLine();
+        System.out.print("Enter new password (min 8 characters): ");
+        String newPassword = PasswordUtils.readMaskedPassword();
 
-        // Verify email exists in database
-        if (DatabaseManager.checkEmailExists(email)) {
-            System.out.print("Enter new password (min 8 characters): ");
-            String newPassword = PasswordUtils.readMaskedPassword();
+        if (newPassword.length() < 8) {
+            System.out.println(" Password must be at least 8 characters long!");
+            return;
+        }
 
-            if (newPassword.length() < 8) {
-                System.out.println("✗ Password must be at least 8 characters long!");
-                return;
-            }
+        System.out.print("Confirm new password: ");
+        String confirmPassword = PasswordUtils.readMaskedPassword();
 
-            System.out.print("Confirm new password: ");
-            String confirmPassword = PasswordUtils.readMaskedPassword();
+        if (!newPassword.equals(confirmPassword)) {
+            System.out.println(" Passwords don't match!");
+            return;
+        }
 
-            if (!newPassword.equals(confirmPassword)) {
-                System.out.println(" Passwords don't match!");
-                return;
-            }
+        // Update password in database
+        boolean success = DatabaseManager.resetPassword(name, newPassword);
 
-            // Update password in database
-            boolean success = DatabaseManager.resetPassword(email, newPassword);
-
-            if (success) {
-                System.out.println("\n Password reset successful!");
-                System.out.println("You can now login with your new password.");
-            } else {
-                System.out.println("\n Password reset failed. Please try again.");
-            }
+        if (success) {
+            System.out.println("\n Password reset successful!");
+            System.out.println("You can now login with your new password.");
         } else {
-            System.out.println("✗ Email not found in the system!");
+            System.out.println("\n Password reset failed. Please try again.");
         }
     }
 }

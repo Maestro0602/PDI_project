@@ -3,6 +3,7 @@ package Backend.src.register;
 import java.util.Scanner;
 import Backend.src.utils.PasswordUtils;
 import Backend.src.database.DatabaseManager;
+import Backend.src.database.EmailManager;
 
 public class RegistrationManager {
 
@@ -24,11 +25,37 @@ public class RegistrationManager {
             System.out.println("          REGISTRATION");
             System.out.println("========================================");
 
-            System.out.print("Enter username: ");
-            String newUsername = scanner.nextLine();
+            System.out.print("Enter your name: ");
+            String name = scanner.nextLine().trim();
+
+            if (name.isEmpty()) {
+                System.out.println("\n Name cannot be empty!");
+                continue;
+            }
 
             System.out.print("Enter email: ");
-            String newEmail = scanner.nextLine();
+            String email = scanner.nextLine().trim();
+
+            if (email.isEmpty()) {
+                System.out.println("\n Email cannot be empty!");
+                continue;
+            }
+
+            // Check if email exists in any of the three tables (owner, student, teacher)
+            String userType = getEmailType(email);
+            if (userType == null) {
+                System.out.println("\n Email not found in our system!");
+                System.out.println("Your email must be registered as an Owner, Student, or Teacher.");
+                System.out.print("Would you like to try with a different email? (yes/no): ");
+                String tryAgain = scanner.nextLine().toLowerCase();
+                if (!tryAgain.equals("yes") && !tryAgain.equals("y")) {
+                    registrationSuccess = true; // Exit loop
+                }
+                continue;
+            }
+
+            // Generate username based on email type and name
+            String generatedUsername = generateUsername(userType, name);
 
             System.out.print("Enter password (min 8 characters): ");
             String newPassword = PasswordUtils.readMaskedPassword();
@@ -48,18 +75,15 @@ public class RegistrationManager {
                 continue;
             }
 
-            // Validate email format
-            if (!isValidEmail(newEmail)) {
-                System.out.println("\n Invalid email format!");
-                continue;
-            }
-
             // Register user in database
-            boolean success = DatabaseManager.registerUser(newUsername, newEmail, newPassword);
+            boolean success = DatabaseManager.registerUser(generatedUsername, email, newPassword);
 
             if (success) {
                 System.out.println("\n Registration successful!");
                 System.out.println("Data saved to MySQL database:");
+                System.out.println("Username: " + generatedUsername);
+                System.out.println("Email: " + email);
+                System.out.println("Account Type: " + userType);
                 System.out.println("\nYou can now login with your credentials.");
                 registrationSuccess = true;
             } else {
@@ -67,11 +91,67 @@ public class RegistrationManager {
                 System.out.print("\nWould you like to try again with different details? (yes/no): ");
                 String tryAgain = scanner.nextLine().toLowerCase();
 
-                if (!tryAgain.equals("yes")) {
+                if (!tryAgain.equals("yes") && !tryAgain.equals("y")) {
                     registrationSuccess = true; // Exit loop
                 }
             }
         }
+    }
+
+    /**
+     * Check which type of user the email belongs to
+     * Returns "STUDENT", "TEACHER", "OWNER", or null if not found
+     */
+    private static String getEmailType(String email) {
+        try {
+            // Get emails from database
+            java.util.List<String> studentEmails = EmailManager.getStudentEmails();
+            java.util.List<String> teacherEmails = EmailManager.getTeacherEmails();
+            java.util.List<String> ownerEmails = EmailManager.getOwnerEmails();
+
+            // // Print debug info
+            // System.out.println("\n[DEBUG] Looking for email: " + email);
+            // System.out.println("[DEBUG] Student emails found: " + studentEmails.size());
+            // System.out.println("[DEBUG] Teacher emails found: " + teacherEmails.size());
+            // System.out.println("[DEBUG] Owner emails found: " + ownerEmails.size());
+
+            // Check with trimmed comparison (case-sensitive)
+            for (String studentEmail : studentEmails) {
+                if (studentEmail != null && studentEmail.trim().equals(email)) {
+                    System.out.println("[DEBUG] Email matched in STUDENT table");
+                    return "STUDENT";
+                }
+            }
+
+            for (String teacherEmail : teacherEmails) {
+                if (teacherEmail != null && teacherEmail.trim().equals(email)) {
+                    System.out.println("[DEBUG] Email matched in TEACHER table");
+                    return "TEACHER";
+                }
+            }
+
+            for (String ownerEmail : ownerEmails) {
+                if (ownerEmail != null && ownerEmail.trim().equals(email)) {
+                    System.out.println("[DEBUG] Email matched in OWNER table");
+                    return "OWNER";
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("[ERROR] Exception in getEmailType: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Generate username based on user type and name
+     * Format: TYPE_name_2026
+     */
+    private static String generateUsername(String userType, String name) {
+        // Remove spaces and special characters from name
+        String cleanName = name.replaceAll("\\s+", "").replaceAll("[^a-zA-Z0-9]", "");
+        return userType + "_" + cleanName + "_2026";
     }
 
     /**
