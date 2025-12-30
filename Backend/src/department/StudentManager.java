@@ -12,10 +12,10 @@ public class StudentManager {
     }
 
     public void displayAllDepartments() {
-        System.out.println("\n📚 Available Departments:");
+        System.out.println("\n Available Departments:");
         System.out.println("1. " + Department.GIC.getDisplayName());
         System.out.println("2. " + Department.GIM.getDisplayName());
-        System.out.println("3. " + Department.ELECTRIC.getDisplayName());
+        System.out.println("3. " + Department.GEE.getDisplayName());
     }
 
     public void viewStudentsByDepartment(Scanner input) {
@@ -34,14 +34,14 @@ public class StudentManager {
                 selectedDepartment = Department.GIM.getDisplayName();
                 break;
             case 3:
-                selectedDepartment = Department.ELECTRIC.getDisplayName();
+                selectedDepartment = Department.GEE.getDisplayName();
                 break;
             default:
                 System.out.println("Invalid choice!");
                 return;
         }
 
-        System.out.println("\n📋 Students in " + selectedDepartment + " Department:");
+        System.out.println("\n Students in " + selectedDepartment + " Department:");
         boolean found = false;
         for (int i = 0; i < students.size(); i++) {
             if (students.get(i).getDepartment() != null &&
@@ -63,7 +63,7 @@ public class StudentManager {
             return;
         }
 
-        System.out.println("📋 Available Students:");
+        System.out.println(" Available Students:");
         for (int i = 0; i < students.size(); i++) {
             System.out.println((i + 1) + ". " + students.get(i));
         }
@@ -86,7 +86,7 @@ public class StudentManager {
                         department = Department.GIM.getDisplayName();
                         break;
                     case 3:
-                        department = Department.ELECTRIC.getDisplayName();
+                        department = Department.GEE.getDisplayName();
                         break;
                     default:
                         System.out.println("Invalid choice!");
@@ -109,7 +109,7 @@ public class StudentManager {
             return;
         }
 
-        System.out.println("📋 Available Students:");
+        System.out.println(" Available Students:");
         for (int i = 0; i < students.size(); i++) {
             System.out.println((i + 1) + ". " + students.get(i));
         }
@@ -139,7 +139,7 @@ public class StudentManager {
             return;
         }
 
-        System.out.println("📋 Available Students:");
+        System.out.println(" Available Students:");
         for (int i = 0; i < students.size(); i++) {
             System.out.println((i + 1) + ". " + students.get(i));
         }
@@ -162,7 +162,7 @@ public class StudentManager {
                         department = Department.GIM.getDisplayName();
                         break;
                     case 3:
-                        department = Department.ELECTRIC.getDisplayName();
+                        department = Department.GEE.getDisplayName();
                         break;
                     default:
                         System.out.println("Invalid choice!");

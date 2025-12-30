@@ -3,7 +3,7 @@ package Backend.src.department;
 public enum Department {
     GIC("GIC"),
     GIM("GIM"),
-    ELECTRIC("Electric");
+    GEE("GEE");
 
     private String displayName;
 

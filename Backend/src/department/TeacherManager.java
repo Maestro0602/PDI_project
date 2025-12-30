@@ -12,10 +12,10 @@ public class TeacherManager {
     }
 
     public void displayAllDepartments() {
-        System.out.println("\n📚 Available Departments:");
+        System.out.println("\n Available Departments:");
         System.out.println("1. " + Department.GIC.getDisplayName());
         System.out.println("2. " + Department.GIM.getDisplayName());
-        System.out.println("3. " + Department.ELECTRIC.getDisplayName());
+        System.out.println("3. " + Department.GEE.getDisplayName());
     }
 
     public void viewTeachersByDepartment(Scanner input) {
@@ -34,7 +34,7 @@ public class TeacherManager {
                 selectedDepartment = Department.GIM.getDisplayName();
                 break;
             case 3:
-                selectedDepartment = Department.ELECTRIC.getDisplayName();
+                selectedDepartment = Department.GEE.getDisplayName();
                 break;
             default:
                 System.out.println("Invalid choice!");
@@ -86,7 +86,7 @@ public class TeacherManager {
                         department = Department.GIM.getDisplayName();
                         break;
                     case 3:
-                        department = Department.ELECTRIC.getDisplayName();
+                        department = Department.GEE.getDisplayName();
                         break;
                     default:
                         System.out.println("Invalid choice!");
@@ -162,7 +162,7 @@ public class TeacherManager {
                         department = Department.GIM.getDisplayName();
                         break;
                     case 3:
-                        department = Department.ELECTRIC.getDisplayName();
+                        department = Department.GEE.getDisplayName();
                         break;
                     default:
                         System.out.println("Invalid choice!");
