@@ -1,3 +1,4 @@
+package Backend.src.mainpage;
 import java.util.Scanner;
 public class MainPageTeacher {
     public static void main(String[] args) {
@@ -41,7 +42,7 @@ public class MainPageTeacher {
                     break;
                 case 6:
                     System.out.println("Logging out...");
-                    Main.main(args);
+                    exit = true;
                     break;
                 default:
                     System.out.println("Invalid option. Please try again.");

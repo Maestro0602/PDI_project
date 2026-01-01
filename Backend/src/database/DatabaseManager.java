@@ -29,32 +29,6 @@ public class DatabaseManager {
             }
         }
 
-        /**
-         * Create users table if it doesn't exist
-         */
-        public static void createUserTable() {
-            Connection conn = null;
-            Statement stmt = null;
-
-            try {
-                conn = connectDB();
-                if (conn != null) {
-                    String sql = "CREATE TABLE IF NOT EXISTS users (" +
-                            "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                            "EmailName VARCHAR(50) UNIQUE NOT NULL, " +
-                            "email VARCHAR(100) UNIQUE NOT NULL, " +
-                            "password VARCHAR(100) NOT NULL, " +
-                            "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
-
-                    stmt = conn.createStatement();
-                    stmt.executeUpdate(sql);
-                }
-            } catch (SQLException e) {
-                System.out.println("Error creating table: " + e.getMessage());
-            } finally {
-                closeResources(conn, stmt, null);
-            }
-        }
 
         /**
          * Close database resources safely
