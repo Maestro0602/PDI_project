@@ -67,38 +67,50 @@ public class TeacherManager {
         for (int i = 0; i < teachers.size(); i++) {
             System.out.println((i + 1) + ". " + teachers.get(i));
         }
-        System.out.print("Enter Teacher ID to assign to department: ");
-        String teacherId = input.nextLine();
-
-        for (Teacher teacher : teachers) {
-            if (teacher.getTeacherId().equals(teacherId)) {
-                displayAllDepartments();
-                System.out.print("Choose department (1-3): ");
-                int deptChoice = input.nextInt();
-                input.nextLine();
-
-                String department = "";
-                switch (deptChoice) {
-                    case 1:
-                        department = Department.GIC.getDisplayName();
-                        break;
-                    case 2:
-                        department = Department.GIM.getDisplayName();
-                        break;
-                    case 3:
-                        department = Department.GEE.getDisplayName();
-                        break;
-                    default:
-                        System.out.println("Invalid choice!");
-                        return;
-                }
-
-                teacher.setDepartment(department);
-                System.out.println(" Teacher assigned to " + department + " department successfully!");
+        String teacherId = "";
+        Teacher targetTeacher = null;
+        while (targetTeacher == null) {
+            System.out.print("Enter Teacher ID to assign to department (or 'q' to cancel): ");
+            teacherId = input.nextLine();
+            if (teacherId.equalsIgnoreCase("q")) {
+                System.out.println("Cancelled.");
                 return;
             }
+            for (Teacher teacher : teachers) {
+                if (teacher.getTeacherId().equals(teacherId)) {
+                    targetTeacher = teacher;
+                    break;
+                }
+            }
+            if (targetTeacher == null) {
+                System.out.println(" Teacher ID not found. Please try again.");
+            }
         }
-        System.out.println(" Teacher ID not found!");
+
+        displayAllDepartments();
+        System.out.print("Choose department (1-3): ");
+        int deptChoice = input.nextInt();
+        input.nextLine();
+
+        String department = "";
+        switch (deptChoice) {
+            case 1:
+                department = Department.GIC.getDisplayName();
+                break;
+            case 2:
+                department = Department.GIM.getDisplayName();
+                break;
+            case 3:
+                department = Department.GEE.getDisplayName();
+                break;
+            default:
+                System.out.println("Invalid choice!");
+                return;
+        }
+
+        targetTeacher.setDepartment(department);
+        System.out.println(" Teacher assigned to " + department + " department successfully!");
+        return;
     }
 
     public void removeTeacherFromDepartment() {
@@ -113,22 +125,34 @@ public class TeacherManager {
         for (int i = 0; i < teachers.size(); i++) {
             System.out.println((i + 1) + ". " + teachers.get(i));
         }
-        System.out.print("Enter Teacher ID to remove from department: ");
-        String teacherId = input.nextLine();
-
-        for (Teacher teacher : teachers) {
-            if (teacher.getTeacherId().equals(teacherId)) {
-                if (teacher.getDepartment() == null || teacher.getDepartment().isEmpty()) {
-                    System.out.println(" Teacher is not assigned to any department!");
-                } else {
-                    String prevDept = teacher.getDepartment();
-                    teacher.setDepartment(null);
-                    System.out.println(" Teacher removed from " + prevDept + " department successfully!");
-                }
+        String teacherId = "";
+        Teacher targetTeacher = null;
+        while (targetTeacher == null) {
+            System.out.print("Enter Teacher ID to remove from department (or 'q' to cancel): ");
+            teacherId = input.nextLine();
+            if (teacherId.equalsIgnoreCase("q")) {
+                System.out.println("Cancelled.");
                 return;
             }
+            for (Teacher teacher : teachers) {
+                if (teacher.getTeacherId().equals(teacherId)) {
+                    targetTeacher = teacher;
+                    break;
+                }
+            }
+            if (targetTeacher == null) {
+                System.out.println(" Teacher ID not found. Please try again.");
+            }
         }
-        System.out.println(" Teacher ID not found!");
+
+        if (targetTeacher.getDepartment() == null || targetTeacher.getDepartment().isEmpty()) {
+            System.out.println(" Teacher is not assigned to any department!");
+        } else {
+            String prevDept = targetTeacher.getDepartment();
+            targetTeacher.setDepartment(null);
+            System.out.println(" Teacher removed from " + prevDept + " department successfully!");
+        }
+        return;
     }
 
     public void updateTeacherDepartment() {
@@ -143,37 +167,49 @@ public class TeacherManager {
         for (int i = 0; i < teachers.size(); i++) {
             System.out.println((i + 1) + ". " + teachers.get(i));
         }
-        System.out.print("Enter Teacher ID to update department: ");
-        String teacherId = input.nextLine();
-
-        for (Teacher teacher : teachers) {
-            if (teacher.getTeacherId().equals(teacherId)) {
-                displayAllDepartments();
-                System.out.print("Choose new department (1-3): ");
-                int deptChoice = input.nextInt();
-                input.nextLine();
-
-                String department = "";
-                switch (deptChoice) {
-                    case 1:
-                        department = Department.GIC.getDisplayName();
-                        break;
-                    case 2:
-                        department = Department.GIM.getDisplayName();
-                        break;
-                    case 3:
-                        department = Department.GEE.getDisplayName();
-                        break;
-                    default:
-                        System.out.println("Invalid choice!");
-                        return;
-                }
-
-                teacher.setDepartment(department);
-                System.out.println(" Teacher department updated to " + department + " successfully!");
+        String teacherId = "";
+        Teacher targetTeacher = null;
+        while (targetTeacher == null) {
+            System.out.print("Enter Teacher ID to update department (or 'q' to cancel): ");
+            teacherId = input.nextLine();
+            if (teacherId.equalsIgnoreCase("q")) {
+                System.out.println("Cancelled.");
                 return;
             }
+            for (Teacher teacher : teachers) {
+                if (teacher.getTeacherId().equals(teacherId)) {
+                    targetTeacher = teacher;
+                    break;
+                }
+            }
+            if (targetTeacher == null) {
+                System.out.println(" Teacher ID not found. Please try again.");
+            }
         }
-        System.out.println(" Teacher ID not found!");
+
+        displayAllDepartments();
+        System.out.print("Choose new department (1-3): ");
+        int deptChoice = input.nextInt();
+        input.nextLine();
+
+        String department = "";
+        switch (deptChoice) {
+            case 1:
+                department = Department.GIC.getDisplayName();
+                break;
+            case 2:
+                department = Department.GIM.getDisplayName();
+                break;
+            case 3:
+                department = Department.GEE.getDisplayName();
+                break;
+            default:
+                System.out.println("Invalid choice!");
+                return;
+        }
+
+        targetTeacher.setDepartment(department);
+        System.out.println(" Teacher department updated to " + department + " successfully!");
+        return;
     }
 }

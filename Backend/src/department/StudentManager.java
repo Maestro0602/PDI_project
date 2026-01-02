@@ -1,15 +1,12 @@
 package Backend.src.department;
 
 import java.util.Scanner;
-import java.util.ArrayList;
+import Backend.src.database.StudentInfoManager;
+import Backend.src.database.MajorManager;
+import Backend.src.major.Studentmajor;
 
 public class StudentManager {
-    private ArrayList<Student> students = new ArrayList<>();
     private Scanner input = new Scanner(System.in);
-
-    public ArrayList<Student> getStudents() {
-        return students;
-    }
 
     public void displayAllDepartments() {
         System.out.println("\n Available Departments:");
@@ -42,138 +39,165 @@ public class StudentManager {
         }
 
         System.out.println("\n Students in " + selectedDepartment + " Department:");
-        boolean found = false;
-        for (int i = 0; i < students.size(); i++) {
-            if (students.get(i).getDepartment() != null &&
-                    students.get(i).getDepartment().equals(selectedDepartment)) {
-                System.out.println((i + 1) + ". " + students.get(i));
-                found = true;
-            }
-        }
-        if (!found) {
-            System.out.println(" No students in " + selectedDepartment + " department!");
-        }
+        StudentInfoManager.displayAllStudents();
     }
 
     public void addStudentToDepartment() {
         System.out.println("\n--- Add Student to Department ---");
 
-        if (students.isEmpty()) {
-            System.out.println(" No students available!");
+        System.out.println(" Available Students:");
+        StudentInfoManager.displayAllStudents();
+
+        String studentId = "";
+        String[] studentInfo = null;
+        while (studentInfo == null) {
+            System.out.print("Enter Student ID to assign to department (or 'q' to cancel): ");
+            studentId = input.nextLine();
+            if (studentId.equalsIgnoreCase("q")) {
+                System.out.println("Cancelled.");
+                return;
+            }
+            studentInfo = StudentInfoManager.getStudentInfo(studentId);
+            if (studentInfo == null) {
+                System.out.println(" Student ID not found. Please try again.");
+            }
+        }
+
+        displayAllDepartments();
+        System.out.print("Choose department (1-3): ");
+        int deptChoice = input.nextInt();
+        input.nextLine();
+
+        String department = "";
+        switch (deptChoice) {
+            case 1:
+                department = Department.GIC.getDisplayName();
+                break;
+            case 2:
+                department = Department.GIM.getDisplayName();
+                break;
+            case 3:
+                department = Department.GEE.getDisplayName();
+                break;
+            default:
+                System.out.println("Invalid choice!");
+                return;
+        }
+
+        // Get major selection without saving yet
+        String major = getMajorForDepartment(department);
+        if (major == null) {
+            System.out.println("Major selection cancelled.");
             return;
         }
 
-        System.out.println(" Available Students:");
-        for (int i = 0; i < students.size(); i++) {
-            System.out.println((i + 1) + ". " + students.get(i));
+        // Now save both department and major together
+        if (MajorManager.saveDepartmentMajor(studentId, department, major)) {
+            System.out.println(" Student assigned to " + department + " with major " + major + " successfully!");
+        } else {
+            System.out.println(" Failed to assign student.");
         }
-        System.out.print("Enter Student ID to assign to department: ");
-        String studentId = input.nextLine();
+    }
 
-        for (Student student : students) {
-            if (student.getStudentId().equals(studentId)) {
-                displayAllDepartments();
-                System.out.print("Choose department (1-3): ");
-                int deptChoice = input.nextInt();
-                input.nextLine();
-
-                String department = "";
-                switch (deptChoice) {
-                    case 1:
-                        department = Department.GIC.getDisplayName();
-                        break;
-                    case 2:
-                        department = Department.GIM.getDisplayName();
-                        break;
-                    case 3:
-                        department = Department.GEE.getDisplayName();
-                        break;
-                    default:
-                        System.out.println("Invalid choice!");
-                        return;
-                }
-
-                student.setDepartment(department);
-                System.out.println(" Student assigned to " + department + " department successfully!");
-                return;
-            }
+    private String getMajorForDepartment(String department) {
+        if (department.equals(Department.GIC.getDisplayName())) {
+            return Studentmajor.getGICMajor();
+        } else if (department.equals(Department.GIM.getDisplayName())) {
+            return Studentmajor.getGIMMajor();
+        } else if (department.equals(Department.GEE.getDisplayName())) {
+            return Studentmajor.getGEEMajor();
         }
-        System.out.println(" Student ID not found!");
+        return null;
     }
 
     public void removeStudentFromDepartment() {
         System.out.println("\n--- Remove Student from Department ---");
 
-        if (students.isEmpty()) {
-            System.out.println(" No students available!");
-            return;
-        }
-
         System.out.println(" Available Students:");
-        for (int i = 0; i < students.size(); i++) {
-            System.out.println((i + 1) + ". " + students.get(i));
-        }
-        System.out.print("Enter Student ID to remove from department: ");
-        String studentId = input.nextLine();
+        StudentInfoManager.displayAllStudents();
 
-        for (Student student : students) {
-            if (student.getStudentId().equals(studentId)) {
-                if (student.getDepartment() == null || student.getDepartment().isEmpty()) {
-                    System.out.println(" Student is not assigned to any department!");
-                } else {
-                    String prevDept = student.getDepartment();
-                    student.setDepartment(null);
-                    System.out.println(" Student removed from " + prevDept + " department successfully!");
-                }
+        String studentId = "";
+        String[] studentInfo = null;
+        while (studentInfo == null) {
+            System.out.print("Enter Student ID to remove from department (or 'q' to cancel): ");
+            studentId = input.nextLine();
+            if (studentId.equalsIgnoreCase("q")) {
+                System.out.println("Cancelled.");
                 return;
             }
+            studentInfo = StudentInfoManager.getStudentInfo(studentId);
+            if (studentInfo == null) {
+                System.out.println(" Student ID not found. Please try again.");
+            }
         }
-        System.out.println(" Student ID not found!");
+
+        String[] deptMajor = MajorManager.getDepartmentMajor(studentId);
+        if (deptMajor == null) {
+            System.out.println(" Student is not assigned to any department!");
+        } else {
+            if (MajorManager.updateDepartmentMajor(studentId, null, null)) {
+                System.out.println(" Student removed from " + deptMajor[0] + " department successfully!");
+            } else {
+                System.out.println(" Failed to remove student from department.");
+            }
+        }
     }
 
     public void updateStudentDepartment() {
         System.out.println("\n--- Update Student Department ---");
 
-        if (students.isEmpty()) {
-            System.out.println(" No students available!");
+        System.out.println(" Available Students:");
+        StudentInfoManager.displayAllStudents();
+
+        String studentId = "";
+        String[] studentInfo = null;
+        while (studentInfo == null) {
+            System.out.print("Enter Student ID to update department (or 'q' to cancel): ");
+            studentId = input.nextLine();
+            if (studentId.equalsIgnoreCase("q")) {
+                System.out.println("Cancelled.");
+                return;
+            }
+            studentInfo = StudentInfoManager.getStudentInfo(studentId);
+            if (studentInfo == null) {
+                System.out.println(" Student ID not found. Please try again.");
+            }
+        }
+
+        displayAllDepartments();
+        System.out.print("Choose new department (1-3): ");
+        int deptChoice = input.nextInt();
+        input.nextLine();
+
+        String department = "";
+        switch (deptChoice) {
+            case 1:
+                department = Department.GIC.getDisplayName();
+                break;
+            case 2:
+                department = Department.GIM.getDisplayName();
+                break;
+            case 3:
+                department = Department.GEE.getDisplayName();
+                break;
+            default:
+                System.out.println("Invalid choice!");
+                return;
+        }
+
+        // Get major selection without saving yet
+        String major = getMajorForDepartment(department);
+        if (major == null) {
+            System.out.println("Major selection cancelled.");
             return;
         }
 
-        System.out.println(" Available Students:");
-        for (int i = 0; i < students.size(); i++) {
-            System.out.println((i + 1) + ". " + students.get(i));
+        // Now update both department and major together
+        if (MajorManager.updateDepartmentMajor(studentId, department, major)) {
+            System.out.println(
+                    " Student department updated to " + department + " with major " + major + " successfully!");
+        } else {
+            System.out.println(" Failed to update student department.");
         }
-        System.out.print("Enter Student ID to update department: ");
-        String studentId = input.nextLine();
-
-        for (Student student : students) {
-            if (student.getStudentId().equals(studentId)) {
-                displayAllDepartments();
-                System.out.print("Choose new department (1-3): ");
-                int deptChoice = input.nextInt();
-                input.nextLine();
-
-                String department = "";
-                switch (deptChoice) {
-                    case 1:
-                        department = Department.GIC.getDisplayName();
-                        break;
-                    case 2:
-                        department = Department.GIM.getDisplayName();
-                        break;
-                    case 3:
-                        department = Department.GEE.getDisplayName();
-                        break;
-                    default:
-                        System.out.println("Invalid choice!");
-                        return;
-                }
-
-                student.setDepartment(department);
-                System.out.println(" Student department updated to " + department + " successfully!");
-                return;
-            }
-        }
-        System.out.println(" Student ID not found!");
     }
 }

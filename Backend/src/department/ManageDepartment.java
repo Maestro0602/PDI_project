@@ -1,6 +1,9 @@
 package Backend.src.department;
 
 import java.util.Scanner;
+import Backend.src.database.StudentInfoManager;
+import Backend.src.database.MajorManager;
+import Backend.src.major.Studentmajor;
 
 public class ManageDepartment {
 
@@ -10,17 +13,12 @@ public class ManageDepartment {
         TeacherManager teacherManager = new TeacherManager();
         boolean exit = false;
 
-        // Pre-load test students
-        studentManager.getStudents().add(new Student("001", "Alice Johnson"));
-        studentManager.getStudents().add(new Student("002", "Bob Smith", "GIC"));
-        studentManager.getStudents().add(new Student("003", "Carol Williams", "GIM"));
-        System.out.println("✓ Pre-loaded test students added!");
+        // Initialize database tables
+        StudentInfoManager.createStudentInfoTable();
+        System.out.println(" Student Info database initialized!");
 
-        // Pre-load test teachers
-        teacherManager.getTeachers().add(new Teacher("T001", "Dr. Ahmed Hassan", "GIC"));
-        teacherManager.getTeachers().add(new Teacher("T002", "Prof. Fatima Mohamed", "GIM"));
-        teacherManager.getTeachers().add(new Teacher("T003", "Eng. Omar Ali"));
-        System.out.println("✓ Pre-loaded test teachers added!");
+        MajorManager.createDepartmentMajorTable();
+        System.out.println(" Department/Major database initialized!");
 
         while (!exit) {
             System.out.println("\n========================================");
@@ -74,12 +72,31 @@ public class ManageDepartment {
             switch (choice) {
                 case 1:
                     studentManager.addStudentToDepartment();
+                    try {
+                        Thread.sleep(4000);
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+                    }
+                    Studentmajor.displayGICMajor();
                     break;
                 case 2:
                     studentManager.removeStudentFromDepartment();
+                    try {
+                        Thread.sleep(4000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Studentmajor.displayGIMMajor();
                     break;
                 case 3:
                     studentManager.updateStudentDepartment();
+                    try {
+                        Thread.sleep(4000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Studentmajor.displayGICMajor();
                     break;
                 case 4:
                     studentManager.viewStudentsByDepartment(input);

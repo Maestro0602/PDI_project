@@ -1,6 +1,9 @@
 import java.util.Scanner;
+
 public class MainPageTeacher {
-    public static void main(String[] args) {
+
+    // New method that accepts Scanner parameter
+    public static void showTeacherMenu(Scanner input) {
         boolean exit = false;
         System.out.println("=".repeat(30));
         System.out.println("Welcome To Teacher main page");
@@ -13,40 +16,41 @@ public class MainPageTeacher {
         System.out.println("6. Logout");
         System.out.println();
 
-        Scanner input = new Scanner(System.in);
-
         while (!exit) {
             System.out.print("Choose an option to proceed: ");
             int choice = input.nextInt();
+            input.nextLine(); // Consume the newline character
+
             switch (choice) {
                 case 1:
                     System.out.println("Managing Students information...");
-                    exit = true;
+                    // Add your student management logic here
                     break;
                 case 2:
                     System.out.println("Managing grades and GPA...");
-                    exit = true;
+                    // Add your grades management logic here
                     break;
                 case 3:
                     System.out.println("Managing Attendance...");
-                    exit = true;
+                    // Add your attendance management logic here
                     break;
                 case 4:
                     System.out.println("Generating Reports...");
-                    exit = true;
+                    // Add your reports generation logic here
                     break;
                 case 5:
                     System.out.println("Managing Department...");
-                    exit = true;
+                    // Add your department management logic here
                     break;
                 case 6:
                     System.out.println("Logging out...");
-                    Main.main(args);
+                    exit = true;
                     break;
                 default:
                     System.out.println("Invalid option. Please try again.");
                     break;
             }
         }
+        // DON'T close the scanner here since it's passed from outside
     }
 }
