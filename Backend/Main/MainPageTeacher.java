@@ -1,3 +1,5 @@
+package Backend.main;
+
 import java.util.Scanner;
 
 public class MainPageTeacher {
@@ -13,13 +15,14 @@ public class MainPageTeacher {
         System.out.println("3. Manage Attendance");
         System.out.println("4. Generate Reports");
         System.out.println("5. Manage Department (Head of Department only)");
-        System.out.println("6. Logout");
+        System.out.println("6. Searching Students");
+        System.out.println("7. Logout");
         System.out.println();
 
         while (!exit) {
             System.out.print("Choose an option to proceed: ");
             int choice = input.nextInt();
-            input.nextLine(); // Consume the newline character
+            input.nextLine(); 
 
             switch (choice) {
                 case 1:

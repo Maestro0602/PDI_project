@@ -5,6 +5,7 @@ import Backend.src.utils.PasswordUtils;
 import Backend.src.database.DatabaseManager;
 import Backend.src.database.MajorManager;
 import Backend.src.register.RegistrationManager;
+import Backend.main.MainPageTeacher;
 
 public class LoginApplication {
 
@@ -74,6 +75,7 @@ public class LoginApplication {
             // Check if username starts with "TEACHER" (case sensitive)
             if (loggedInUser.startsWith("TEACHER")) {
                 System.out.println("\nRedirecting to Teacher Page...");
+                 MainPageTeacher.showTeacherMenu(globalScanner);
             }
 
             return true;

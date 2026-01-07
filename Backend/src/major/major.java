@@ -3,7 +3,7 @@ package Backend.src.major;
 import java.util.Scanner;
 import Backend.src.database.MajorManager;
 
-public class Studentmajor {
+public class major {
 
     /**
      * Get major selection for GIC department - returns the major string without
@@ -37,6 +37,7 @@ public class Studentmajor {
                 return null;
         }
         return major;
+
     }
 
     /**

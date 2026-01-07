@@ -3,7 +3,7 @@ package Backend.src.department;
 import java.util.Scanner;
 import Backend.src.database.StudentInfoManager;
 import Backend.src.database.MajorManager;
-import Backend.src.major.Studentmajor;
+import Backend.src.major.major;
 
 public class StudentManager {
     private Scanner input = new Scanner(System.in);
@@ -38,8 +38,7 @@ public class StudentManager {
                 return;
         }
 
-        System.out.println("\n Students in " + selectedDepartment + " Department:");
-        StudentInfoManager.displayAllStudents();
+        StudentInfoManager.displayStudentsByDepartment(selectedDepartment);
     }
 
     public void addStudentToDepartment() {
@@ -60,6 +59,13 @@ public class StudentManager {
             studentInfo = StudentInfoManager.getStudentInfo(studentId);
             if (studentInfo == null) {
                 System.out.println(" Student ID not found. Please try again.");
+            } else {
+                // Check if student already has a department assigned
+                String[] existingDeptMajor = MajorManager.getDepartmentMajor(studentId);
+                if (existingDeptMajor != null) {
+                    System.out.println(" This id already have department! Try again.");
+                    studentInfo = null; // Reset to loop again
+                }
             }
         }
 
@@ -101,11 +107,11 @@ public class StudentManager {
 
     private String getMajorForDepartment(String department) {
         if (department.equals(Department.GIC.getDisplayName())) {
-            return Studentmajor.getGICMajor();
+            return major.getGICMajor();
         } else if (department.equals(Department.GIM.getDisplayName())) {
-            return Studentmajor.getGIMMajor();
+            return major.getGIMMajor();
         } else if (department.equals(Department.GEE.getDisplayName())) {
-            return Studentmajor.getGEEMajor();
+            return major.getGEEMajor();
         }
         return null;
     }
@@ -156,6 +162,7 @@ public class StudentManager {
             studentId = input.nextLine();
             if (studentId.equalsIgnoreCase("q")) {
                 System.out.println("Cancelled.");
+                ManageDepartment.manageStudents(input, null);
                 return;
             }
             studentInfo = StudentInfoManager.getStudentInfo(studentId);
