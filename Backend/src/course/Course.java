@@ -3,6 +3,89 @@ package Backend.src.course;
 import java.util.Scanner;
 
 public class Course {
+
+    /**
+     * Get 4 courses for a specific major
+     * 
+     * param major The major name
+     * return Array of 4 course names, or null if major not found
+     */
+    public static String[] getCoursesForMajor(String major) {
+        switch (major) {
+            // GIC Department Majors
+            case "Software Engineering":
+                return new String[] {
+                        "Programming Fundamentals",
+                        "Object-Oriented Programming",
+                        "Software Engineering Principles",
+                        "Database Design"
+                };
+            case "Cyber Security":
+                return new String[] {
+                        "Computer and Network Security",
+                        "Ethical Hacking Fundamentals",
+                        "Cyber Security Management",
+                        "Cryptography Basics"
+                };
+            case "Artificial Intelligence":
+                return new String[] {
+                        "Introduction to Artificial Intelligence",
+                        "Machine Learning",
+                        "Data Science Fundamentals",
+                        "Deep Learning"
+                };
+
+            // GIM Department Majors
+            case "Mechanical Engineering":
+                return new String[] {
+                        "Engineering Mechanics",
+                        "Thermodynamics",
+                        "Machine Design",
+                        "Fluid Mechanics"
+                };
+            case "Manufacturing Engineering":
+                return new String[] {
+                        "Manufacturing Processes",
+                        "Computer-Aided Manufacturing",
+                        "Production Planning and Control",
+                        "Industrial Equipment"
+                };
+            case "Industrial Engineering":
+                return new String[] {
+                        "Operations Research",
+                        "Quality Control and Assurance",
+                        "Supply Chain Management",
+                        "Work Study and Ergonomics"
+                };
+
+            // GEE Department Majors
+            case "Electrical Engineering":
+                return new String[] {
+                        "Electrical Circuits",
+                        "Electrical Machines",
+                        "Power Systems",
+                        "Power Electronics"
+                };
+            case "Electronics Engineering":
+                return new String[] {
+                        "Analog Electronics",
+                        "Digital Electronics",
+                        "Microprocessors and Microcontrollers Systems",
+                        "Embedded Systems"
+                };
+            case "Automation Engineering":
+                return new String[] {
+                        "Control Systems",
+                        "Industrial Automation",
+                        "PLC and SCADA Systems",
+                        "Robotics Fundamentals"
+                };
+
+            default:
+                return null;
+        }
+    }
+
     // For GIC Department
     public static String getSECourse() {
         System.out.println("\nSelect your Course in Software Engineering:");
@@ -63,11 +146,10 @@ public class Course {
                 return null;
         }
         return major;
-  
 
     }
 
-        public static String getAICourse() {
+    public static String getAICourse() {
         System.out.println("\nSelect your Course in Artificial Intelligence:");
         System.out.println("1. Introduction to Artificial Intelligence");
         System.out.println("2. Machine Learning");
@@ -98,7 +180,7 @@ public class Course {
     }
 
     // For GIM Department
-        public static String getMechanicCourse() {
+    public static String getMechanicCourse() {
         System.out.println("\nSelect your Course in Mechanical Engineering:");
         System.out.println("1. Engineering Mechanics");
         System.out.println("2. Thermodynamics");
@@ -128,7 +210,7 @@ public class Course {
         return major;
     }
 
-        public static String getManufactCourse() {
+    public static String getManufactCourse() {
         System.out.println("\nSelect your Course in Manufacturing Engineering:");
         System.out.println("1. Manufacturing Processes");
         System.out.println("2. Computer-Aided Manufacturing");
@@ -158,7 +240,7 @@ public class Course {
         return major;
     }
 
-        public static String getIndustCourse() {
+    public static String getIndustCourse() {
         System.out.println("\nSelect your Course in Industrial Engineering:");
         System.out.println("1. operations Research");
         System.out.println("2. Quality Control and Assurance");
@@ -189,7 +271,7 @@ public class Course {
     }
 
     // For GEE Department
-        public static String getAutomationCourse() {
+    public static String getAutomationCourse() {
         System.out.println("\nSelect your Course in Automation Engineering:");
         System.out.println("1. Control Systems");
         System.out.println("2. Industrial Automation");
@@ -219,8 +301,7 @@ public class Course {
         return major;
     }
 
-
-        public static String getElectricCourse() {
+    public static String getElectricCourse() {
         System.out.println("\nSelect your Course in Electrical Engineering:");
         System.out.println("1. Electrical Circuits");
         System.out.println("2. Electrical Machines");
@@ -250,7 +331,7 @@ public class Course {
         return major;
     }
 
-        public static String getElectronicCourse() {
+    public static String getElectronicCourse() {
         System.out.println("\nSelect your Course in Electronic Engineering:");
         System.out.println("1. Analog Electronics");
         System.out.println("2. Digital Electronics");
@@ -277,6 +358,6 @@ public class Course {
                 System.out.println("Invalid choice!");
                 return null;
         }
-        return major;  
+        return major;
     }
 }

@@ -1,6 +1,7 @@
 package Backend.src.database;
 
 import java.sql.*;
+import Backend.src.course.Course;
 
 public class MajorManager {
 
@@ -19,6 +20,10 @@ public class MajorManager {
                         "stuId VARCHAR(50) NOT NULL, " +
                         "department VARCHAR(50) NOT NULL, " +
                         "major VARCHAR(100) NOT NULL, " +
+                        "Course1 VARCHAR(100) NOT NULL, " +
+                        "Course2 VARCHAR(100) NOT NULL, " +
+                        "Course3 VARCHAR(100) NOT NULL, " +
+                        "Course4 VARCHAR(100) NOT NULL, " +
                         "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 
                 stmt = conn.createStatement();
@@ -33,7 +38,7 @@ public class MajorManager {
     }
 
     /**
-     * Save student department and major to database
+     * Save student department and major to database along with 4 courses
      */
     public static boolean saveDepartmentMajor(String stuId, String department, String major) {
         Connection conn = null;
@@ -42,13 +47,34 @@ public class MajorManager {
         try {
             conn = DatabaseManager.connectDB();
             if (conn != null) {
-                String sql = "INSERT INTO departmentMajor (stuId, department, major) VALUES (?, ?, ?)";
+                // Get 4 courses for the selected major
+                String[] courses = Course.getCoursesForMajor(major);
+
+                if (courses == null || courses.length < 4) {
+                    System.out.println("Error: Could not find 4 courses for major: " + major);
+                    return false;
+                }
+
+                String sql = "INSERT INTO departmentMajor (stuId, department, major, Course1, Course2, Course3, Course4) "
+                        +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, stuId);
                 pstmt.setString(2, department);
                 pstmt.setString(3, major);
+                pstmt.setString(4, courses[0]);
+                pstmt.setString(5, courses[1]);
+                pstmt.setString(6, courses[2]);
+                pstmt.setString(7, courses[3]);
 
                 int rowsAffected = pstmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("\nAssigned 4 courses to student:");
+                    System.out.println("  1. " + courses[0]);
+                    System.out.println("  2. " + courses[1]);
+                    System.out.println("  3. " + courses[2]);
+                    System.out.println("  4. " + courses[3]);
+                }
                 return rowsAffected > 0;
             }
         } catch (SQLException e) {
