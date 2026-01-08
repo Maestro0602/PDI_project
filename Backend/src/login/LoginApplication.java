@@ -4,11 +4,13 @@ import java.util.Scanner;
 import Backend.src.utils.PasswordUtils;
 import Backend.src.database.DatabaseManager;
 import Backend.src.register.RegistrationManager;
+import Backend.src.mainpage.MainPageStudent;
+import Backend.src.mainpage.MainPageTeacher;
 
 public class LoginApplication {
 
     private static Scanner globalScanner;
-    public static String loggedInUser; 
+    public static String loggedInUser;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -22,9 +24,6 @@ public class LoginApplication {
     public static void startLogin(Scanner scanner) {
         globalScanner = scanner;
 
-        // Initialize database
-        DatabaseManager.createUserTable();
-
         boolean loggedIn = false;
 
         while (!loggedIn) {
@@ -32,25 +31,25 @@ public class LoginApplication {
             System.out.println("          LOGIN SYSTEM");
             System.out.println("========================================");
 
-            System.out.print("Enter your name: ");
-            String name = globalScanner.nextLine();
+            System.out.print("Enter your username or email: ");  // CHANGED: More clear prompt
+            String usernameOrEmail = globalScanner.nextLine();
 
             System.out.print("Enter password: ");
             String password = PasswordUtils.readMaskedPassword();
 
             // Check if user exists
-            if (!DatabaseManager.checkUserExists(name)) {
+            if (!DatabaseManager.checkUserExists(usernameOrEmail)) {
                 System.out.println("\n✗ User not found!");
                 System.out.println("You need to register first.");
 
                 System.out.print("\nWould you like to register? (yes/no): ");
                 String register = globalScanner.nextLine().toLowerCase();
 
-                if (register.equals("yes") || register.equals("y") || register.equals("YES")) {
+                if (register.equals("yes") || register.equals("y")) {
                     RegistrationManager.handleRegistration(globalScanner);
                 }
             } else {
-                loggedIn = handleLogin(name, password);
+                loggedIn = handleLogin(usernameOrEmail, password);
             }
         }
 
@@ -68,6 +67,18 @@ public class LoginApplication {
             System.out.println("\n✓ Login successful!");
             System.out.println("Welcome, " + loggedInUser + "!");
             System.out.println("\nYou are now logged in to the system.");
+
+            // --- New: Redirect by role ---
+            String role = DatabaseManager.getUserRole(usernameOrEmail);
+
+            if ("STUDENT".equalsIgnoreCase(role)) {
+                MainPageStudent.main(new String[]{});
+            } else if ("TEACHER".equalsIgnoreCase(role)) {
+                MainPageTeacher.main(new String[]{});
+            } else {
+                System.out.println("Role not recognized. Cannot redirect to main page.");
+            }
+
             return true;
         } else {
             System.out.println("\n✗ Login failed! Invalid password.");
@@ -88,12 +99,20 @@ public class LoginApplication {
                         String newPassword = PasswordUtils.readMaskedPassword();
                         loggedInUser = DatabaseManager.verifyLogin(usernameOrEmail, newPassword);
                         if (loggedInUser != null) {
-                            System.out.println("\n Login successful!");
+                            System.out.println("\n✓ Login successful!");
                             System.out.println("Welcome, " + loggedInUser + "!");
                             System.out.println("\nYou are now logged in to the system.");
+
+                            String role = DatabaseManager.getUserRole(usernameOrEmail);
+
+                            if ("STUDENT".equalsIgnoreCase(role)) {
+                                MainPageStudent.main(new String[]{});
+                            } else if ("TEACHER".equalsIgnoreCase(role)) {
+                                MainPageTeacher.main(new String[]{});
+                            }
                             return true;
                         } else {
-                            System.out.println("\n Password is still incorrect!");
+                            System.out.println("\n✗ Password is still incorrect!");
                         }
                         break;
 
@@ -117,16 +136,22 @@ public class LoginApplication {
     /**
      * Handle forgot password functionality
      */
-    private static void handleForgotPassword(String name) {
+    private static void handleForgotPassword(String usernameOrEmail) {
         System.out.println("\n========================================");
         System.out.println("          PASSWORD RESET");
         System.out.println("========================================");
+
+        // First verify the email exists
+        if (!DatabaseManager.checkEmailExists(usernameOrEmail)) {
+            System.out.println("Email not found in system!");
+            return;
+        }
 
         System.out.print("Enter new password (min 8 characters): ");
         String newPassword = PasswordUtils.readMaskedPassword();
 
         if (newPassword.length() < 8) {
-            System.out.println(" Password must be at least 8 characters long!");
+            System.out.println("✗ Password must be at least 8 characters long!");
             return;
         }
 
@@ -134,18 +159,18 @@ public class LoginApplication {
         String confirmPassword = PasswordUtils.readMaskedPassword();
 
         if (!newPassword.equals(confirmPassword)) {
-            System.out.println(" Passwords don't match!");
+            System.out.println("✗ Passwords don't match!");
             return;
         }
 
         // Update password in database
-        boolean success = DatabaseManager.resetPassword(name, newPassword);
+        boolean success = DatabaseManager.resetPassword(usernameOrEmail, newPassword);
 
         if (success) {
-            System.out.println("\n Password reset successful!");
+            System.out.println("\n✓ Password reset successful!");
             System.out.println("You can now login with your new password.");
         } else {
-            System.out.println("\n Password reset failed. Please try again.");
+            System.out.println("\n✗ Password reset failed. Please try again.");
         }
     }
 }

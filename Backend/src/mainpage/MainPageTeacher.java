@@ -48,6 +48,7 @@ public class MainPageTeacher {
                     System.out.println("Invalid option. Please try again.");
                     break;
             }
+            input.close();
         }
     }
 }

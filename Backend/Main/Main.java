@@ -1,17 +1,12 @@
 import Backend.src.login.LoginApplication;
 import Backend.src.register.RegistrationManager;
-import Backend.src.database.DatabaseManager;
 import java.util.Scanner;
-import Backend.src.mainpage.MainPageStudent;
-import Backend.src.mainpage.MainPageTeacher;
 
 public class Main {
 
     protected static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-
-        DatabaseManager.createUserTable();
 
         boolean exit = false;
 
@@ -29,17 +24,18 @@ public class Main {
 
             switch (choice) {
                 case 1:
+                    // LOGIN and redirect based on role
                     LoginApplication.startLogin(scanner);
                     break;
                 case 2:
                     RegistrationManager.startRegistration(scanner);
                     break;
                 case 3:
-                    System.out.println("\n Thank you for using the system. Goodbye!");
+                    System.out.println("\nThank you for using the system. Goodbye!");
                     exit = true;
                     break;
                 default:
-                    System.out.println(" Invalid option. Please try again.");
+                    System.out.println("Invalid option. Please try again.");
             }
         }
 

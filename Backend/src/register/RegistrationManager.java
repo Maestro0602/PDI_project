@@ -54,6 +54,13 @@ public class RegistrationManager {
                 continue;
             }
 
+            // Get role_id for the user
+            int roleId = getRoleId(email, userType);
+            if (roleId == -1) {
+                System.out.println("\n Error: Could not retrieve user ID!");
+                continue;
+            }
+
             // Generate username based on email type and name
             String generatedUsername = generateUsername(userType, name);
 
@@ -75,8 +82,8 @@ public class RegistrationManager {
                 continue;
             }
 
-            // Register user in database
-            boolean success = DatabaseManager.registerUser(generatedUsername, email, newPassword);
+            // Register user in database with role and roleId
+            boolean success = DatabaseManager.registerUser(generatedUsername, email, newPassword, userType, roleId);
 
             if (success) {
                 System.out.println("\n Registration successful!");
@@ -109,30 +116,21 @@ public class RegistrationManager {
             java.util.List<String> teacherEmails = EmailManager.getTeacherEmails();
             java.util.List<String> ownerEmails = EmailManager.getOwnerEmails();
 
-            // // Print debug info
-            // System.out.println("\n[DEBUG] Looking for email: " + email);
-            // System.out.println("[DEBUG] Student emails found: " + studentEmails.size());
-            // System.out.println("[DEBUG] Teacher emails found: " + teacherEmails.size());
-            // System.out.println("[DEBUG] Owner emails found: " + ownerEmails.size());
-
             // Check with trimmed comparison (case-sensitive)
             for (String studentEmail : studentEmails) {
                 if (studentEmail != null && studentEmail.trim().equals(email)) {
-                    System.out.println("[DEBUG] Email matched in STUDENT table");
                     return "STUDENT";
                 }
             }
 
             for (String teacherEmail : teacherEmails) {
                 if (teacherEmail != null && teacherEmail.trim().equals(email)) {
-                    System.out.println("[DEBUG] Email matched in TEACHER table");
                     return "TEACHER";
                 }
             }
 
             for (String ownerEmail : ownerEmails) {
                 if (ownerEmail != null && ownerEmail.trim().equals(email)) {
-                    System.out.println("[DEBUG] Email matched in OWNER table");
                     return "OWNER";
                 }
             }
@@ -142,6 +140,24 @@ public class RegistrationManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Get the role_id for the user based on email and type
+     */
+    private static int getRoleId(String email, String userType) {
+        try {
+            if (userType.equals("STUDENT")) {
+                return EmailManager.getStudentIdByEmail(email);
+            } else if (userType.equals("TEACHER")) {
+                return EmailManager.getTeacherIdByEmail(email);
+            } else if (userType.equals("OWNER")) {
+                return EmailManager.getOwnerIdByEmail(email);
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR] Error getting role ID: " + e.getMessage());
+        }
+        return -1;
     }
 
     /**
