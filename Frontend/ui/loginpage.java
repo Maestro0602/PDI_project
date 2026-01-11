@@ -138,7 +138,7 @@ public class loginpage extends JFrame {
                 GradientPaint gp = new GradientPaint(
                         (float)(centerX + Math.cos(rotation) * 30),
                         (float)(centerY + Math.sin(rotation) * 30),
-                        PRIMARY_BLUE,
+                        TEXT_PRIMARY,
                         (float)(centerX - Math.cos(rotation) * 30),
                         (float)(centerY - Math.sin(rotation) * 30),
                         SECONDARY_BLUE
@@ -165,7 +165,7 @@ public class loginpage extends JFrame {
         return iconPanel;
     }
 
-    // Input group: just label + field
+    // Input group
     private JPanel createInputGroup(String labelText, JComponent field) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -245,7 +245,7 @@ public class loginpage extends JFrame {
         return field;
     }
 
-    // Styled button
+    // button
     private JButton createStyledButton() {
         JButton button = new JButton("LOGIN") {
             @Override
