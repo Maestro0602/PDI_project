@@ -15,7 +15,7 @@ public class Grades extends JFrame {
     private static final Color TEXT_PRIMARY = new Color(15, 23, 42);
     private static final Color TEXT_SECONDARY = new Color(100, 116, 139);
     private static final Color ACCENT_GREEN = new Color(34, 197, 94);
-    private static final Color ACCENT_ORANGE = new Color(249, 115, 22);
+    // private static final Color ACCENT_ORANGE = new Color(249, 115, 22); //not used yet
     private static final Color ACCENT_PURPLE = new Color(168, 85, 247);
     private static final Color ACCENT_RED = new Color(239, 68, 68);
     private static final Color ACCENT_BLUE = new Color(59, 130, 246);
@@ -203,7 +203,7 @@ public class Grades extends JFrame {
         panel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 15));
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        JLabel selectLabel = new JLabel("📚 Select Subject:");
+        JLabel selectLabel = new JLabel("Select Subject:");
         selectLabel.setFont(new Font("Segoe UI", Font.BOLD, 15));
         selectLabel.setForeground(TEXT_PRIMARY);
 
@@ -378,7 +378,7 @@ public class Grades extends JFrame {
         panel.setBorder(new EmptyBorder(15, 20, 15, 20));
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
 
-        JLabel subjectLabel = new JLabel("📖 " + selectedSubject);
+        JLabel subjectLabel = new JLabel(selectedSubject);
         subjectLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
         subjectLabel.setForeground(TEXT_PRIMARY);
 
@@ -628,7 +628,7 @@ public class Grades extends JFrame {
         summary.append("═══════════════════════════════════════\n\n");
 
         for (String student : students) {
-            summary.append("👤 ").append(student).append("\n");
+            summary.append(">>").append(student).append("\n");
             summary.append("─────────────────────────────────────\n");
             
             Map<String, Double> grades = studentGrades.get(student);
@@ -638,14 +638,14 @@ public class Grades extends JFrame {
                 double total = 0;
                 int count = 0;
                 for (Map.Entry<String, Double> entry : grades.entrySet()) {
-                    summary.append("   📖 ").append(entry.getKey()).append(": ")
+                    summary.append("*").append(entry.getKey()).append(": ")
                            .append(entry.getValue().intValue()).append("\n");
                     total += entry.getValue();
                     count++;
                 }
                 if (count > 0) {
                     summary.append("   ────────────────\n");
-                    summary.append("   📊 Average: ").append(String.format("%.1f", total / count)).append("\n");
+                    summary.append("   Average: ").append(String.format("%.1f", total / count)).append("\n");
                 }
             }
             summary.append("\n");
