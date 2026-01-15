@@ -302,8 +302,8 @@ public class TeacheinforManager {
                 int courseCount = TeacherInfoManager.getCourseCountForTeacher(teacherId);
 
                 // Save teacher info to database with courses and course count
-                boolean saved = TeacherInfoManager.updateTeacherInfo(teacherId, department, selectedMajor,
-                        coursesJoined, courseCount);
+                boolean saved = TeacherInfoManager.updateTeacherInfo(teacherId, department, selectedMajor
+                        );
                 if (saved) {
                     System.out.println("\n✓ Teacher information saved to teacherInfo table.");
                     System.out.println(

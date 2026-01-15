@@ -90,7 +90,7 @@ public class Searching {
                     System.out.println("  Invalid selection!");
                 }
             } catch (NumberFormatException e) {
-                System.out.println(" ✗ Please enter a valid number!");
+                System.out.println("  Please enter a valid number!");
             }
         }
     }
@@ -100,7 +100,7 @@ public class Searching {
         String searchID = scanner.nextLine().trim();
 
         if (searchID.isEmpty()) {
-            System.out.println(" ✗ ID cannot be empty!");
+            System.out.println(" ID cannot be empty!");
             return;
         }
 
