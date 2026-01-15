@@ -16,6 +16,7 @@ public class mainpageTeacher extends JFrame {
     private static final Color ACCENT_RED = new Color(239, 68, 68);
     private static final Color ACCENT_BLUE = new Color(59, 130, 246);
     private static final Color ACCENT_PINK = new Color(236, 72, 153);
+    private static final Color ACCENT_CYAN = new Color(63,240,199);
 
     public mainpageTeacher() {
         initComponent();
@@ -154,10 +155,9 @@ public class mainpageTeacher extends JFrame {
         return headerPanel;
     }
 
-    private JPanel createCardsContainer() {
+      private JPanel createCardsContainer() {
         JPanel container = new JPanel(new GridBagLayout());
         container.setOpaque(false);
-        container.setPreferredSize(new Dimension(800, 540));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -165,44 +165,89 @@ public class mainpageTeacher extends JFrame {
         gbc.weightx = 1;
         gbc.weighty = 1;
 
-        // Row 1
         gbc.gridx = 0; gbc.gridy = 0;
-        container.add(createOptionCard("Attendance", "Mark and manage student attendance", 
-                                       ACCENT_GREEN, "📋"), gbc);
+        container.add(createOptionCard(
+                "Attendance",
+                "Mark and manage student attendance",
+                ACCENT_GREEN,
+                "📋",
+                () -> {
+                    AttendancePage page = new AttendancePage();
+                    page.setVisible(true);
+                    setVisible(false);
+                }
+        ), gbc);
 
         gbc.gridx = 1;
-        container.add(createOptionCard("Assign Grades", "Grade assignments and exams", 
-                                       ACCENT_BLUE, "📝"), gbc);
+        container.add(createOptionCard(
+                "Assign Grades",
+                "Grade assignments and exams",
+                ACCENT_BLUE,
+                "📝",
+                () -> {
+                    Grades page = new Grades();
+                    page.setVisible(true);
+                    setVisible(false);
+                }),gbc);
 
         gbc.gridx = 2;
-        container.add(createOptionCard("View Students", "Browse student information", 
-                                       ACCENT_ORANGE, "👥"), gbc);
+        container.add(createOptionCard(
+                "View Students",
+                "Browse student information",
+                ACCENT_ORANGE,
+                "👥",
+                () -> JOptionPane.showMessageDialog(this, "View Students")
+        ), gbc);
 
-        // Row 2
         gbc.gridx = 0; gbc.gridy = 1;
-        container.add(createOptionCard("Manage Classes", "View and organize your classes", 
-                                       ACCENT_PURPLE, "📚"), gbc);
+        container.add(createOptionCard(
+                "Manage Classes",
+                "View and organize your classes",
+                ACCENT_PURPLE,
+                "📚",
+                () -> JOptionPane.showMessageDialog(this, "Manage Classes")
+        ), gbc);
 
         gbc.gridx = 1;
-        container.add(createOptionCard("Reports", "Generate academic reports", 
-                                       ACCENT_PINK, "📊"), gbc);
+        container.add(createOptionCard(
+                "Reports",
+                "Generate academic reports",
+                ACCENT_PINK,
+                "📊",
+                () -> JOptionPane.showMessageDialog(this, "Reports")
+        ), gbc);
 
         gbc.gridx = 2;
-        container.add(createOptionCard("Announcements", "Post class announcements", 
-                                       ACCENT_RED, "📢"), gbc);
-
-        // Row 3
-        gbc.gridx = 0; gbc.gridy = 2;
-        container.add(createOptionCard("Super Teacher Password", "Change administrator password", 
-                                       new Color(168, 85, 247), "🔐"), gbc);
+        container.add(createOptionCard(
+                "Announcements",
+                "Post class announcements",
+                ACCENT_RED,
+                "📢",
+                () -> {
+                    AnnouncementPage page = new AnnouncementPage();
+                    page.setVisible(true);
+                    setVisible(false);
+                }
+        ), gbc);
+        gbc.gridx = 1; gbc.gridy = 3;
+        container.add(createOptionCard(
+                "Super Teacher Password",
+                "Enter super teacher password",
+                ACCENT_CYAN,
+                "📋",
+                () -> {
+                    AttendancePage page = new AttendancePage();
+                    page.setVisible(true);
+                    setVisible(false);
+                }
+        ), gbc);
 
         return container;
     }
 
-    private JPanel createOptionCard(String title, String description, Color accentColor, String icon) {
+    private JPanel createOptionCard(String title, String description, Color accentColor, String icon, Runnable onClick) {
         JPanel card = new JPanel() {
             private boolean isHovered = false;
-            private float elevation = 0f;
 
             @Override
             protected void paintComponent(Graphics g) {
@@ -297,10 +342,10 @@ public class mainpageTeacher extends JFrame {
                 card.repaint();
             }
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                JOptionPane.showMessageDialog(card, "Opening " + title + "...", 
-                                            "Navigation", JOptionPane.INFORMATION_MESSAGE);
+                if (onClick != null) onClick.run();
             }
         });
+        
 
         return card;
     }
