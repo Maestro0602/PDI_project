@@ -24,10 +24,10 @@ public class StudentInfoManager {
 
                 stmt = conn.createStatement();
                 stmt.executeUpdate(sql);
-                System.out.println("studentInfo table created/verified successfully.");
+                // System.out.println("studentInfo table created/verified successfully.");
             }
         } catch (SQLException e) {
-            System.out.println("Error creating studentInfo table: " + e.getMessage());
+            // System.out.println("Error creating studentInfo table: " + e.getMessage());
         } finally {
             closeResources(conn, stmt, null);
         }
@@ -88,6 +88,60 @@ public class StudentInfoManager {
             }
         } catch (SQLException e) {
             System.out.println("Error getting student information: " + e.getMessage());
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return null;
+    }
+
+    /**
+     * Search students by name (partial match)
+     */
+    public static String[][] searchStudentByName(String studentName) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                String sql = "SELECT studentName, studentID, gender, year FROM studentInfo WHERE studentName LIKE ? ORDER BY studentName";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, "%" + studentName + "%");
+
+                rs = pstmt.executeQuery();
+
+                // First, count the results
+                int count = 0;
+                while (rs.next()) {
+                    count++;
+                }
+
+                if (count == 0) {
+                    return null;
+                }
+
+                // Reset ResultSet
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, "%" + studentName + "%");
+                rs = pstmt.executeQuery();
+
+                // Create array to store results
+                String[][] results = new String[count][4];
+                int index = 0;
+
+                while (rs.next()) {
+                    results[index][0] = rs.getString("studentName");
+                    results[index][1] = rs.getString("studentID");
+                    results[index][2] = rs.getString("gender");
+                    results[index][3] = rs.getString("year");
+                    index++;
+                }
+
+                return results;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error searching students: " + e.getMessage());
         } finally {
             closeResources(conn, pstmt, rs);
         }
@@ -268,6 +322,74 @@ public class StudentInfoManager {
         } finally {
             closeResources(conn, pstmt, rs);
         }
+    }
+
+    /**
+     * Get total count of students
+     */
+    public static int getTotalStudentCount() {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                String sql = "SELECT COUNT(*) as total FROM studentInfo";
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery(sql);
+
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error counting students: " + e.getMessage());
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return 0;
+    }
+
+    /**
+     * Get students by department and gender
+     * Returns array with [total, males, females]
+     */
+    public static int[] getStudentsByDepartmentAndGender(String department) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                // Join studentInfo with departmentMajor to get students with department
+                // assignment
+                String sql = "SELECT COUNT(*) as total, " +
+                        "SUM(CASE WHEN si.gender = 'M' THEN 1 ELSE 0 END) as males, " +
+                        "SUM(CASE WHEN si.gender = 'F' THEN 1 ELSE 0 END) as females " +
+                        "FROM studentInfo si " +
+                        "INNER JOIN departmentMajor dm ON si.studentID = dm.stuId " +
+                        "WHERE dm.department = ?";
+
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, department);
+                rs = pstmt.executeQuery();
+
+                if (rs.next()) {
+                    int total = rs.getInt("total");
+                    int males = rs.getInt("males") != 0 ? rs.getInt("males") : 0;
+                    int females = rs.getInt("females") != 0 ? rs.getInt("females") : 0;
+
+                    return new int[] { total, males, females };
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting students by department and gender: " + e.getMessage());
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return new int[] { 0, 0, 0 };
     }
 
     /**

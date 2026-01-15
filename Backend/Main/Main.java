@@ -1,7 +1,9 @@
 package Backend.main;
+
 import Backend.src.login.LoginApplication;
 import Backend.src.register.RegistrationManager;
 import Backend.src.database.DatabaseManager;
+import Backend.src.database.EmailManager;
 import java.util.Scanner;
 
 public class Main {
@@ -10,7 +12,10 @@ public class Main {
 
     public static void main(String[] args) {
 
+        // Initialize databases - create database first, then tables
+        DatabaseManager.DatabaseConnection.createDatabase();
         DatabaseManager.createUserTable();
+        EmailManager.AccountDatabaseConnection.initializeEmailTables();
 
         boolean exit = false;
 

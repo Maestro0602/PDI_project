@@ -5,7 +5,7 @@ import Backend.src.utils.PasswordUtils;
 import Backend.src.database.DatabaseManager;
 import Backend.src.database.MajorManager;
 import Backend.src.register.RegistrationManager;
-import Backend.main.MainPageTeacher;
+import Backend.main.*;
 
 public class LoginApplication {
 
@@ -24,7 +24,8 @@ public class LoginApplication {
     public static void startLogin(Scanner scanner) {
         globalScanner = scanner;
 
-        // Initialize database
+        // Initialize database - create database first, then tables
+        DatabaseManager.DatabaseConnection.createDatabase();
         DatabaseManager.createUserTable();
         MajorManager.createDepartmentMajorTable();
 
@@ -57,7 +58,7 @@ public class LoginApplication {
             }
         }
 
-        globalScanner.close();
+        // Don't close scanner here - let the caller handle it
     }
 
     /**
@@ -68,14 +69,22 @@ public class LoginApplication {
         loggedInUser = DatabaseManager.verifyLogin(usernameOrEmail, password);
 
         if (loggedInUser != null) {
-            System.out.println("\n✓ Login successful!");
+            System.out.println("\n Login successful!");
             System.out.println("Welcome, " + loggedInUser + "!");
             System.out.println("\nYou are now logged in to the system.");
 
             // Check if username starts with "TEACHER" (case sensitive)
             if (loggedInUser.startsWith("TEACHER")) {
                 System.out.println("\nRedirecting to Teacher Page...");
-                 MainPageTeacher.showTeacherMenu(globalScanner);
+                MainPageTeacher.main(null);
+            }
+            if (loggedInUser.startsWith("STUDENT")) {
+                System.out.println("\nRedirecting to Student Page...");
+                MainPageStudent.main(null);
+            }
+            if (loggedInUser.startsWith("OWNER")) {
+                System.out.println("\nRedirecting to Owner Page...");
+                MainPageOwner.main(null);
             }
 
             return true;

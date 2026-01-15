@@ -28,10 +28,11 @@ public class MajorManager {
 
                 stmt = conn.createStatement();
                 stmt.executeUpdate(sql);
-                System.out.println("departmentMajor table created/verified successfully.");
+                // System.out.println("departmentMajor table created/verified successfully.");
             }
         } catch (SQLException e) {
-            System.out.println("Error creating departmentMajor table: " + e.getMessage());
+            // System.out.println("Error creating departmentMajor table: " +
+            // e.getMessage());
         } finally {
             closeResources(conn, stmt, null);
         }
@@ -138,6 +139,41 @@ public class MajorManager {
             closeResources(conn, pstmt, null);
         }
         return false;
+    }
+
+    /**
+     * Get full department, major, and courses information for a student
+     */
+    public static String[] getFullDepartmentMajorCourse(String stuId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                String sql = "SELECT department, major, Course1, Course2, Course3, Course4 FROM departmentMajor WHERE stuId = ? LIMIT 1";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, stuId);
+
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return new String[] {
+                            rs.getString("department"),
+                            rs.getString("major"),
+                            rs.getString("Course1"),
+                            rs.getString("Course2"),
+                            rs.getString("Course3"),
+                            rs.getString("Course4")
+                    };
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting full department/major/course information: " + e.getMessage());
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return null;
     }
 
     /**

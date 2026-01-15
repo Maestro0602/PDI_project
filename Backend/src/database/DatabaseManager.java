@@ -11,6 +11,34 @@ public class DatabaseManager {
         private static final String DB_URL = "jdbc:mysql://localhost:3306/login_system";
         private static final String DB_USER = "myuser";
         private static final String DB_PASSWORD = "mypassword";
+        private static final String DB_ROOT_URL = "jdbc:mysql://localhost:3306";
+
+        /**
+         * Create login_system database if it doesn't exist
+         */
+        public static void createDatabase() {
+            Connection conn = null;
+            Statement stmt = null;
+
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                conn = DriverManager.getConnection(DB_ROOT_URL, DB_USER, DB_PASSWORD);
+                if (conn != null) {
+                    String sql = "CREATE DATABASE IF NOT EXISTS login_system";
+                    stmt = conn.createStatement();
+                    stmt.executeUpdate(sql);
+                    //System.out.println("✓ Login system database initialized successfully");
+                }
+            } catch (ClassNotFoundException e) {
+                System.out.println("MySQL JDBC Driver not found: " + e.getMessage());
+                e.printStackTrace();
+            } catch (SQLException e) {
+                System.out.println("Error creating database: " + e.getMessage());
+                e.printStackTrace();
+            } finally {
+                closeResources(conn, stmt, null);
+            }
+        }
 
         /**
          * Connect to MySQL database
@@ -41,16 +69,21 @@ public class DatabaseManager {
                 if (conn != null) {
                     String sql = "CREATE TABLE IF NOT EXISTS users (" +
                             "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                            "EmailName VARCHAR(50) UNIQUE NOT NULL, " +
+                            "UserID VARCHAR(30), " +
+                            "Name VARCHAR(50) UNIQUE NOT NULL, " +
                             "email VARCHAR(100) UNIQUE NOT NULL, " +
                             "password VARCHAR(100) NOT NULL, " +
                             "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
+                   // System.out.println("✓ Users table initialized successfully");
+                } else {
+                    System.out.println("✗ Failed to connect to login_system database");
                 }
             } catch (SQLException e) {
                 System.out.println("Error creating table: " + e.getMessage());
+                e.printStackTrace();
             } finally {
                 closeResources(conn, stmt, null);
             }
@@ -111,7 +144,7 @@ public class DatabaseManager {
             try {
                 conn = DatabaseConnection.connectDB();
                 if (conn != null) {
-                    String sql = "SELECT * FROM users WHERE EmailName = ? OR email = ?";
+                    String sql = "SELECT * FROM users WHERE Name = ? OR email = ?";
                     pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, usernameOrEmail);
                     pstmt.setString(2, usernameOrEmail);
@@ -155,6 +188,33 @@ public class DatabaseManager {
         }
 
         /**
+         * Check if UserID exists in database
+         */
+        public static boolean checkUserIDExists(String userID) {
+            Connection conn = null;
+            PreparedStatement pstmt = null;
+            ResultSet rs = null;
+
+            try {
+                conn = DatabaseConnection.connectDB();
+                if (conn != null) {
+                    String sql = "SELECT UserID FROM users WHERE UserID = ?";
+
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, userID);
+
+                    rs = pstmt.executeQuery();
+                    return rs.next();
+                }
+            } catch (SQLException e) {
+                System.out.println("Error checking UserID: " + e.getMessage());
+            } finally {
+                DatabaseConnection.closeResources(conn, pstmt, rs);
+            }
+            return false;
+        }
+
+        /**
          * Verify login credentials (username or email + password)
          * Returns username if successful, null if failed
          */
@@ -168,8 +228,8 @@ public class DatabaseManager {
                 if (conn != null) {
                     // Hash the input password for comparison
                     String hashedPassword = hashPassword(password);
-                    String sql = "SELECT EmailName FROM users WHERE " +
-                            "(EmailName = ? OR email = ?) AND password = ?";
+                    String sql = "SELECT Name FROM users WHERE " +
+                            "(Name = ? OR email = ?) AND password = ?";
 
                     pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, usernameOrEmail);
@@ -179,7 +239,7 @@ public class DatabaseManager {
                     rs = pstmt.executeQuery();
 
                     if (rs.next()) {
-                        return rs.getString("EmailName");
+                        return rs.getString("Name");
                     }
                 }
             } catch (SQLException e) {
@@ -201,8 +261,8 @@ public class DatabaseManager {
             try {
                 conn = DatabaseConnection.connectDB();
                 if (conn != null) {
-                    String sql = "SELECT id, EmailName, email, created_at FROM users " +
-                            "WHERE EmailName = ? OR email = ?";
+                    String sql = "SELECT id, Name, email, created_at FROM users " +
+                            "WHERE Name = ? OR email = ?";
 
                     pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, usernameOrEmail);
@@ -211,11 +271,11 @@ public class DatabaseManager {
                     rs = pstmt.executeQuery();
 
                     // if (rs.next()) {
-                    //     System.out.println("\nUser Details:");
-                    //     System.out.println("ID: " + rs.getInt("id"));
-                    //     System.out.println("Username: " + rs.getString("username"));
-                    //     System.out.println("Email: " + rs.getString("email"));
-                    //     System.out.println("Created: " + rs.getTimestamp("created_at"));
+                    // System.out.println("\nUser Details:");
+                    // System.out.println("ID: " + rs.getInt("id"));
+                    // System.out.println("Username: " + rs.getString("username"));
+                    // System.out.println("Email: " + rs.getString("email"));
+                    // System.out.println("Created: " + rs.getTimestamp("created_at"));
                     // }
                 }
             } catch (SQLException e) {
@@ -230,7 +290,7 @@ public class DatabaseManager {
     public static class RegistrationHandler {
 
         /**
-         * Register new user in database
+         * Register new user in database with ID from email account
          */
         public static boolean registerUser(String username, String email, String password) {
             Connection conn = null;
@@ -239,14 +299,18 @@ public class DatabaseManager {
             try {
                 conn = DatabaseConnection.connectDB();
                 if (conn != null) {
+                    // Get UserID from email using CheckEmail
+                    String userId = CheckEmail.getIdFromEmail(email);
+
                     // Hash the password before storing
                     String hashedPassword = ConditionChecker.hashPassword(password);
-                    String sql = "INSERT INTO users (EmailName, email, password) VALUES (?, ?, ?)";
+                    String sql = "INSERT INTO users (Name, email, password, UserID) VALUES (?, ?, ?, ?)";
 
                     pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, username);
                     pstmt.setString(2, email);
                     pstmt.setString(3, hashedPassword);
+                    pstmt.setString(4, userId);
 
                     int rowsAffected = pstmt.executeUpdate();
                     return rowsAffected > 0;

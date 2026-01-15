@@ -3,6 +3,7 @@ package Backend.src.department;
 import java.util.Scanner;
 import Backend.src.database.StudentInfoManager;
 import Backend.src.database.MajorManager;
+import Backend.src.database.DatabaseManager;
 import Backend.src.major.major;
 
 public class StudentManager {
@@ -56,6 +57,14 @@ public class StudentManager {
                 System.out.println("Cancelled.");
                 return;
             }
+
+            // Check if UserID exists in users table
+            boolean userIDExists = DatabaseManager.ConditionChecker.checkUserIDExists(studentId);
+            if (!userIDExists) {
+                System.out.println(" ✗ UserID not found in users table. Please try again.");
+                continue;
+            }
+
             studentInfo = StudentInfoManager.getStudentInfo(studentId);
             if (studentInfo == null) {
                 System.out.println(" Student ID not found. Please try again.");

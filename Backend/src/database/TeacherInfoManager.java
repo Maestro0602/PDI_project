@@ -19,40 +19,41 @@ public class TeacherInfoManager {
                         "teacherID VARCHAR(50) NOT NULL UNIQUE, " +
                         "department VARCHAR(100) NOT NULL, " +
                         "major VARCHAR(100) NOT NULL, " +
-                        "course VARCHAR(100) NOT NULL, " +
+                        "course_count INT DEFAULT 0, " +
                         "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 
                 stmt = conn.createStatement();
                 stmt.executeUpdate(sql);
-                System.out.println("teacherInfo table created/verified successfully.");
+               // System.out.println("teacherInfo table created/verified successfully.");
             }
         } catch (SQLException e) {
-            System.out.println("Error creating teacherInfo table: " + e.getMessage());
+           // System.out.println("Error creating teacherInfo table: " + e.getMessage());
         } finally {
             closeResources(conn, stmt, null);
         }
     }
 
     /**
-     * Save teacher information to database (CREATE)
+     * Save teacher information to database with course count (CREATE)
      */
-    public static boolean saveTeacherInfo(String teacherID, String department, String major, String course) {
+    public static boolean saveTeacherInfo(String teacherID, String department, String major, String course,
+            int courseCount) {
         Connection conn = null;
         PreparedStatement pstmt = null;
 
         try {
             conn = DatabaseManager.DatabaseConnection.connectDB();
             if (conn != null) {
-                String sql = "INSERT INTO teacherInfo (teacherID, department, major, course) VALUES (?, ?, ?, ?)";
+                String sql = "INSERT INTO teacherInfo (teacherID, department, major, course_count) VALUES (?, ?, ?, ?)";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, teacherID);
                 pstmt.setString(2, department);
                 pstmt.setString(3, major);
-                pstmt.setString(4, course);
+                pstmt.setInt(4, courseCount);
 
                 int rowsAffected = pstmt.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("✓ Teacher information saved successfully.");
+                    System.out.println(" Teacher information saved successfully.");
                     return true;
                 }
             }
@@ -62,6 +63,14 @@ public class TeacherInfoManager {
             closeResources(conn, pstmt, null);
         }
         return false;
+    }
+
+    /**
+     * Save teacher information to database (CREATE) - Overloaded for backward
+     * compatibility
+     */
+    public static boolean saveTeacherInfo(String teacherID, String department, String major, String course) {
+        return saveTeacherInfo(teacherID, department, major, course, 0);
     }
 
     /**
@@ -75,7 +84,7 @@ public class TeacherInfoManager {
         try {
             conn = DatabaseManager.DatabaseConnection.connectDB();
             if (conn != null) {
-                String sql = "SELECT teacherID, department, major, course FROM teacherInfo WHERE teacherID = ? LIMIT 1";
+                String sql = "SELECT teacherID, department, major, course_count FROM teacherInfo WHERE teacherID = ? LIMIT 1";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, teacherID);
 
@@ -85,7 +94,7 @@ public class TeacherInfoManager {
                             rs.getString("teacherID"),
                             rs.getString("department"),
                             rs.getString("major"),
-                            rs.getString("course")
+                            rs.getString("course_count")
                     };
                 }
             }
@@ -162,10 +171,44 @@ public class TeacherInfoManager {
 
                 int rowsAffected = pstmt.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("✓ Teacher information updated successfully.");
+                    System.out.println(" Teacher information updated successfully.");
                     return true;
                 } else {
-                    System.out.println("✗ Teacher with ID " + teacherID + " not found.");
+                    System.out.println(" Teacher with ID " + teacherID + " not found.");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error updating teacher information: " + e.getMessage());
+        } finally {
+            closeResources(conn, pstmt, null);
+        }
+        return false;
+    }
+
+    /**
+     * Update teacher information with course count (UPDATE)
+     */
+    public static boolean updateTeacherInfo(String teacherID, String department, String major, String course,
+            int courseCount) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = DatabaseManager.DatabaseConnection.connectDB();
+            if (conn != null) {
+                String sql = "UPDATE teacherInfo SET department = ?, major = ?, course_count = ? WHERE teacherID = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, department);
+                pstmt.setString(2, major);
+                pstmt.setInt(4, courseCount);
+                pstmt.setString(5, teacherID);
+
+                int rowsAffected = pstmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println(" Teacher information updated successfully.");
+                    return true;
+                } else {
+                    System.out.println(" Teacher with ID " + teacherID + " not found.");
                 }
             }
         } catch (SQLException e) {
@@ -192,10 +235,10 @@ public class TeacherInfoManager {
 
                 int rowsAffected = pstmt.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("✓ Teacher deleted successfully.");
+                    System.out.println(" Teacher deleted successfully.");
                     return true;
                 } else {
-                    System.out.println("✗ Teacher with ID " + teacherID + " not found.");
+                    System.out.println(" Teacher with ID " + teacherID + " not found.");
                 }
             }
         } catch (SQLException e) {
@@ -326,6 +369,34 @@ public class TeacherInfoManager {
         } finally {
             closeResources(conn, pstmt, rs);
         }
+    }
+
+    /**
+     * Get course count for a teacher from teacher_course table
+     */
+    public static int getCourseCountForTeacher(String teacherID) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.DatabaseConnection.connectDB();
+            if (conn != null) {
+                String sql = "SELECT COUNT(*) as course_count FROM teachercourse WHERE teacherID = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, teacherID);
+
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt("course_count");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting course count: " + e.getMessage());
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
     }
 
     /**
