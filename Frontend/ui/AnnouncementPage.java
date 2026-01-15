@@ -616,14 +616,14 @@ public class AnnouncementPage extends JFrame {
         actionPanel.setOpaque(false);
         actionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton commentBtn = createActionButton("💬 " + announcement.comments + " Comments", ACCENT_BLUE);
+        JButton commentBtn = createActionButton(announcement.comments + " Comments", ACCENT_BLUE);
         commentBtn.addActionListener(e -> {
             announcement.comments++;
             refreshFeed();
             JOptionPane.showMessageDialog(this, "Comment feature coming soon!", "Comments", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        JButton shareBtn = createActionButton("🔗 Share", ACCENT_GREEN);
+        JButton shareBtn = createActionButton("Share", ACCENT_GREEN);
         shareBtn.addActionListener(e -> 
             JOptionPane.showMessageDialog(this, "Link copied to clipboard!", "Share", JOptionPane.INFORMATION_MESSAGE));
 
