@@ -211,7 +211,7 @@ public class AnnouncementPage extends JFrame {
     }
 
     private JButton createNewPostButton() {
-        JButton button = new JButton("✏️ New Announcement") {
+        JButton button = new JButton("New Announcement") {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
@@ -274,7 +274,7 @@ public class AnnouncementPage extends JFrame {
         card.setBorder(new EmptyBorder(15, 15, 15, 15));
         card.setMaximumSize(new Dimension(220, 200));
 
-        JLabel statsTitle = new JLabel("📊 Statistics");
+        JLabel statsTitle = new JLabel(" Statistics");
         statsTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
         statsTitle.setForeground(TEXT_PRIMARY);
         statsTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -330,7 +330,7 @@ public class AnnouncementPage extends JFrame {
         card.setBorder(new EmptyBorder(15, 15, 15, 15));
         card.setMaximumSize(new Dimension(220, 250));
 
-        JLabel categoriesTitle = new JLabel("🏷️ Categories");
+        JLabel categoriesTitle = new JLabel("Categories");
         categoriesTitle.setFont(new Font("Segoe UI", Font.BOLD, 15));
         categoriesTitle.setForeground(TEXT_PRIMARY);
         categoriesTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
