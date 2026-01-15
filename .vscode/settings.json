@@ -2,24 +2,8 @@
     "java.project.sourcePaths": [
         "src"
     ],
-    "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "lib\\mysql-connector-j-8.2.0.jar"
-    ],
-    "sqltools.connections": [
-        {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "enableSsl": "Disabled"
-            },
-            "ssh": "Disabled",
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 3306,
-            "driver": "MySQL",
-            "name": "attendance",
-            "database": "school_db",
-            "username": "root"
-        }
+        "lib\\mysql-connector-j-8.2.0.jar",
+        "d:\\PDI_I2\\Attendance\\lib\\mysql-connector-j-8.2.0.jar"
     ]
 }

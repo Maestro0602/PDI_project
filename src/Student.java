@@ -1,34 +1,36 @@
 public class Student {
-    private int studentID;
+    private int studentId;
     private String studentName;
-    private String enrollmentDate;
 
-    public Student(int studentID, String studentName) {
-        this.studentID = studentID;
+    public Student(int studentId, String studentName)
+    {
+        this.studentId = studentId;
         this.studentName = studentName;
     }
 
-    public int getStudentID() {
-        return studentID;
+    public int getStudentId()
+    {
+        return studentId;
     }
 
-    public void setStudentID(int studentID) {
-        this.studentID = studentID;
+    public void setStudentId(int studentId)
+    {
+        this.studentId = studentId;
     }
 
-    public String getStudentName() {
+    public String getStudentName()
+    {
         return studentName;
     }
 
-    public void setStudentName(String studentName) {
+    public void setStudentName(String studentName)
+    {
         this.studentName = studentName;
     }
 
-    public String getEnrollmentDate() {
-        return enrollmentDate;
-    }
-
-    public void setEnrollmentDate(String enrollmentDate) {
-        this.enrollmentDate = enrollmentDate;
+    @Override
+    public String toString()
+    {
+        return "Student{id=" + studentId + ", name='" + studentName + "'}";
     }
 }

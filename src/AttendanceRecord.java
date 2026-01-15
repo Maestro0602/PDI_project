@@ -1,54 +1,68 @@
-public class AttendanceRecord {
-    private int attendanceID;
-    private int studentID;
-    private String attendanceDate;
+import java.time.LocalDate;
+
+public class AttendanceRecord
+{
+    private int attedanceId;
+    private int studentId;
+    private LocalDate attendanceDate;
     private int status;
     private double score;
 
-    public AttendanceRecord(int studentID, String attendanceDate, int status, int score) {
-        this.studentID = studentID;
+    public AttendanceRecord(int studentId, LocalDate attendanceDate, int status, double score)
+    {
+        this.studentId = studentId;
         this.attendanceDate = attendanceDate;
         this.status = status;
         this.score = score;
     }
 
-    public int getAttendanceID() {
-        return attendanceID;
+    public int getAttendanceId()
+    {
+        return attedanceId;
     }
 
-    public void setAttendanceID(int attendanceID) {
-        this.attendanceID = attendanceID;
+    public void setAttendanceId(int attedanceId)
+    {
+        this.attedanceId = attedanceId;
     }
 
-    public int getStudentID() {
-        return studentID;
+    public int getStudentId()
+    {
+        return studentId;
     }
 
-    public void setStudentID(int studentID) {
-        this.studentID = studentID;
+    public void setStudentId(int studentId)
+    {
+        this.studentId = studentId;
     }
 
-    public String getAttendanceDate() {
+    public LocalDate getAttendaceDate()
+    {
         return attendanceDate;
     }
 
-    public void setAttendanceDate(String attendanceDate) {
+    public void setAttendanceDate(LocalDate attendanceDate)
+    {
         this.attendanceDate = attendanceDate;
     }
 
-    public int getStatus() {
+    public int getStatus()
+    {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(int status)
+    {
         this.status = status;
     }
 
-    public double getScore() {
+    public double getScore()
+    {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(double score)
+    {
         this.score = score;
     }
 }
