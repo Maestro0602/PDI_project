@@ -1,8 +1,8 @@
 package Frontend.ui;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
 public class loginpage extends JFrame {
 
@@ -89,6 +89,22 @@ public class loginpage extends JFrame {
 
         // Login button
         JButton loginButton = createStyledButton();
+        loginButton.addActionListener(e -> {
+            String username = usernameField.getText().trim();
+            String password = new String(passwordField.getPassword());
+            
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, 
+                    "Please enter both username and password", 
+                    "Login Required", 
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            mainpageTeacher teacherPage = new mainpageTeacher();
+            teacherPage.setVisible(true);
+            dispose();
+        });
 
         // Footer
         JLabel footerLabel = new JLabel("Secure Login • Powered ITC");
@@ -198,6 +214,7 @@ public class loginpage extends JFrame {
         ));
 
         field.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
                 field.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(PRIMARY_BLUE, 2, true),
@@ -205,6 +222,7 @@ public class loginpage extends JFrame {
                 ));
             }
 
+            @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 field.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(new Color(203, 213, 225), 1, true),
@@ -227,6 +245,7 @@ public class loginpage extends JFrame {
         ));
 
         field.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
                 field.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(PRIMARY_BLUE, 2, true),
@@ -234,6 +253,7 @@ public class loginpage extends JFrame {
                 ));
             }
 
+            @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 field.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(new Color(203, 213, 225), 1, true),
@@ -284,7 +304,9 @@ public class loginpage extends JFrame {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) { button.repaint(); }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) { button.repaint(); }
         });
 

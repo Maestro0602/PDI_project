@@ -1,8 +1,8 @@
 package Frontend.ui;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
 public class mainpageTeacher extends JFrame {
 
@@ -155,7 +155,7 @@ public class mainpageTeacher extends JFrame {
         return headerPanel;
     }
 
-      private JPanel createCardsContainer() {
+    private JPanel createCardsContainer() {
         JPanel container = new JPanel(new GridBagLayout());
         container.setOpaque(false);
 
@@ -165,6 +165,7 @@ public class mainpageTeacher extends JFrame {
         gbc.weightx = 1;
         gbc.weighty = 1;
 
+        // Row 1
         gbc.gridx = 0; gbc.gridy = 0;
         container.add(createOptionCard(
                 "Attendance",
@@ -188,24 +189,33 @@ public class mainpageTeacher extends JFrame {
                     Grades page = new Grades();
                     page.setVisible(true);
                     setVisible(false);
-                }),gbc);
+                }), gbc);
 
         gbc.gridx = 2;
         container.add(createOptionCard(
-                "View Students",
-                "Browse student information",
+                "Manage Students",
+                "View, search and manage students by class, major & department",
                 ACCENT_ORANGE,
                 "👥",
-                () -> JOptionPane.showMessageDialog(this, "View Students")
+                () -> {
+                    ManageStudentsPage page = new ManageStudentsPage();
+                    page.setVisible(true);
+                    setVisible(false);
+                }
         ), gbc);
 
+        // Row 2
         gbc.gridx = 0; gbc.gridy = 1;
         container.add(createOptionCard(
-                "Manage Classes",
-                "View and organize your classes",
+                "Schedule",
+                "View calendar, add classes & track attendance",
                 ACCENT_PURPLE,
-                "📚",
-                () -> JOptionPane.showMessageDialog(this, "Manage Classes")
+                "📅",
+                () -> {
+                    SchedulePage page = new SchedulePage();
+                    page.setVisible(true);
+                    setVisible(false);
+                }
         ), gbc);
 
         gbc.gridx = 1;
@@ -225,18 +235,6 @@ public class mainpageTeacher extends JFrame {
                 "📢",
                 () -> {
                     AnnouncementPage page = new AnnouncementPage();
-                    page.setVisible(true);
-                    setVisible(false);
-                }
-        ), gbc);
-        gbc.gridx = 1; gbc.gridy = 3;
-        container.add(createOptionCard(
-                "Super Teacher Password",
-                "Enter super teacher password",
-                ACCENT_CYAN,
-                "📋",
-                () -> {
-                    AttendancePage page = new AttendancePage();
                     page.setVisible(true);
                     setVisible(false);
                 }
@@ -335,12 +333,15 @@ public class mainpageTeacher extends JFrame {
 
         // Hover effect with animation
         card.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 card.repaint();
             }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 card.repaint();
             }
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if (onClick != null) onClick.run();
             }
@@ -386,9 +387,17 @@ public class mainpageTeacher extends JFrame {
         button.setFocusPainted(false);
         button.setPreferredSize(new Dimension(100, 38));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        button.addActionListener(e -> {
+            loginpage login = new loginpage();
+            login.setVisible(true);
+            dispose();
+        });
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) { button.repaint(); }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) { button.repaint(); }
         });
 

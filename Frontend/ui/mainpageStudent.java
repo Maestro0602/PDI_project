@@ -1,8 +1,8 @@
 package Frontend.ui;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
 public class mainpageStudent extends JFrame {
 
@@ -164,32 +164,39 @@ public class mainpageStudent extends JFrame {
         gbc.weightx = 1;
         gbc.weighty = 1;
 
+        // Row 1
         gbc.gridx = 0; gbc.gridy = 0;
         container.add(createOptionCard("Attendance", "Use attendance code", 
-                                       ACCENT_GREEN, "📋"), gbc);
+                                       ACCENT_GREEN, "📋", () -> {
+            // Navigate to student attendance page
+            JOptionPane.showMessageDialog(container, "Opening Attendance...");
+        }), gbc);
 
         gbc.gridx = 1;
         container.add(createOptionCard("Grades", "Check exam grade", 
-                                       ACCENT_BLUE, "📝"), gbc);
+                                       ACCENT_BLUE, "📝", () -> {
+            JOptionPane.showMessageDialog(container, "Opening Grades...");
+        }), gbc);
 
+        // Row 2
         gbc.gridx = 0; gbc.gridy = 1;
-        container.add(createOptionCard("Schedule", "View your classes", 
-                                       ACCENT_PURPLE, "📚"), gbc);
-
-        gbc.gridx = 1;
-        container.add(createOptionCard("Assingment", "Check Assignment", 
-                                       ACCENT_PINK, "📊"), gbc);
+        container.add(createOptionCard("Schedule", "View calendar & track classes", 
+                                       ACCENT_PURPLE, "📅", () -> {
+            SchedulePage page = new SchedulePage(false);
+            page.setVisible(true);
+            setVisible(false);
+        }), gbc);
 
         gbc.gridx = 1;
         container.add(createOptionCard("Announcements", "Check class announcements", 
-                                       ACCENT_RED, "📢"), gbc);
-
-
+                                       ACCENT_RED, "📢", () -> {
+            JOptionPane.showMessageDialog(container, "Opening Announcements...");
+        }), gbc);
 
         return container;
     }
 
-    private JPanel createOptionCard(String title, String description, Color accentColor, String icon) {
+    private JPanel createOptionCard(String title, String description, Color accentColor, String icon, Runnable onClick) {
         JPanel card = new JPanel() {
             private boolean isHovered = false;
 
@@ -279,15 +286,17 @@ public class mainpageStudent extends JFrame {
 
         // Hover effect with animation
         card.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 card.repaint();
             }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 card.repaint();
             }
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                JOptionPane.showMessageDialog(card, "Opening " + title + "...", 
-                                            "Navigation", JOptionPane.INFORMATION_MESSAGE);
+                if (onClick != null) onClick.run();
             }
         });
 
@@ -330,9 +339,17 @@ public class mainpageStudent extends JFrame {
         button.setFocusPainted(false);
         button.setPreferredSize(new Dimension(100, 38));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        button.addActionListener(e -> {
+            loginpage login = new loginpage();
+            login.setVisible(true);
+            dispose();
+        });
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) { button.repaint(); }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) { button.repaint(); }
         });
 

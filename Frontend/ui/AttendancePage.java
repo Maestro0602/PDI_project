@@ -1,12 +1,12 @@
 package Frontend.ui;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class AttendancePage extends JFrame {
 
@@ -360,7 +360,9 @@ public class AttendancePage extends JFrame {
         button.setToolTipText(text);
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) { button.repaint(); }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) { button.repaint(); }
         });
 
@@ -443,7 +445,9 @@ public class AttendancePage extends JFrame {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) { button.repaint(); }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) { button.repaint(); }
         });
 
@@ -483,10 +487,16 @@ public class AttendancePage extends JFrame {
         button.setPreferredSize(new Dimension(100, 38));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        button.addActionListener(e ->dispose());
+        button.addActionListener(e -> {
+            mainpageTeacher teacherPage = new mainpageTeacher();
+            teacherPage.setVisible(true);
+            dispose();
+        });
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) { button.repaint(); }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) { button.repaint(); }
         });
 

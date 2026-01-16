@@ -3,6 +3,7 @@
         "."
     ],
     "java.project.referencedLibraries": [
-        "Backend\\lib\\mysql-connector-j-8.2.0.jar"
-    ]
+        "d:\\java project\\pull\\PDI_project\\Backend\\lib\\mysql-connector-j-8.2.0.jar"
+    ],
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m -Xlog:disable"
 }

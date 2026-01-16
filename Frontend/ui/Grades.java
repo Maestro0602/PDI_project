@@ -483,15 +483,16 @@ public class Grades extends JFrame {
         if (existingGrade != null) {
             field.setText(String.valueOf(existingGrade.intValue()));
         }
-
         // Add focus listener for visual feedback
         field.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
                 field.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(ACCENT_PURPLE, 2, true),
                     new EmptyBorder(7, 11, 7, 11)
                 ));
             }
+            @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 field.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(203, 213, 225), 1, true),
@@ -560,7 +561,9 @@ public class Grades extends JFrame {
         });
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) { button.repaint(); }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) { button.repaint(); }
         });
 
@@ -704,7 +707,9 @@ public class Grades extends JFrame {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) { button.repaint(); }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) { button.repaint(); }
         });
 
@@ -744,10 +749,16 @@ public class Grades extends JFrame {
         button.setPreferredSize(new Dimension(100, 38));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        button.addActionListener(e -> dispose());
+        button.addActionListener(e -> {
+            mainpageTeacher teacherPage = new mainpageTeacher();
+            teacherPage.setVisible(true);
+            dispose();
+        });
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) { button.repaint(); }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) { button.repaint(); }
         });
 
