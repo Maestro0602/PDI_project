@@ -3,7 +3,7 @@ package Backend.src.register;
 import java.util.Scanner;
 import Backend.src.utils.PasswordUtils;
 import Backend.src.database.DatabaseManager;
-import Backend.src.database.EmailManager;
+import Backend.src.database.CheckEmail;
 
 public class RegistrationManager {
 
@@ -11,6 +11,9 @@ public class RegistrationManager {
      * Public method to start registration process
      */
     public static void startRegistration(Scanner scanner) {
+        // Ensure login_system database and users table exist before registration
+        DatabaseManager.DatabaseConnection.createDatabase();
+        DatabaseManager.createUserTable();
         handleRegistration(scanner);
     }
 
@@ -103,45 +106,7 @@ public class RegistrationManager {
      * Returns "STUDENT", "TEACHER", "OWNER", or null if not found
      */
     private static String getEmailType(String email) {
-        try {
-            // Get emails from database
-            java.util.List<String> studentEmails = EmailManager.getStudentEmails();
-            java.util.List<String> teacherEmails = EmailManager.getTeacherEmails();
-            java.util.List<String> ownerEmails = EmailManager.getOwnerEmails();
-
-            // // Print debug info
-            // System.out.println("\n[DEBUG] Looking for email: " + email);
-            // System.out.println("[DEBUG] Student emails found: " + studentEmails.size());
-            // System.out.println("[DEBUG] Teacher emails found: " + teacherEmails.size());
-            // System.out.println("[DEBUG] Owner emails found: " + ownerEmails.size());
-
-            // Check with trimmed comparison (case-sensitive)
-            for (String studentEmail : studentEmails) {
-                if (studentEmail != null && studentEmail.trim().equals(email)) {
-                    System.out.println("[DEBUG] Email matched in STUDENT table");
-                    return "STUDENT";
-                }
-            }
-
-            for (String teacherEmail : teacherEmails) {
-                if (teacherEmail != null && teacherEmail.trim().equals(email)) {
-                    System.out.println("[DEBUG] Email matched in TEACHER table");
-                    return "TEACHER";
-                }
-            }
-
-            for (String ownerEmail : ownerEmails) {
-                if (ownerEmail != null && ownerEmail.trim().equals(email)) {
-                    System.out.println("[DEBUG] Email matched in OWNER table");
-                    return "OWNER";
-                }
-            }
-
-        } catch (Exception e) {
-            System.out.println("[ERROR] Exception in getEmailType: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
+        return CheckEmail.getEmailType(email);
     }
 
     /**
@@ -157,8 +122,8 @@ public class RegistrationManager {
     /**
      * Validate email format
      */
-    public static boolean isValidEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        return email.matches(emailRegex);
-    }
+    // public static boolean isValidEmail(String email) {
+    // String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+    // return email.matches(emailRegex);
+    // }
 }

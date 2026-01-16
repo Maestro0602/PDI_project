@@ -1,26 +1,30 @@
 package Backend.src.department;
 
 import java.util.Scanner;
+import Backend.src.database.StudentInfoManager;
+import Backend.src.database.MajorManager;
+import Backend.src.database.TeacherInfoManager;
+import Backend.src.major.major;
+import Backend.main.MainPageTeacher;
+import Backend.src.course.Course;
 
 public class ManageDepartment {
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         StudentManager studentManager = new StudentManager();
-        TeacherManager teacherManager = new TeacherManager();
+        TeacheinforManager teacherManager = new TeacheinforManager();
         boolean exit = false;
 
-        // Pre-load test students
-        studentManager.getStudents().add(new Student("001", "Alice Johnson"));
-        studentManager.getStudents().add(new Student("002", "Bob Smith", "GIC"));
-        studentManager.getStudents().add(new Student("003", "Carol Williams", "GIM"));
-        System.out.println("✓ Pre-loaded test students added!");
+        // Initialize database tables
+        StudentInfoManager.createStudentInfoTable();
+        //System.out.println(" Student Info database initialized!");
 
-        // Pre-load test teachers
-        teacherManager.getTeachers().add(new Teacher("T001", "Dr. Ahmed Hassan", "GIC"));
-        teacherManager.getTeachers().add(new Teacher("T002", "Prof. Fatima Mohamed", "GIM"));
-        teacherManager.getTeachers().add(new Teacher("T003", "Eng. Omar Ali"));
-        System.out.println("✓ Pre-loaded test teachers added!");
+        MajorManager.createDepartmentMajorTable();
+        System.out.println(" Department/Major database initialized!");
+
+        TeacherInfoManager.createTeacherInfoTable();
+        //System.out.println(" Teacher Info database initialized!");
 
         while (!exit) {
             System.out.println("\n========================================");
@@ -42,8 +46,8 @@ public class ManageDepartment {
                     manageTeachers(input, teacherManager);
                     break;
                 case 3:
-                    exit = true;
                     System.out.println(" Thank you! Goodbye!");
+                    MainPageTeacher.main(null);
                     break;
                 default:
                     System.out.println(" Invalid choice. Please try again.");
@@ -52,20 +56,19 @@ public class ManageDepartment {
         input.close();
     }
 
-    private static void manageStudents(Scanner input, StudentManager studentManager) {
+    public static void manageStudents(Scanner input, StudentManager studentManager) {
         boolean backToMain = false;
 
         while (!backToMain) {
             System.out.println("\n========================================");
             System.out.println("     STUDENT MANAGEMENT");
             System.out.println("========================================");
-            studentManager.displayAllDepartments();
             System.out.println("\n--- Operations ---");
             System.out.println("1. Add Student to Department");
             System.out.println("2. Remove Student from Department");
             System.out.println("3. Update Student Department");
             System.out.println("4. View All Students by Department");
-            System.out.println("5. Back to Main Menu");
+            System.out.println("5. Back to Menu");
             System.out.print("Enter your choice: ");
 
             int choice = input.nextInt();
@@ -74,12 +77,28 @@ public class ManageDepartment {
             switch (choice) {
                 case 1:
                     studentManager.addStudentToDepartment();
+                    try {
+                        Thread.sleep(4000);
+                    } catch (InterruptedException e) {
+
+                        e.printStackTrace();
+                    }
                     break;
                 case 2:
                     studentManager.removeStudentFromDepartment();
+                    try {
+                        Thread.sleep(4000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case 3:
                     studentManager.updateStudentDepartment();
+                    try {
+                        Thread.sleep(4000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case 4:
                     studentManager.viewStudentsByDepartment(input);
@@ -93,20 +112,21 @@ public class ManageDepartment {
         }
     }
 
-    private static void manageTeachers(Scanner input, TeacherManager teacherManager) {
+    private static void manageTeachers(Scanner input, TeacheinforManager teacherManager) {
         boolean backToMain = false;
 
         while (!backToMain) {
             System.out.println("\n========================================");
             System.out.println("     TEACHER MANAGEMENT");
             System.out.println("========================================");
-            teacherManager.displayAllDepartments();
             System.out.println("\n--- Operations ---");
-            System.out.println("1. Add Teacher to Department");
-            System.out.println("2. Remove Teacher from Department");
-            System.out.println("3. Update Teacher Department");
-            System.out.println("4. View All Teachers by Department");
-            System.out.println("5. Back to Main Menu");
+            System.out.println("1. View All Teachers");
+            System.out.println("2. View Teachers by Department");
+            System.out.println("3. View Teachers by Course");
+            System.out.println("4. Add New Teacher");
+            System.out.println("5. Update Teacher Information");
+            System.out.println("6. Delete Teacher");
+            System.out.println("7. Back to Menu");
             System.out.print("Enter your choice: ");
 
             int choice = input.nextInt();
@@ -114,23 +134,304 @@ public class ManageDepartment {
 
             switch (choice) {
                 case 1:
-                    teacherManager.addTeacherToDepartment();
+                    TeacherInfoManager.displayAllTeachers();
                     break;
                 case 2:
-                    teacherManager.removeTeacherFromDepartment();
+                    viewTeachersByDepartment(input);
                     break;
                 case 3:
-                    teacherManager.updateTeacherDepartment();
+                    viewTeachersByCourse(input);
                     break;
                 case 4:
-                    teacherManager.viewTeachersByDepartment(input);
+                    addNewTeacher(input);
                     break;
                 case 5:
+                    updateTeacher(input);
+                    break;
+                case 6:
+                    deleteTeacher(input);
+                    break;
+                case 7:
                     backToMain = true;
                     break;
                 default:
                     System.out.println(" Invalid choice. Please try again.");
             }
+        }
+    }
+
+    private static void viewTeachersByDepartment(Scanner input) {
+        System.out.println("\n========================================");
+        System.out.println("  VIEW TEACHERS BY DEPARTMENT");
+        System.out.println("========================================");
+        System.out.println("1. GIC (General IT & Computing)");
+        System.out.println("2. GIM (General IT & Management)");
+        System.out.println("3. GEE (General Electrical & Engineering)");
+        System.out.print("Enter department choice (1-3): ");
+
+        int choice = input.nextInt();
+        input.nextLine();
+
+        String department = "";
+        switch (choice) {
+            case 1:
+                department = "GIC";
+                break;
+            case 2:
+                department = "GIM";
+                break;
+            case 3:
+                department = "GEE";
+                break;
+            default:
+                System.out.println("Invalid choice!");
+                return;
+        }
+
+        TeacherInfoManager.displayTeachersByDepartment(department);
+    }
+
+    private static void viewTeachersByCourse(Scanner input) {
+        System.out.println("\n========================================");
+        System.out.println("   VIEW TEACHERS BY COURSE");
+        System.out.println("========================================");
+        System.out.print("Enter course name: ");
+        String course = input.nextLine();
+
+        TeacherInfoManager.displayTeachersByCourse(course);
+    }
+
+    private static void addNewTeacher(Scanner input) {
+        System.out.println("\n========================================");
+        System.out.println("        ADD NEW TEACHER");
+        System.out.println("========================================");
+
+        String teacherID = "";
+        boolean validID = false;
+
+        // Loop until user enters a valid teacher ID
+        while (!validID) {
+            System.out.print("Enter Teacher ID: ");
+            teacherID = input.nextLine();
+
+            if (teacherID.trim().isEmpty()) {
+                System.out.println(" Teacher ID cannot be empty! Try again.");
+                continue;
+            }
+            if (teacherID.length() < 8) {
+                System.out.println("Teacher ID must be at least 8 characters long! Try again.");
+                continue;
+            }
+            if (!teacherID.startsWith("T2024")) {
+                System.out.println("Teacher ID must start with 'T2024'! Try again.");
+                continue;
+            }
+
+            if (TeacherInfoManager.teacherExists(teacherID)) {
+                System.out.println(" Teacher with ID " + teacherID + " already exists! Try again.");
+                continue;
+            }
+
+            validID = true;
+            System.out.println("1. GIC (General IT & Computing)");
+            System.out.println("2. GIM (General IT & Management)");
+            System.out.println("3. GEE (General Electrical & Engineering)");
+            System.out.print("Enter department choice (1-3): ");
+
+            String department = "";
+            int deptChoice = input.nextInt();
+            input.nextLine();
+
+            switch (deptChoice) {
+                case 1:
+                    department = "GIC";
+                    break;
+                case 2:
+                    department = "GIM";
+                    break;
+                case 3:
+                    department = "GEE";
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+                    return;
+            }
+
+            String selectedMajor = "";
+            switch (deptChoice) {
+                case 1:
+                    selectedMajor = major.getGICMajor();
+                    break;
+                case 2:
+                    selectedMajor = major.getGIMMajor();
+                    break;
+                case 3:
+                    selectedMajor = major.getGEEMajor();
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+                    return;
+            }
+
+            if (selectedMajor == null) {
+                System.out.println("Major selection cancelled.");
+                return;
+            }
+
+            String major = selectedMajor;
+
+            String course = "";
+
+            // Get course based on selected major
+            if (major.equals("Software Engineering")) {
+                course = Course.getSECourse();
+            } else if (major.equals("Cyber Security")) {
+                course = Course.getCyberCourse();
+            } else if (major.equals("Artificial Intelligence")) {
+                course = Course.getAICourse();
+            } else if (major.equals("Mechanical Engineering")) {
+                course = Course.getMechanicCourse();
+            } else if (major.equals("Manufacturing Engineering")) {
+                course = Course.getManufactCourse();
+            } else if (major.equals("Industrial Engineering")) {
+                course = Course.getIndustCourse();
+            } else if (major.equals("Automation Engineering")) {
+                course = Course.getAutomationCourse();
+            } else if (major.equals("Electrical Engineering")) {
+                course = Course.getElectricCourse();
+            } else if (major.equals("Electronics Engineering")) {
+                course = Course.getElectronicCourse();
+            }
+
+            if (course == null) {
+                System.out.println("Course selection cancelled.");
+                return;
+            }
+
+            TeacherInfoManager.saveTeacherInfo(teacherID, department, major, course);
+            System.out.println(" Teacher added successfully!");
+        }
+    }
+
+    private static void updateTeacher(Scanner input) {
+        System.out.println("\n========================================");
+        System.out.println("     UPDATE TEACHER INFORMATION");
+        System.out.println("========================================");
+
+        String teacherID = "";
+        boolean validID = false;
+
+        // Loop until user enters a valid teacher ID
+        while (!validID) {
+            System.out.print("Enter Teacher ID to update: ");
+            teacherID = input.nextLine();
+
+            if (teacherID.trim().isEmpty()) {
+                System.out.println("✗ Teacher ID cannot be empty! Try again.");
+                continue;
+            }
+
+            if (!TeacherInfoManager.teacherExists(teacherID)) {
+                System.out.println(" Teacher with ID " + teacherID + " not found! Try again.");
+                continue;
+            }
+
+            validID = true;
+        }
+
+        // Select Department
+        System.out.println("\n--- Select Department ---");
+        System.out.println("1. GIC (General IT & Computing)");
+        System.out.println("2. GIM (General IT & Management)");
+        System.out.println("3. GEE (General Electrical & Engineering)");
+        System.out.print("Choose department (1-3): ");
+        int deptChoice = input.nextInt();
+        input.nextLine();
+
+        String department = "";
+        String selectedMajor = null;
+
+        switch (deptChoice) {
+            case 1:
+                department = "GIC";
+                selectedMajor = major.getGICMajor();
+                break;
+            case 2:
+                department = "GIM";
+                selectedMajor = major.getGIMMajor();
+                break;
+            case 3:
+                department = "GEE";
+                selectedMajor = major.getGEEMajor();
+                break;
+            default:
+                System.out.println("Invalid choice!");
+                return;
+        }
+
+        if (selectedMajor == null) {
+            System.out.println("Major selection cancelled.");
+            return;
+        }
+
+        // Select Course based on major
+        System.out.println("\n--- Select Course ---");
+        String selectedCourse = selectCourseForMajor(selectedMajor);
+
+        if (selectedCourse == null) {
+            System.out.println("Course selection cancelled.");
+            return;
+        }
+
+        // Save to database
+        TeacherInfoManager.updateTeacherInfo(teacherID, department, selectedMajor, selectedCourse);
+    }
+
+    private static String selectCourseForMajor(String major) {
+        switch (major) {
+            case "Software Engineering":
+                return Course.getSECourse();
+            case "Cyber Security":
+                return Course.getCyberCourse();
+            case "Artificial Intelligence":
+                return Course.getAICourse();
+            case "Mechanical Engineering":
+                return Course.getMechanicCourse();
+            case "Manufacturing Engineering":
+                return Course.getManufactCourse();
+            case "Industrial Engineering":
+                return Course.getIndustCourse();
+            case "Electrical Engineering":
+                return Course.getElectricCourse();
+            case "Electronics Engineering":
+                return Course.getElectronicCourse();
+            case "Automation Engineering":
+                return Course.getAutomationCourse();
+            default:
+                return null;
+        }
+    }
+
+    private static void deleteTeacher(Scanner input) {
+        System.out.println("\n========================================");
+        System.out.println("        DELETE TEACHER");
+        System.out.println("========================================");
+
+        System.out.print("Enter Teacher ID to delete: ");
+        String teacherID = input.nextLine();
+
+        if (!TeacherInfoManager.teacherExists(teacherID)) {
+            System.out.println(" Teacher with ID " + teacherID + " not found!");
+            return;
+        }
+
+        System.out.print("Are you sure you want to delete this teacher? (yes/no): ");
+        String confirm = input.nextLine();
+
+        if (confirm.equalsIgnoreCase("yes") || confirm.equalsIgnoreCase("y")) {
+            TeacherInfoManager.deleteTeacher(teacherID);
+        } else {
+            System.out.println("Delete cancelled.");
         }
     }
 }

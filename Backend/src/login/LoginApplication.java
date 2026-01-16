@@ -3,12 +3,14 @@ package Backend.src.login;
 import java.util.Scanner;
 import Backend.src.utils.PasswordUtils;
 import Backend.src.database.DatabaseManager;
+import Backend.src.database.MajorManager;
 import Backend.src.register.RegistrationManager;
+import Backend.main.*;
 
 public class LoginApplication {
 
     private static Scanner globalScanner;
-    public static String loggedInUser; 
+    public static String loggedInUser;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -22,8 +24,10 @@ public class LoginApplication {
     public static void startLogin(Scanner scanner) {
         globalScanner = scanner;
 
-        // Initialize database
+        // Initialize database - create database first, then tables
+        DatabaseManager.DatabaseConnection.createDatabase();
         DatabaseManager.createUserTable();
+        MajorManager.createDepartmentMajorTable();
 
         boolean loggedIn = false;
 
@@ -54,7 +58,7 @@ public class LoginApplication {
             }
         }
 
-        globalScanner.close();
+        // Don't close scanner here - let the caller handle it
     }
 
     /**
@@ -65,12 +69,27 @@ public class LoginApplication {
         loggedInUser = DatabaseManager.verifyLogin(usernameOrEmail, password);
 
         if (loggedInUser != null) {
-            System.out.println("\n✓ Login successful!");
+            System.out.println("\n Login successful!");
             System.out.println("Welcome, " + loggedInUser + "!");
             System.out.println("\nYou are now logged in to the system.");
+
+            // Check if username starts with "TEACHER" (case sensitive)
+            if (loggedInUser.startsWith("TEACHER")) {
+                System.out.println("\nRedirecting to Teacher Page...");
+                MainPageTeacher.main(null);
+            }
+            if (loggedInUser.startsWith("STUDENT")) {
+                System.out.println("\nRedirecting to Student Page...");
+                MainPageStudent.main(null);
+            }
+            if (loggedInUser.startsWith("OWNER")) {
+                System.out.println("\nRedirecting to Owner Page...");
+                MainPageOwner.main(null);
+            }
+
             return true;
         } else {
-            System.out.println("\n✗ Login failed! Invalid password.");
+            System.out.println("\n Login failed! Invalid password.");
 
             boolean resolved = false;
             while (!resolved) {
@@ -91,6 +110,12 @@ public class LoginApplication {
                             System.out.println("\n Login successful!");
                             System.out.println("Welcome, " + loggedInUser + "!");
                             System.out.println("\nYou are now logged in to the system.");
+
+                            // Check if username starts with "TEACHER" (case sensitive)
+                            if (loggedInUser.startsWith("TEACHER")) {
+                                System.out.println("\nRedirecting to Teacher Page...");
+                            }
+
                             return true;
                         } else {
                             System.out.println("\n Password is still incorrect!");

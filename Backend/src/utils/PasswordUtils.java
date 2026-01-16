@@ -33,7 +33,7 @@ public class PasswordUtils {
                         System.out.print("*");
                     }
                 }
-                System.out.println(); // New line after password entry
+                System.out.println(); 
                 return password.toString();
             } catch (Exception e) {
                 return "";
