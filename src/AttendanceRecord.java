@@ -1,68 +1,74 @@
 import java.time.LocalDate;
 
-public class AttendanceRecord
-{
-    private int attedanceId;
+public class AttendanceRecord {
+    private int attendanceId;
     private int studentId;
+    private String studentName;
     private LocalDate attendanceDate;
     private int status;
     private double score;
-
-    public AttendanceRecord(int studentId, LocalDate attendanceDate, int status, double score)
-    {
+    
+    public AttendanceRecord(int studentId, LocalDate attendanceDate, int status, double score) {
         this.studentId = studentId;
         this.attendanceDate = attendanceDate;
         this.status = status;
         this.score = score;
     }
-
-    public int getAttendanceId()
-    {
-        return attedanceId;
+    
+    public AttendanceRecord(int attendanceId, int studentId, String studentName, LocalDate attendanceDate, int status, double score) {
+        this.attendanceId = attendanceId;
+        this.studentId = studentId;
+        this.studentName = studentName;
+        this.attendanceDate = attendanceDate;
+        this.status = status;
+        this.score = score;
     }
-
-    public void setAttendanceId(int attedanceId)
-    {
-        this.attedanceId = attedanceId;
+    
+    public int getAttendanceId() {
+        return attendanceId;
     }
-
-    public int getStudentId()
-    {
+    
+    public void setAttendanceId(int attendanceId) {
+        this.attendanceId = attendanceId;
+    }
+    
+    public int getStudentId() {
         return studentId;
     }
-
-    public void setStudentId(int studentId)
-    {
+    
+    public void setStudentId(int studentId) {
         this.studentId = studentId;
     }
-
-    public LocalDate getAttendaceDate()
-    {
+    
+    public String getStudentName() {
+        return studentName;
+    }
+    
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+    
+    public LocalDate getAttendanceDate() {
         return attendanceDate;
     }
-
-    public void setAttendanceDate(LocalDate attendanceDate)
-    {
+    
+    public void setAttendanceDate(LocalDate attendanceDate) {
         this.attendanceDate = attendanceDate;
     }
-
-    public int getStatus()
-    {
+    
+    public int getStatus() {
         return status;
     }
-
-    public void setStatus(int status)
-    {
+    
+    public void setStatus(int status) {
         this.status = status;
     }
-
-    public double getScore()
-    {
+    
+    public double getScore() {
         return score;
     }
-
-    public void setScore(double score)
-    {
+    
+    public void setScore(double score) {
         this.score = score;
     }
 }
