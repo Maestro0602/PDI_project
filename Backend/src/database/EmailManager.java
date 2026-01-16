@@ -31,7 +31,7 @@ public class EmailManager {
                     String sql = "CREATE DATABASE IF NOT EXISTS account";
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
-                   // System.out.println("✓ Account database initialized successfully");
+                    // System.out.println(" Account database initialized successfully");
                 }
             } catch (ClassNotFoundException e) {
                 System.out.println("MySQL JDBC Driver not found: " + e.getMessage());
@@ -94,7 +94,7 @@ public class EmailManager {
 
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
-                    //System.out.println("✓ Student email table initialized successfully");
+                    // System.out.println(" Student email table initialized successfully");
                 } else {
                     System.out.println(" Failed to connect to account database");
                 }
@@ -123,7 +123,7 @@ public class EmailManager {
 
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
-                   // System.out.println("✓ Teacher email table initialized successfully");
+                    // System.out.println(" Teacher email table initialized successfully");
                 } else {
                     System.out.println(" Failed to connect to account database");
                 }
@@ -152,9 +152,9 @@ public class EmailManager {
 
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
-                    //System.out.println("✓ Owner email table initialized successfully");
+                    // System.out.println(" Owner email table initialized successfully");
                 } else {
-                    System.out.println("✗ Failed to connect to account database");
+                    System.out.println(" Failed to connect to account database");
                 }
             } catch (SQLException e) {
                 System.out.println("Error creating owner email table: " + e.getMessage());

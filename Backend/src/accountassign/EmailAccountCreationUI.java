@@ -34,7 +34,7 @@ public class EmailAccountCreationUI {
 
             int choice = getUserChoice();
             if (choice != 1) {
-                System.out.println("\n✓ Exiting application...");
+                System.out.println("\n Exiting application...");
                 MainPageOwner.main(new String[] {});
                 continueApp = false;
             }
@@ -85,12 +85,12 @@ public class EmailAccountCreationUI {
                 type = AccountType.OWNER;
                 break;
             case 4:
-                System.out.println("\n✓ Exiting application...");
+                System.out.println("\n Exiting application...");
                 MainPageOwner.main(new String[] {});
                 System.exit(0);
                 return;
             default:
-                System.out.println("✗ Invalid choice. Please try again.");
+                System.out.println(" Invalid choice. Please try again.");
                 return;
         }
 
@@ -99,7 +99,7 @@ public class EmailAccountCreationUI {
         String id = scanner.nextLine().trim();
 
         if (id.isEmpty()) {
-            System.out.println("✗ ID cannot be empty");
+            System.out.println(" ID cannot be empty");
             return;
         }
 
@@ -108,28 +108,28 @@ public class EmailAccountCreationUI {
         String email = scanner.nextLine().trim();
 
         if (email.isEmpty()) {
-            System.out.println("✗ Email cannot be empty");
+            System.out.println(" Email cannot be empty");
             return;
         }
 
         // Validate inputs
         if (!EmailManager.validateIdFormat(id, type)) {
-            System.out.println("✗ Invalid ID format. Must start with " + type.getPrefix());
+            System.out.println(" Invalid ID format. Must start with " + type.getPrefix());
             return;
         }
 
         if (!EmailManager.validateEmailFormat(email)) {
-            System.out.println("✗ Invalid email format. Use format: example@domain.com");
+            System.out.println(" Invalid email format. Use format: example@domain.com");
             return;
         }
 
         if (EmailManager.idExists(id, type)) {
-            System.out.println("✗ Error: This ID already has an email account");
+            System.out.println(" Error: This ID already has an email account");
             return;
         }
 
         if (EmailManager.emailExistsInSystem(email)) {
-            System.out.println("✗ Error: This email is already in use");
+            System.out.println(" Error: This email is already in use");
             return;
         }
 
@@ -139,14 +139,14 @@ public class EmailAccountCreationUI {
 
         if (success) {
             System.out.println("\n========================================");
-            System.out.println("✓ EMAIL ACCOUNT CREATED SUCCESSFULLY!");
+            System.out.println(" EMAIL ACCOUNT CREATED SUCCESSFULLY!");
             System.out.println("========================================");
             System.out.println("Account Type: " + getAccountTypeLabel(type));
             System.out.println("ID: " + id);
             System.out.println("Email: " + email);
             System.out.println("========================================\n");
         } else {
-            System.out.println("\n✗ Failed to create email account. Please try again.");
+            System.out.println("\n Failed to create email account. Please try again.");
         }
     }
 

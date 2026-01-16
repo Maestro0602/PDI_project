@@ -2,6 +2,8 @@ package Backend.main;
 
 import java.util.Scanner;
 
+import Backend.src.searching.Searching;
+
 public class MainPageStudent {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
@@ -25,9 +27,10 @@ public class MainPageStudent {
                     case 1:
                         System.out.println("Managing Students information...");
                         // Add your student management logic here
+                        Searching.main(new String[] {});
                         break;
                     case 2:
-                        System.out.println("Managing grades and GPA...");
+                        System.out.println("See Grades and GPA...");
                         // Add your grades management logic here
                         break;
                     case 3:
@@ -36,7 +39,8 @@ public class MainPageStudent {
                         break;
                     case 4:
                         System.out.println("Logging out...");
-                        exit = true;
+                         exit = true;
+                        Main.main(args);
                         break;
                     default:
                         System.out.println("Invalid option. Please try again.");

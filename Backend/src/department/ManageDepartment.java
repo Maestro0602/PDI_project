@@ -23,7 +23,7 @@ public class ManageDepartment {
         // System.out.println(" Student Info database initialized!");
 
         MajorManager.createDepartmentMajorTable();
-        System.out.println(" Department/Major database initialized!");
+        // System.out.println(" Department/Major database initialized!");
 
         CourseManager.createCourseTable();
         TeacherCourseManager.createTeacherCourseTable();
@@ -207,119 +207,119 @@ public class ManageDepartment {
     }
 
     private static void addNewTeacher(Scanner input) {
-    System.out.println("\n========================================");
-    System.out.println("        ADD NEW TEACHER");
-    System.out.println("========================================");
+        System.out.println("\n========================================");
+        System.out.println("        ADD NEW TEACHER");
+        System.out.println("========================================");
 
-    String teacherID = "";
-    boolean validID = false;
+        String teacherID = "";
+        boolean validID = false;
 
-    // Loop until user enters a valid teacher ID
-    while (!validID) {
-        System.out.print("Enter Teacher ID: ");
-        teacherID = input.nextLine();
+        // Loop until user enters a valid teacher ID
+        while (!validID) {
+            System.out.print("Enter Teacher ID: ");
+            teacherID = input.nextLine();
 
-        if (teacherID.trim().isEmpty()) {
-            System.out.println("✗ Teacher ID cannot be empty! Try again.");
-            continue;
-        }
-        if (teacherID.length() < 8) {
-            System.out.println("✗ Teacher ID must be at least 8 characters long! Try again.");
-            continue;
-        }
-        if (!teacherID.startsWith("T2024")) {
-            System.out.println("✗ Teacher ID must start with 'T2024'! Try again.");
-            continue;
-        }
-
-        // Check if teacher already exists
-        if (TeacherInfoManager.teacherExists(teacherID)) {
-            System.out.println("\n✓ Teacher with ID " + teacherID + " already exists!");
-            
-            // Get existing teacher info
-            String[] teacherInfo = TeacherInfoManager.getTeacherInfo(teacherID);
-            if (teacherInfo != null) {
-                System.out.println("Current Department: " + teacherInfo[1]);
-                System.out.println("Current Major: " + teacherInfo[2]);
-                
-                String majorName = teacherInfo[2];
-                
-                // Show current courses
-                System.out.println("\n--- Current Courses ---");
-                TeacherCourseManager.getTeacherCourses(teacherID);
-                
-                // Ask if they want to add more courses
-                System.out.print("\nDo you want to assign additional courses to this teacher? (yes/no): ");
-                String response = input.nextLine();
-                
-                if (response.equalsIgnoreCase("yes") || response.equalsIgnoreCase("y")) {
-                    assignMultipleCoursesToTeacher(input, teacherID, majorName);
-                } else {
-                    System.out.println("Operation cancelled.");
-                }
+            if (teacherID.trim().isEmpty()) {
+                System.out.println("Teacher ID cannot be empty! Try again.");
+                continue;
             }
-            return; // Exit the method after handling existing teacher
-        }
+            if (teacherID.length() < 8) {
+                System.out.println("Teacher ID must be at least 8 characters long! Try again.");
+                continue;
+            }
+            if (!teacherID.startsWith("T2024")) {
+                System.out.println("Teacher ID must start with 'T2024'! Try again.");
+                continue;
+            }
 
-        // If teacher doesn't exist, proceed with normal registration
-        validID = true;
-        System.out.println("\n✓ Teacher ID is available!");
-        
-        System.out.println("\n--- Select Department ---");
-        System.out.println("1. GIC (General IT & Computing)");
-        System.out.println("2. GIM (General IT & Management)");
-        System.out.println("3. GEE (General Electrical & Engineering)");
-        System.out.print("Enter department choice (1-3): ");
+            // Check if teacher already exists
+            if (TeacherInfoManager.teacherExists(teacherID)) {
+                System.out.println("\nTeacher with ID " + teacherID + " already exists!");
 
-        String department = "";
-        int deptChoice = input.nextInt();
-        input.nextLine();
+                // Get existing teacher info
+                String[] teacherInfo = TeacherInfoManager.getTeacherInfo(teacherID);
+                if (teacherInfo != null) {
+                    System.out.println("Current Department: " + teacherInfo[1]);
+                    System.out.println("Current Major: " + teacherInfo[2]);
 
-        switch (deptChoice) {
-            case 1:
-                department = "GIC";
-                break;
-            case 2:
-                department = "GIM";
-                break;
-            case 3:
-                department = "GEE";
-                break;
-            default:
-                System.out.println("✗ Invalid choice!");
+                    String majorName = teacherInfo[2];
+
+                    // Show current courses
+                    System.out.println("\n--- Current Courses ---");
+                    TeacherCourseManager.getTeacherCourses(teacherID);
+
+                    // Ask if they want to add more courses
+                    System.out.print("\nDo you want to assign additional courses to this teacher? (yes/no): ");
+                    String response = input.nextLine();
+
+                    if (response.equalsIgnoreCase("yes") || response.equalsIgnoreCase("y")) {
+                        assignMultipleCoursesToTeacher(input, teacherID, majorName);
+                    } else {
+                        System.out.println("Operation cancelled.");
+                    }
+                }
+                return; // Exit the method after handling existing teacher
+            }
+
+            // If teacher doesn't exist, proceed with normal registration
+            validID = true;
+            System.out.println("\n Teacher ID is available!");
+
+            System.out.println("\n--- Select Department ---");
+            System.out.println("1. GIC (General IT & Computing)");
+            System.out.println("2. GIM (General IT & Management)");
+            System.out.println("3. GEE (General Electrical & Engineering)");
+            System.out.print("Enter department choice (1-3): ");
+
+            String department = "";
+            int deptChoice = input.nextInt();
+            input.nextLine();
+
+            switch (deptChoice) {
+                case 1:
+                    department = "GIC";
+                    break;
+                case 2:
+                    department = "GIM";
+                    break;
+                case 3:
+                    department = "GEE";
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+                    return;
+            }
+
+            String selectedMajor = "";
+            switch (deptChoice) {
+                case 1:
+                    selectedMajor = major.getGICMajor();
+                    break;
+                case 2:
+                    selectedMajor = major.getGIMMajor();
+                    break;
+                case 3:
+                    selectedMajor = major.getGEEMajor();
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+                    return;
+            }
+
+            if (selectedMajor == null) {
+                System.out.println("Major selection cancelled.");
                 return;
+            }
+
+            String majorName = selectedMajor;
+
+            // Save teacher info
+            TeacherInfoManager.saveTeacherInfo(teacherID, department, majorName);
+
+            // Allow teacher to select multiple courses
+            assignMultipleCoursesToTeacher(input, teacherID, majorName);
         }
-
-        String selectedMajor = "";
-        switch (deptChoice) {
-            case 1:
-                selectedMajor = major.getGICMajor();
-                break;
-            case 2:
-                selectedMajor = major.getGIMMajor();
-                break;
-            case 3:
-                selectedMajor = major.getGEEMajor();
-                break;
-            default:
-                System.out.println("✗ Invalid choice!");
-                return;
-        }
-
-        if (selectedMajor == null) {
-            System.out.println("Major selection cancelled.");
-            return;
-        }
-
-        String majorName = selectedMajor;
-
-        // Save teacher info
-        TeacherInfoManager.saveTeacherInfo(teacherID, department, majorName);
-
-        // Allow teacher to select multiple courses
-        assignMultipleCoursesToTeacher(input, teacherID, majorName);
     }
-}
 
     private static void updateTeacher(Scanner input) {
         System.out.println("\n========================================");
@@ -335,7 +335,7 @@ public class ManageDepartment {
             teacherID = input.nextLine();
 
             if (teacherID.trim().isEmpty()) {
-                System.out.println("✗ Teacher ID cannot be empty! Try again.");
+                System.out.println("Teacher ID cannot be empty! Try again.");
                 continue;
             }
 
@@ -385,6 +385,9 @@ public class ManageDepartment {
         // Save to database
         TeacherInfoManager.updateTeacherInfo(teacherID, department, selectedMajor);
 
+        // Remove old courses from teacher_course table
+        TeacherCourseManager.deleteTeacherAllCourses(teacherID);
+
         // Allow teacher to select multiple courses
         assignMultipleCoursesToTeacher(input, teacherID, selectedMajor);
     }
@@ -414,9 +417,9 @@ public class ManageDepartment {
             // Assign course to teacher in teacher_course table
             boolean courseAssigned = TeacherCourseManager.addTeacherCourse(teacherID, courseId);
             if (courseAssigned) {
-                System.out.println(" ✓ Course assigned: " + selectedCourse + " (" + courseId + ")");
+                System.out.println(" Course assigned: " + selectedCourse + " (" + courseId + ")");
             } else {
-                System.out.println(" ✗ Failed to assign course.");
+                // System.out.println(" Failed to assign course.");
             }
 
             // Ask if teacher wants to teach another course
@@ -429,30 +432,30 @@ public class ManageDepartment {
         }
     }
 
-    private static String selectCourseForMajor(String major) {
-        switch (major) {
-            case "Software Engineering":
-                return Course.getSECourse();
-            case "Cyber Security":
-                return Course.getCyberCourse();
-            case "Artificial Intelligence":
-                return Course.getAICourse();
-            case "Mechanical Engineering":
-                return Course.getMechanicCourse();
-            case "Manufacturing Engineering":
-                return Course.getManufactCourse();
-            case "Industrial Engineering":
-                return Course.getIndustCourse();
-            case "Electrical Engineering":
-                return Course.getElectricCourse();
-            case "Electronics Engineering":
-                return Course.getElectronicCourse();
-            case "Automation Engineering":
-                return Course.getAutomationCourse();
-            default:
-                return null;
-        }
-    }
+    // private static String selectCourseForMajor(String major) {
+    // switch (major) {
+    // case "Software Engineering":
+    // return Course.getSECourse();
+    // case "Cyber Security":
+    // return Course.getCyberCourse();
+    // case "Artificial Intelligence":
+    // return Course.getAICourse();
+    // case "Mechanical Engineering":
+    // return Course.getMechanicCourse();
+    // case "Manufacturing Engineering":
+    // return Course.getManufactCourse();
+    // case "Industrial Engineering":
+    // return Course.getIndustCourse();
+    // case "Electrical Engineering":
+    // return Course.getElectricCourse();
+    // case "Electronics Engineering":
+    // return Course.getElectronicCourse();
+    // case "Automation Engineering":
+    // return Course.getAutomationCourse();
+    // default:
+    // return null;
+    // }
+    // }
 
     /**
      * Display available courses for a major and let teacher select one

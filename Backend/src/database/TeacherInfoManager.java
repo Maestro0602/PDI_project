@@ -51,7 +51,7 @@ public class TeacherInfoManager {
 
                 int rowsAffected = pstmt.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("✓ Teacher information saved successfully.");
+                    System.out.println("Teacher information saved successfully.");
                     return true;
                 }
             }
@@ -166,10 +166,10 @@ public class TeacherInfoManager {
 
                 int rowsAffected = pstmt.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("✓ Teacher information updated successfully.");
+                    System.out.println("Teacher information updated successfully.");
                     return true;
                 } else {
-                    System.out.println("✗ Teacher with ID " + teacherID + " not found.");
+                    System.out.println("Teacher with ID " + teacherID + " not found.");
                 }
             }
         } catch (SQLException e) {
@@ -196,10 +196,10 @@ public class TeacherInfoManager {
 
                 int rowsAffected = pstmt.executeUpdate();
                 if (rowsAffected > 0) {
-                    System.out.println("✓ Teacher deleted successfully.");
+                    System.out.println("Teacher deleted successfully.");
                     return true;
                 } else {
-                    System.out.println("✗ Teacher with ID " + teacherID + " not found.");
+                    System.out.println("Teacher with ID " + teacherID + " not found.");
                 }
             }
         } catch (SQLException e) {

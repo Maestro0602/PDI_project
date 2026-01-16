@@ -37,7 +37,7 @@ public class Searching {
                     searching = false;
                     break;
                 default:
-                    System.out.println("  Invalid choice. Please try again.");
+                    System.out.println("Invalid choice. Please try again.");
             }
         }
 
@@ -46,7 +46,7 @@ public class Searching {
 
     private static void searchByName(Scanner scanner) {
         System.out.print("\nEnter student name to search: ");
-        String searchName = scanner.nextLine().trim();
+        String searchName = scanner.nextLine().trim().toLowerCase();
 
         if (searchName.isEmpty()) {
             System.out.println(" Name cannot be empty!");

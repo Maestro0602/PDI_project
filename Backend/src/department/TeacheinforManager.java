@@ -86,7 +86,7 @@ public class TeacheinforManager {
             // Check if UserID exists in users table
             boolean userIDExists = DatabaseManager.ConditionChecker.checkUserIDExists(teacherId);
             if (!userIDExists) {
-                System.out.println(" ✗ UserID not found in users table. Please try again.");
+                System.out.println(" UserID not found in users table. Please try again.");
                 continue;
             }
 
@@ -302,19 +302,18 @@ public class TeacheinforManager {
                 int courseCount = TeacherInfoManager.getCourseCountForTeacher(teacherId);
 
                 // Save teacher info to database with courses and course count
-                boolean saved = TeacherInfoManager.updateTeacherInfo(teacherId, department, selectedMajor
-                        );
+                boolean saved = TeacherInfoManager.updateTeacherInfo(teacherId, department, selectedMajor);
                 if (saved) {
-                    System.out.println("\n✓ Teacher information saved to teacherInfo table.");
+                    System.out.println("\nTeacher information saved to teacherInfo table.");
                     System.out.println(
-                            "✓ Successfully assigned " + successCount + " course(s) to the teacher_course table.");
-                    System.out.println("\n✓ Successfully updated teacher with:");
+                            "Successfully assigned " + successCount + " course(s) to the teacher_course table.");
+                    System.out.println("\nSuccessfully updated teacher with:");
                     System.out.println("  - Department: " + department);
                     System.out.println("  - Major: " + selectedMajor);
                     System.out.println("  - Courses: " + coursesJoined);
                     System.out.println("  - Total Course Count: " + courseCount);
                 } else {
-                    System.out.println("\n✗ Failed to save teacher information to database.");
+                    System.out.println("\nFailed to save teacher information to database.");
                 }
             } else {
                 System.out.println("No courses selected or course IDs could not be found!");

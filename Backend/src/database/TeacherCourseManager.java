@@ -41,6 +41,12 @@ public class TeacherCourseManager {
         try {
             conn = DatabaseManager.connectDB();
             if (conn != null) {
+                // Check if course is already assigned to this teacher
+                if (isTeacherCourseAssigned(teacherID, courseId)) {
+                    System.out.println("Course already joined by this teacher.");
+                    return false;
+                }
+
                 String sql = "INSERT INTO teacher_course (teacherID, course_id) VALUES (?, ?)";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, teacherID);
@@ -58,6 +64,35 @@ public class TeacherCourseManager {
             System.out.println("Error adding teacher-course assignment: " + e.getMessage());
         } finally {
             closeResources(conn, pstmt, null);
+        }
+        return false;
+    }
+
+    /**
+     * CHECK - Verify if a teacher-course assignment already exists
+     */
+    private static boolean isTeacherCourseAssigned(String teacherID, String courseId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                String sql = "SELECT COUNT(*) as count FROM teacher_course WHERE teacherID = ? AND course_id = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, teacherID);
+                pstmt.setString(2, courseId);
+
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt("count") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checking teacher-course assignment: " + e.getMessage());
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return false;
     }
@@ -275,10 +310,6 @@ public class TeacherCourseManager {
                 rs = pstmt.executeQuery();
                 if (rs.next()) {
                     int count = rs.getInt("course_count");
-
-                    // Update course_count in teacherinfo table
-                    updateTeacherCourseCount(teacherID, count);
-
                     return count;
                 }
             }
@@ -288,31 +319,6 @@ public class TeacherCourseManager {
             closeResources(conn, pstmt, rs);
         }
         return 0;
-    }
-
-    /**
-     * UPDATE - Update course_count in teacherinfo table
-     */
-    private static void updateTeacherCourseCount(String teacherID, int courseCount) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-
-        try {
-            conn = DatabaseManager.connectDB();
-            if (conn != null) {
-                String sql = "UPDATE teacherinfo SET course_count = ? WHERE id = " +
-                        "(SELECT id FROM teacherinfo WHERE teacherID = ?)";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, courseCount);
-                pstmt.setString(2, teacherID);
-
-                pstmt.executeUpdate();
-            }
-        } catch (SQLException e) {
-            System.out.println("Error updating course count: " + e.getMessage());
-        } finally {
-            closeResources(conn, pstmt, null);
-        }
     }
 
     /**

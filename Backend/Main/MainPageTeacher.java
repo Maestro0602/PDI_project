@@ -1,7 +1,8 @@
 package Backend.main;
 
 import java.util.Scanner;
-import Backend.src.department.ManageDepartment;
+import Backend.src.department.LogHeadTeacher;
+import Backend.src.searching.Searching;
 import Backend.src.studentassign.studentassign;;
 
 public class MainPageTeacher {
@@ -48,10 +49,11 @@ public class MainPageTeacher {
                         break;
                     case 5:
                         System.out.println("Managing Department...");
-                        ManageDepartment.main(null);
+                        LogHeadTeacher.main(null);
                         break;
                     case 6:
                         System.out.println("Searching Students...");
+                        Searching.main(args);
                         break;
                     case 7:
                         System.out.println("Logging out...");

@@ -61,7 +61,7 @@ public class StudentManager {
             // Check if UserID exists in users table
             boolean userIDExists = DatabaseManager.ConditionChecker.checkUserIDExists(studentId);
             if (!userIDExists) {
-                System.out.println(" ✗ UserID not found in users table. Please try again.");
+                System.out.println(" UserID not found in users table. Please try again.");
                 continue;
             }
 
