@@ -53,7 +53,7 @@ public class AttendanceSystem {
         {
             ui.displayError(e.getMessage());
             e.printStackTrace();
-        } finally 
+        } finally
         {
             try
             {
