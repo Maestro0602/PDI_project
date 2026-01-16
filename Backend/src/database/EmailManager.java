@@ -170,10 +170,6 @@ public class EmailManager {
         public static void initializeEmailTables() {
             // Create account database first
             createAccountDatabase();
-
-            System.out.println("\n========================================");
-            System.out.println("   INITIALIZING EMAIL TABLES");
-            System.out.println("========================================");
             createStudentEmailTable();
             createTeacherEmailTable();
             createOwnerEmailTable();

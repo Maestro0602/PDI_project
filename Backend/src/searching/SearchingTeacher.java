@@ -2,10 +2,10 @@ package Backend.src.searching;
 
 import java.util.Scanner;
 import Backend.src.database.StudentInfoManager;
-import Backend.main.MainPageStudent;
+import Backend.main.MainPageTeacher;
 import Backend.src.database.MajorManager;
 
-public class Searching {
+public class SearchingTeacher {
 
     public static void main(String[] args) {
         // Create the studentInfo table if it doesn't exist
@@ -35,7 +35,7 @@ public class Searching {
                     break;
                 case "3":
                     System.out.println("\n Exiting search system. Goodbye!");
-                    MainPageStudent.main(null);
+                    MainPageTeacher.main(null);
                     searching = false;
                     break;
                 default:

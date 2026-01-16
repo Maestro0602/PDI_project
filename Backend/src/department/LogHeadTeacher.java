@@ -2,7 +2,6 @@ package Backend.src.department;
 
 import java.util.Scanner;
 
-import Backend.main.MainPageStudent;
 import Backend.main.MainPageTeacher;
 import Backend.src.database.HeadTeacherpw;
 

@@ -508,6 +508,7 @@ public class ManageDepartment {
 
         if (confirm.equalsIgnoreCase("yes") || confirm.equalsIgnoreCase("y")) {
             TeacherInfoManager.deleteTeacher(teacherID);
+            TeacherCourseManager.deleteTeacherAllCourses(teacherID);
         } else {
             System.out.println("Delete cancelled.");
         }

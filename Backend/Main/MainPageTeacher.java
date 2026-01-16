@@ -2,9 +2,10 @@ package Backend.main;
 
 import java.util.Scanner;
 import Backend.src.department.LogHeadTeacher;
-import Backend.src.searching.Searching;
-import Backend.src.studentassign.studentassign;;
-
+import Backend.src.searching.SearchingTeacher;
+import Backend.src.studentassign.studentassign;
+import Backend.src.grading.Grading;
+import Backend.src.report.GenerateStudentReport;
 public class MainPageTeacher {
 
     // New method that accepts Scanner parameter
@@ -16,7 +17,7 @@ public class MainPageTeacher {
             System.out.println("Welcome To Teacher main page");
             System.out.println("=".repeat(30));
             System.out.println("1. Manage Students information");
-            System.out.println("2. Manage grades and GPA");
+            System.out.println("2. Manage Score and Grades");
             System.out.println("3. Manage Attendance");
             System.out.println("4. Generate Reports");
             System.out.println("5. Manage Department (Head of Department only)");
@@ -37,6 +38,7 @@ public class MainPageTeacher {
                         break;
                     case 2:
                         System.out.println("Managing grades and GPA...");
+                        Grading.main(null);
                         // Add your grades management logic here
                         break;
                     case 3:
@@ -45,6 +47,7 @@ public class MainPageTeacher {
                         break;
                     case 4:
                         System.out.println("Generating Reports...");
+                        GenerateStudentReport.main(null);
                         // Add your reports generation logic here
                         break;
                     case 5:
@@ -53,7 +56,7 @@ public class MainPageTeacher {
                         break;
                     case 6:
                         System.out.println("Searching Students...");
-                        Searching.main(args);
+                        SearchingTeacher.main(args);
                         break;
                     case 7:
                         System.out.println("Logging out...");

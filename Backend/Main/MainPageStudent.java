@@ -14,8 +14,7 @@ public class MainPageStudent {
             System.out.println("=".repeat(30));
             System.out.println("1. Search Student Information");
             System.out.println("2. See Grades and GPA");
-            System.out.println("3. Add Comments to Teachers");
-            System.out.println("4. Logout");
+            System.out.println("3. Logout");
             System.out.println();
 
             while (!exit) {
@@ -34,10 +33,6 @@ public class MainPageStudent {
                         // Add your grades management logic here
                         break;
                     case 3:
-                        System.out.println("Add Comments to Teachers...");
-                        // Add your comments logic here
-                        break;
-                    case 4:
                         System.out.println("Logging out...");
                          exit = true;
                         Main.main(args);

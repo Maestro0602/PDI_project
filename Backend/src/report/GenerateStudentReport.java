@@ -1,13 +1,10 @@
-package Backend.src.studentDisplay;
+package Backend.src.report;
 
-import java.util.Scanner;
-
-import Backend.main.MainPageStudent;
 import Backend.src.database.Genreport;
-import Backend.src.report.Report;
+import java.util.Scanner;
+import Backend.main.MainPageTeacher;
+public class GenerateStudentReport {
 
-public class Displaystdgrade {
-    
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
@@ -15,7 +12,7 @@ public class Displaystdgrade {
         while (true) {
 
             System.out.println("=====================================");
-            System.out.println("        Grade Display SYSTEM         ");
+            System.out.println("        STUDENT REPORT SYSTEM         ");
             System.out.println("=====================================");
             System.out.print("Enter Student ID (0 to exit): ");
 
@@ -23,8 +20,8 @@ public class Displaystdgrade {
 
             // ✅ Exit condition
             if (studentID.equals("0")) {
-                System.out.println("\nExit to Student Main Page.");
-                MainPageStudent.main(null);
+                System.out.println("\nExit to Teacher Main Page.");
+                MainPageTeacher.main(null);
                 break;
             }
 

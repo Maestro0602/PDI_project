@@ -18,10 +18,6 @@ public class EmailAccountCreationUI {
         EmailManager.AccountDatabaseConnection.createAccountDatabase();
         EmailManager.AccountDatabaseConnection.initializeEmailTables();
 
-        System.out.println("\n========================================");
-        System.out.println("   EMAIL ACCOUNT CREATION SYSTEM");
-        System.out.println("========================================\n");
-
         boolean continueApp = true;
 
         while (continueApp) {
