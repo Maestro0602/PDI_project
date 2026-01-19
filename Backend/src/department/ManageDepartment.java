@@ -9,6 +9,7 @@ import Backend.src.database.TeacherCourseManager;
 import Backend.src.major.major;
 import Backend.main.MainPageTeacher;
 import Backend.src.course.Course;
+import Backend.src.database.DatabaseManager;
 
 public class ManageDepartment {
 
@@ -148,12 +149,15 @@ public class ManageDepartment {
                     viewTeachersByCourse(input);
                     break;
                 case 4:
+                    DatabaseManager.displayTemporaryTeacherUsers();
                     addNewTeacher(input);
                     break;
                 case 5:
+                    DatabaseManager.displayTemporaryTeacherUsers();
                     updateTeacher(input);
                     break;
                 case 6:
+                    DatabaseManager.displayTemporaryTeacherUsers();
                     deleteTeacher(input);
                     break;
                 case 7:
@@ -200,7 +204,17 @@ public class ManageDepartment {
         System.out.println("\n========================================");
         System.out.println("   VIEW TEACHERS BY COURSE");
         System.out.println("========================================");
-        System.out.print("Enter course name: ");
+        System.out.println("AI00(1-4)");
+        System.out.println("AU10(1-4)");
+        System.out.println("AI00(1-4)");
+        System.out.println("CS00(1-4)");
+        System.out.println("EE10(1-4)");
+        System.out.println("EL10(1-4)");
+        System.out.println("IE10(1-4)");
+        System.out.println("ME10(1-4)");
+        System.out.println("MF10(1-4)");
+        System.out.println("SE10(1-4)");
+        System.out.print("Enter course ID: ");
         String course = input.nextLine();
 
         TeacherInfoManager.displayTeachersByCourse(course);

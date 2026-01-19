@@ -27,7 +27,7 @@ public class DatabaseManager {
                     String sql = "CREATE DATABASE IF NOT EXISTS login_system";
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
-                    //System.out.println("✓ Login system database initialized successfully");
+                    // System.out.println("✓ Login system database initialized successfully");
                 }
             } catch (ClassNotFoundException e) {
                 System.out.println("MySQL JDBC Driver not found: " + e.getMessage());
@@ -77,7 +77,7 @@ public class DatabaseManager {
 
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
-                   // System.out.println("✓ Users table initialized successfully");
+                    // System.out.println("✓ Users table initialized successfully");
                 } else {
                     System.out.println("✗ Failed to connect to login_system database");
                 }
@@ -392,5 +392,57 @@ public class DatabaseManager {
 
     public static boolean resetPassword(String email, String newPassword) {
         return RegistrationHandler.resetPassword(email, newPassword);
+    }
+
+    /**
+     * Display temporary teacher entries from users table
+     * Shows entries where UserID starts with 'T2024', Name starts with 'TEACHER'
+     * and contains '_2026'
+     */
+    public static void displayTemporaryTeacherUsers() {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseConnection.connectDB();
+            if (conn != null) {
+                String sql = "SELECT UserID, Name FROM users WHERE " +
+                            "UserID LIKE 'T2024%' AND " +
+                            "Name LIKE 'TEACHER%' AND " +
+                            "Name LIKE '%\\\\_2026'";
+
+
+
+                pstmt = conn.prepareStatement(sql);
+                rs = pstmt.executeQuery();
+
+                System.out.println("\n" + "=".repeat(50));
+                System.out.println("TEMPORARY TEACHER ENTRIES IN USERS TABLE");
+                System.out.println("=".repeat(50));
+                System.out.printf("%-15s %-40s %n", "UserID", "Name");
+                System.out.println("-".repeat(50));
+
+                int count = 0;
+                while (rs.next()) {
+                    count++;
+                    System.out.printf("%-15s %-40s %n",
+                            rs.getString("UserID"),
+                            rs.getString("Name"));
+                }
+
+                System.out.println("=".repeat(50));
+                if (count == 0) {
+                    System.out.println("No temporary teacher entries found.");
+                } else {
+                    System.out.println("Total entries found: " + count);
+                }
+                System.out.println("=".repeat(50));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error displaying temporary teacher entries: " + e.getMessage());
+        } finally {
+            DatabaseConnection.closeResources(conn, pstmt, rs);
+        }
     }
 }

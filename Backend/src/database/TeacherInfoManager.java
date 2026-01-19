@@ -293,9 +293,9 @@ public class TeacherInfoManager {
 
     /**
      * Get teachers by course
-     * Now uses JOIN with teacher_course table
+     * Now uses JOIN with studentInfo, course, and teacherInfo tables
      */
-    public static void displayTeachersByCourse(String courseName) {
+    public static void displayTeachersByCourse(String courseID) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -303,40 +303,44 @@ public class TeacherInfoManager {
         try {
             conn = DatabaseManager.DatabaseConnection.connectDB();
             if (conn != null) {
-                String sql = "SELECT t.teacherID, t.department, t.major, c.course_name " +
-                        "FROM teacherInfo t " +
-                        "INNER JOIN teacher_course tc ON t.teacherID = tc.teacherID " +
-                        "INNER JOIN course c ON tc.course_id = c.course_id " +
-                        "WHERE c.course_name = ? " +
+                String sql = "SELECT DISTINCT " +
+                        "t.teacherID, t.department, t.major, " +
+                        "c.course_id, c.course_name " +
+                        "FROM teacher_course tc " +
+                        "JOIN teacherInfo t ON tc.teacherID = t.teacherID " +
+                        "JOIN course c ON tc.course_id = c.course_id " +
+                        "WHERE c.course_id = ? " +
                         "ORDER BY t.teacherID";
+
                 pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, courseName);
+                pstmt.setString(1, courseID);
 
                 rs = pstmt.executeQuery();
 
-                System.out.println("\n" + "=".repeat(100));
-                System.out.println("                    TEACHERS FOR " + courseName.toUpperCase() + " COURSE");
-                System.out.println("=".repeat(100));
-                System.out.printf("%-5s %-15s %-25s %-35s %-15s%n", "NO", "Teacher ID",
-                        "Department", "Major", "Course");
-                System.out.println("-".repeat(100));
+                System.out.println("\n" + "=".repeat(120));
+                System.out.println("                    TEACHERS FOR COURSE ID " + courseID);
+                System.out.println("=".repeat(120));
+                System.out.printf("%-5s %-15s %-25s %-35s %-12s %-25s%n", "NO", "Teacher ID",
+                        "Department", "Major", "Course ID", "Course Name");
+                System.out.println("-".repeat(120));
 
                 int count = 1;
                 boolean hasData = false;
                 while (rs.next()) {
                     hasData = true;
-                    System.out.printf("%-5d %-15s %-25s %-35s %-15s%n",
+                    System.out.printf("%-5d %-15s %-25s %-35s %-12s %-25s%n",
                             count++,
                             rs.getString("teacherID"),
                             rs.getString("department"),
                             rs.getString("major"),
-                            rs.getString("courseName"));
+                            rs.getString("course_id"),
+                            rs.getString("course_name"));
                 }
 
                 if (!hasData) {
-                    System.out.println("No teachers found for " + courseName + " course.");
+                    System.out.println("No teachers found for course ID " + courseID + ".");
                 }
-                System.out.println("=".repeat(100));
+                System.out.println("=".repeat(120));
             }
         } catch (SQLException e) {
             System.out.println("Error displaying teachers by course: " + e.getMessage());
