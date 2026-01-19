@@ -224,7 +224,11 @@ public class mainpageTeacher extends JFrame {
                 "Generate academic reports",
                 ACCENT_PINK,
                 "📊",
-                () -> JOptionPane.showMessageDialog(this, "Reports")
+                () -> {
+                    StudentReportPage page = new StudentReportPage();
+                    page.setVisible(true);
+                    setVisible(false);
+                }
         ), gbc);
 
         gbc.gridx = 2;
