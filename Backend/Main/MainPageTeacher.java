@@ -6,6 +6,7 @@ import Backend.src.searching.SearchingTeacher;
 import Backend.src.studentassign.studentassign;
 import Backend.src.grading.Grading;
 import Backend.src.report.GenerateStudentReport;
+import Backend.src.attendance.AttendanceUI;
 public class MainPageTeacher {
 
     // New method that accepts Scanner parameter
@@ -43,6 +44,7 @@ public class MainPageTeacher {
                         break;
                     case 3:
                         System.out.println("Managing Attendance...");
+                        AttendanceUI.main(null);
                         // Add your attendance management logic here
                         break;
                     case 4:
