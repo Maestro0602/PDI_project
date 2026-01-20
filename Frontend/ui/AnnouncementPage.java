@@ -35,24 +35,19 @@
             String category;
             
             Announcement(String author, String title, String content, String category) {
-                this.author = author;
-                this.title = title;
-                this.content = content;
+                this.author = author != null ? author : "";
+                this.title = title != null ? title : "";
+                this.content = content != null ? content : "";
                 this.timestamp = new Date();
-                this.upvotes = 0;
-                this.comments = 0;
-                this.category = category;
+                this.upvotes = 0; // Default to 0, never negative
+                this.comments = 0; // Default to 0, never negative
+                this.category = category != null ? category : "";
             }
         }
 
         public AnnouncementPage() {
-            // Sample data
-            announcements.add(new Announcement("Dr. Smith", "Quiz Next Week", 
-                "There will be a quiz on Chapter 5 next Wednesday. Please review the study materials posted on the course page.", "Academic"));
-            announcements.add(new Announcement("Prof. Johnson", "Lab Session Rescheduled", 
-                "Tomorrow's lab session has been moved to Friday at 2 PM. Please adjust your schedules accordingly.", "Schedule"));
-            announcements.add(new Announcement("Admin", "Campus Event: Tech Fest", 
-                "Join us for the annual Tech Fest on March 15th! Register now to showcase your projects and innovations.", "Event"));
+            // No fake data - announcements list starts empty
+            // Users can add announcements using the "New Post" button
             
             initComponent();
         }

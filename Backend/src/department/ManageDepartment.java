@@ -1,12 +1,12 @@
 package Backend.src.department;
 
-import java.util.Scanner;
-import Backend.src.database.StudentInfoManager;
-import Backend.src.database.MajorManager;
-import Backend.src.database.TeacherInfoManager;
-import Backend.src.major.major;
-import Backend.Main.MainPageTeacher;
 import Backend.src.course.Course;
+import Backend.src.database.MajorManager;
+import Backend.src.database.StudentInfoManager;
+import Backend.src.database.TeacherInfoManager;
+import Backend.src.mainpage.MainPageTeacher;
+import Backend.src.major.major;
+import java.util.Scanner;
 
 public class ManageDepartment {
 

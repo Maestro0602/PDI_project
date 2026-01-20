@@ -1,7 +1,7 @@
 package Backend.Main;
 
-import java.util.Scanner;
 import Backend.src.accountassign.EmailAccountCreationUI;
+import java.util.Scanner;
 
 public class MainPageOwner {
     public static void main(String[] args) {

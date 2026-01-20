@@ -1,13 +1,17 @@
 package Frontend.ui;
 
+import Backend.src.database.CourseManager;
 import java.awt.*;
+import java.awt.event.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.time.format.TextStyle;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 public class SchedulePage extends JFrame {
 
@@ -15,98 +19,128 @@ public class SchedulePage extends JFrame {
     private static final Color CARD_BG = Color.WHITE;
     private static final Color TEXT_PRIMARY = new Color(15, 23, 42);
     private static final Color TEXT_SECONDARY = new Color(100, 116, 139);
-    private static final Color ACCENT_GREEN = new Color(34, 197, 94);
-    private static final Color ACCENT_ORANGE = new Color(249, 115, 22);
+    private static final Color HEADER_BG = new Color(51, 65, 85);
+    private static final Color GRID_BORDER = new Color(203, 213, 225);
+    
+    // Course type colors (matching reference)
+    private static final Color LECTURE_COLOR = new Color(255, 236, 179);      // Light yellow
+    private static final Color TUTORIAL_COLOR = new Color(179, 229, 252);     // Light blue
+    private static final Color PRACTICAL_COLOR = new Color(255, 205, 178);    // Light orange
+    private static final Color LAB_COLOR = new Color(200, 230, 201);          // Light green
+    private static final Color SEMINAR_COLOR = new Color(225, 190, 231);      // Light purple
+    
     private static final Color ACCENT_PURPLE = new Color(168, 85, 247);
-    private static final Color ACCENT_RED = new Color(239, 68, 68);
     private static final Color ACCENT_BLUE = new Color(59, 130, 246);
-    private static final Color ACCENT_PINK = new Color(236, 72, 153);
-    private static final Color ACCENT_CYAN = new Color(63, 240, 199);
-    private static final Color ACCENT_YELLOW = new Color(234, 179, 8);
+    private static final Color ACCENT_GREEN = new Color(34, 197, 94);
 
-    // Class colors palette
-    private static final Color[] CLASS_COLORS = {
-        ACCENT_BLUE, ACCENT_GREEN, ACCENT_PURPLE, ACCENT_ORANGE, 
-        ACCENT_PINK, ACCENT_CYAN, ACCENT_YELLOW, ACCENT_RED
+    // Time slots matching the reference
+    private static final String[][] TIME_SLOTS = {
+        {"7:00 - 7:55", "7-8"},
+        {"8:00 - 8:55", "8-9"},
+        {"9:10 - 10:05", "9-10"},
+        {"10:10 - 11:05", "10-11"},
+        {"13:00 - 13:55", "13-14"},
+        {"14:00 - 14:55", "14-15"},
+        {"15:10 - 16:05", "15-16"},
+        {"16:10 - 17:05", "16-17"}
     };
 
-    // Schedule data structure
-    private Map<LocalDate, List<ScheduledClass>> scheduleData = new HashMap<>();
-    private Set<ScheduledClass> missedClasses = new HashSet<>();
-    private YearMonth currentMonth;
-    private JPanel calendarPanel;
-    private JPanel classListPanel;
+    // Days of week
+    private static final String[] DAYS = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+    // Schedule data: Week -> Day -> TimeSlot -> CourseInfo
+    private Map<String, Map<String, Map<String, CourseInfo>>> scheduleData = new HashMap<>();
+    private LocalDate currentWeekStart;
+    private JPanel mainContentPanel;
+    private JLabel weekLabel;
     
-    // Available classes
-    private List<ClassInfo> availableClasses = new ArrayList<>();
+    // Available courses
+    private List<String> availableCourses = new ArrayList<>();
     
-    // Navigation flag - true for teacher, false for student
+    // Navigation flag
     private boolean isTeacher;
+    
+    // View mode
+    private String viewMode = "week"; // "week" or "day"
+    private String selectedDay = null;
 
     public SchedulePage() {
-        this(true); // Default to teacher
+        this(true);
     }
     
     public SchedulePage(boolean isTeacher) {
         this.isTeacher = isTeacher;
-        currentMonth = YearMonth.now();
-        initSampleData();
+        currentWeekStart = getStartOfWeek(LocalDate.now());
+        loadDataFromDatabase();
         initComponent();
     }
 
-    private void initSampleData() {
-        // Sample classes
-        availableClasses.add(new ClassInfo("Mathematics", CLASS_COLORS[0]));
-        availableClasses.add(new ClassInfo("Physics", CLASS_COLORS[1]));
-        availableClasses.add(new ClassInfo("Computer Science", CLASS_COLORS[2]));
-        availableClasses.add(new ClassInfo("English", CLASS_COLORS[3]));
-        availableClasses.add(new ClassInfo("Chemistry", CLASS_COLORS[4]));
-
-        // Sample schedule
-        LocalDate today = LocalDate.now();
-        addClassToDate(today, new ScheduledClass("Mathematics", "09:00", "10:30", CLASS_COLORS[0]));
-        addClassToDate(today, new ScheduledClass("Physics", "11:00", "12:30", CLASS_COLORS[1]));
-        addClassToDate(today.plusDays(1), new ScheduledClass("Computer Science", "14:00", "15:30", CLASS_COLORS[2]));
-        addClassToDate(today.plusDays(2), new ScheduledClass("English", "10:00", "11:30", CLASS_COLORS[3]));
-        addClassToDate(today.plusDays(3), new ScheduledClass("Chemistry", "09:00", "10:30", CLASS_COLORS[4]));
+    private LocalDate getStartOfWeek(LocalDate date) {
+        return date.with(DayOfWeek.MONDAY);
     }
 
-    private void addClassToDate(LocalDate date, ScheduledClass scheduledClass) {
-        scheduleData.computeIfAbsent(date, k -> new ArrayList<>()).add(scheduledClass);
+    private void loadDataFromDatabase() {
+        String[] dbCourses = CourseManager.getAllCoursesArray();
+        if (dbCourses != null && dbCourses.length > 0) {
+            for (String course : dbCourses) {
+                if (course != null && !course.isEmpty()) {
+                    availableCourses.add(course);
+                }
+            }
+        }
+    }
+
+    private String getWeekKey(LocalDate weekStart) {
+        return weekStart.toString();
+    }
+
+    private void addCourseToSchedule(LocalDate weekStart, String day, String timeSlot, CourseInfo course) {
+        String weekKey = getWeekKey(weekStart);
+        scheduleData.computeIfAbsent(weekKey, k -> new HashMap<>())
+                    .computeIfAbsent(day, k -> new HashMap<>())
+                    .put(timeSlot, course);
+    }
+
+    private void removeCourseFromSchedule(LocalDate weekStart, String day, String timeSlot) {
+        String weekKey = getWeekKey(weekStart);
+        if (scheduleData.containsKey(weekKey) && scheduleData.get(weekKey).containsKey(day)) {
+            scheduleData.get(weekKey).get(day).remove(timeSlot);
+        }
+    }
+
+    private CourseInfo getCourse(LocalDate weekStart, String day, String timeSlot) {
+        String weekKey = getWeekKey(weekStart);
+        if (scheduleData.containsKey(weekKey) && 
+            scheduleData.get(weekKey).containsKey(day) &&
+            scheduleData.get(weekKey).get(day).containsKey(timeSlot)) {
+            return scheduleData.get(weekKey).get(day).get(timeSlot);
+        }
+        return null;
     }
 
     public void initComponent() {
-        setTitle("Class Schedule");
+        setTitle("Teaching Schedule");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(1000, 750);
+        setSize(1300, 850);
         setLocationRelativeTo(null);
 
-        // Main background panel
         JPanel backgroundPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                GradientPaint gp = new GradientPaint(
-                        0, 0, new Color(241, 245, 249),
-                        getWidth(), getHeight(), new Color(226, 232, 240)
-                );
+                GradientPaint gp = new GradientPaint(0, 0, new Color(241, 245, 249), getWidth(), getHeight(), new Color(226, 232, 240));
                 g2d.setPaint(gp);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
-
-                g2d.setColor(new Color(147, 197, 253, 25));
-                g2d.fillOval(-80, -80, 240, 240);
-                g2d.fillOval(getWidth() - 160, getHeight() - 160, 240, 240);
             }
         };
 
         JPanel headerPanel = createHeaderPanel();
-        JPanel contentPanel = createContentPanel();
+        mainContentPanel = createWeekViewPanel();
 
         backgroundPanel.add(headerPanel, BorderLayout.NORTH);
-        backgroundPanel.add(contentPanel, BorderLayout.CENTER);
+        backgroundPanel.add(mainContentPanel, BorderLayout.CENTER);
 
         setContentPane(backgroundPanel);
     }
@@ -118,27 +152,19 @@ public class SchedulePage extends JFrame {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
                 g2d.setColor(new Color(0, 0, 0, 15));
                 g2d.fillRoundRect(4, 4, getWidth() - 8, getHeight() - 4, 20, 20);
-
                 g2d.setColor(CARD_BG);
                 g2d.fillRoundRect(0, 0, getWidth() - 4, getHeight(), 20, 20);
-
-                GradientPaint purpleGradient = new GradientPaint(
-                    0, 0, new Color(168, 85, 247, 200),
-                    0, getHeight(), new Color(192, 132, 252, 150)
-                );
-                g2d.setPaint(purpleGradient);
+                GradientPaint gradient = new GradientPaint(0, 0, new Color(168, 85, 247, 200), 0, getHeight(), new Color(192, 132, 252, 150));
+                g2d.setPaint(gradient);
                 g2d.fillRoundRect(0, 0, 6, getHeight(), 20, 20);
-
-                g2d.setColor(new Color(168, 85, 247, 8));
-                g2d.fillRoundRect(0, 0, getWidth() - 4, getHeight(), 20, 20);
             }
         };
         headerPanel.setOpaque(false);
-        headerPanel.setBorder(new EmptyBorder(25, 35, 25, 35));
+        headerPanel.setBorder(new EmptyBorder(20, 30, 20, 30));
 
+        // Left - Title
         JPanel titleContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         titleContainer.setOpaque(false);
 
@@ -148,496 +174,676 @@ public class SchedulePage extends JFrame {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                GradientPaint gradient = new GradientPaint(
-                    0, 0, ACCENT_PURPLE,
-                    getWidth(), getHeight(), new Color(126, 34, 206)
-                );
+                GradientPaint gradient = new GradientPaint(0, 0, ACCENT_PURPLE, getWidth(), getHeight(), new Color(126, 34, 206));
                 g2d.setPaint(gradient);
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16);
             }
         };
         iconBadge.setOpaque(false);
-        iconBadge.setPreferredSize(new Dimension(55, 55));
+        iconBadge.setPreferredSize(new Dimension(50, 50));
         iconBadge.setLayout(new GridBagLayout());
-
         JLabel iconLabel = new JLabel("📅");
-        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 28));
+        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
         iconBadge.add(iconLabel);
 
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
         titlePanel.setOpaque(false);
 
-        JLabel titleLabel = new JLabel("Class Schedule");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        JLabel titleLabel = new JLabel("Teaching Schedule");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 26));
         titleLabel.setForeground(TEXT_PRIMARY);
 
-        JLabel subtitleLabel = new JLabel("View and manage your class schedule");
-        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        JLabel subtitleLabel = new JLabel("Semester 1 • Week View");
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         subtitleLabel.setForeground(TEXT_SECONDARY);
 
         titlePanel.add(titleLabel);
-        titlePanel.add(Box.createRigidArea(new Dimension(0, 4)));
+        titlePanel.add(Box.createRigidArea(new Dimension(0, 2)));
         titlePanel.add(subtitleLabel);
 
         titleContainer.add(iconBadge);
         titleContainer.add(titlePanel);
 
+        // Center - Week navigation
+        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        navPanel.setOpaque(false);
+
+        JButton prevBtn = createNavButton("<", () -> {
+            if (viewMode.equals("week")) {
+                currentWeekStart = currentWeekStart.minusWeeks(1);
+            } else {
+                currentWeekStart = currentWeekStart.minusDays(1);
+            }
+            refreshView();
+        });
+
+        weekLabel = new JLabel(getWeekDisplayText());
+        weekLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        weekLabel.setForeground(TEXT_PRIMARY);
+        weekLabel.setPreferredSize(new Dimension(300, 30));
+        weekLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JButton nextBtn = createNavButton(">", () -> {
+            if (viewMode.equals("week")) {
+                currentWeekStart = currentWeekStart.plusWeeks(1);
+            } else {
+                currentWeekStart = currentWeekStart.plusDays(1);
+            }
+            refreshView();
+        });
+
+        JButton todayBtn = createTodayButton();
+
+        navPanel.add(prevBtn);
+        navPanel.add(weekLabel);
+        navPanel.add(nextBtn);
+        navPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        navPanel.add(todayBtn);
+
+        // Right - Buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setOpaque(false);
-        
-        JButton addClassBtn = createAddClassButton();
+
+        if (viewMode.equals("day")) {
+            JButton weekViewBtn = createActionButton("Week View", ACCENT_BLUE, () -> {
+                viewMode = "week";
+                selectedDay = null;
+                refreshView();
+            });
+            buttonPanel.add(weekViewBtn);
+        }
+
         JButton backButton = createBackButton();
-        
-        buttonPanel.add(addClassBtn);
         buttonPanel.add(backButton);
 
         headerPanel.add(titleContainer, BorderLayout.WEST);
+        headerPanel.add(navPanel, BorderLayout.CENTER);
         headerPanel.add(buttonPanel, BorderLayout.EAST);
 
         return headerPanel;
     }
 
-    private JPanel createContentPanel() {
-        JPanel contentPanel = new JPanel(new BorderLayout(15, 0));
-        contentPanel.setOpaque(false);
-        contentPanel.setBorder(new EmptyBorder(15, 30, 30, 30));
-
-        // Left side - Calendar
-        JPanel leftPanel = createCalendarPanel();
-        
-        // Right side - Class list for selected date
-        JPanel rightPanel = createClassListContainer();
-
-        contentPanel.add(leftPanel, BorderLayout.CENTER);
-        contentPanel.add(rightPanel, BorderLayout.EAST);
-
-        return contentPanel;
+    private String getWeekDisplayText() {
+        if (viewMode.equals("day") && selectedDay != null) {
+            int dayIndex = Arrays.asList(DAYS).indexOf(selectedDay);
+            LocalDate date = currentWeekStart.plusDays(dayIndex);
+            return selectedDay + ", " + date.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH) + " " + date.getDayOfMonth() + ", " + date.getYear();
+        }
+        LocalDate weekEnd = currentWeekStart.plusDays(5);
+        return "Week " + currentWeekStart.get(WeekFields.ISO.weekOfYear()) + " • " +
+               currentWeekStart.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH) + " " + currentWeekStart.getDayOfMonth() + 
+               " - " + weekEnd.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH) + " " + weekEnd.getDayOfMonth() + ", " + currentWeekStart.getYear();
     }
 
-    private JPanel createCalendarPanel() {
-        JPanel container = new JPanel(new BorderLayout(0, 10)) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                g2d.setColor(new Color(0, 0, 0, 10));
-                g2d.fillRoundRect(2, 2, getWidth() - 4, getHeight() - 2, 20, 20);
-
-                g2d.setColor(CARD_BG);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-            }
-        };
-        container.setOpaque(false);
-        container.setBorder(new EmptyBorder(20, 20, 20, 20));
-
-        // Month navigation
-        JPanel navPanel = new JPanel(new BorderLayout());
-        navPanel.setOpaque(false);
-
-        JButton prevBtn = createNavButton("◀", () -> {
-            currentMonth = currentMonth.minusMonths(1);
-            updateCalendar();
-        });
-        
-        JLabel monthLabel = new JLabel(currentMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH) + " " + currentMonth.getYear());
-        monthLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        monthLabel.setForeground(TEXT_PRIMARY);
-        monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        JButton nextBtn = createNavButton("▶", () -> {
-            currentMonth = currentMonth.plusMonths(1);
-            updateCalendar();
-        });
-
-        navPanel.add(prevBtn, BorderLayout.WEST);
-        navPanel.add(monthLabel, BorderLayout.CENTER);
-        navPanel.add(nextBtn, BorderLayout.EAST);
-
-        // Day headers
-        JPanel dayHeaderPanel = new JPanel(new GridLayout(1, 7, 5, 5));
-        dayHeaderPanel.setOpaque(false);
-        String[] days = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-        for (String day : days) {
-            JLabel dayLabel = new JLabel(day, SwingConstants.CENTER);
-            dayLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            dayLabel.setForeground(TEXT_SECONDARY);
-            dayHeaderPanel.add(dayLabel);
-        }
-
-        // Calendar grid
-        calendarPanel = new JPanel(new GridLayout(6, 7, 5, 5));
-        calendarPanel.setOpaque(false);
-        updateCalendarDays();
-
-        container.add(navPanel, BorderLayout.NORTH);
-        JPanel centerPanel = new JPanel(new BorderLayout(0, 10));
-        centerPanel.setOpaque(false);
-        centerPanel.add(dayHeaderPanel, BorderLayout.NORTH);
-        centerPanel.add(calendarPanel, BorderLayout.CENTER);
-        container.add(centerPanel, BorderLayout.CENTER);
-
-        // Legend
-        JPanel legendPanel = createCalendarLegend();
-        container.add(legendPanel, BorderLayout.SOUTH);
-
-        return container;
-    }
-
-    private void updateCalendar() {
-        // Update month label
-        Container parent = calendarPanel.getParent();
-        while (parent != null && !(parent.getLayout() instanceof BorderLayout)) {
-            parent = parent.getParent();
-        }
-        if (parent != null) {
-            BorderLayout layout = (BorderLayout) parent.getLayout();
-            Component north = layout.getLayoutComponent(BorderLayout.NORTH);
-            if (north instanceof JPanel) {
-                JPanel navPanel = (JPanel) north;
-                BorderLayout navLayout = (BorderLayout) navPanel.getLayout();
-                Component center = navLayout.getLayoutComponent(BorderLayout.CENTER);
-                if (center instanceof JLabel) {
-                    ((JLabel) center).setText(currentMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH) + " " + currentMonth.getYear());
-                }
-            }
-        }
-        updateCalendarDays();
-    }
-
-    private void updateCalendarDays() {
-        calendarPanel.removeAll();
-
-        LocalDate firstOfMonth = currentMonth.atDay(1);
-        int dayOfWeek = firstOfMonth.getDayOfWeek().getValue() % 7; // Sunday = 0
-        int daysInMonth = currentMonth.lengthOfMonth();
-        LocalDate today = LocalDate.now();
-
-        // Empty cells before first day
-        for (int i = 0; i < dayOfWeek; i++) {
-            calendarPanel.add(createEmptyDayCell());
-        }
-
-        // Day cells
-        for (int day = 1; day <= daysInMonth; day++) {
-            LocalDate date = currentMonth.atDay(day);
-            List<ScheduledClass> classes = scheduleData.getOrDefault(date, new ArrayList<>());
-            boolean isToday = date.equals(today);
-            calendarPanel.add(createDayCell(day, date, classes, isToday));
-        }
-
-        // Fill remaining cells
-        int remainingCells = 42 - (dayOfWeek + daysInMonth);
-        for (int i = 0; i < remainingCells; i++) {
-            calendarPanel.add(createEmptyDayCell());
-        }
-
-        calendarPanel.revalidate();
-        calendarPanel.repaint();
-    }
-
-    private JPanel createEmptyDayCell() {
-        JPanel cell = new JPanel();
-        cell.setOpaque(false);
-        return cell;
-    }
-
-    private JPanel createDayCell(int day, LocalDate date, List<ScheduledClass> classes, boolean isToday) {
-        JPanel cell = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                if (isToday) {
-                    g2d.setColor(new Color(59, 130, 246, 30));
-                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                    g2d.setColor(ACCENT_BLUE);
-                    g2d.setStroke(new BasicStroke(2));
-                    g2d.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 10, 10);
-                } else {
-                    g2d.setColor(new Color(248, 250, 252));
-                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                }
-            }
-        };
-        cell.setLayout(new BorderLayout(2, 2));
-        cell.setBorder(new EmptyBorder(5, 5, 5, 5));
-        cell.setOpaque(false);
-        cell.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        // Day number
-        JLabel dayLabel = new JLabel(String.valueOf(day));
-        dayLabel.setFont(new Font("Segoe UI", isToday ? Font.BOLD : Font.PLAIN, 14));
-        dayLabel.setForeground(isToday ? ACCENT_BLUE : TEXT_PRIMARY);
-        cell.add(dayLabel, BorderLayout.NORTH);
-
-        // Class indicators
-        if (!classes.isEmpty()) {
-            JPanel classIndicators = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
-            classIndicators.setOpaque(false);
-            
-            int maxIndicators = Math.min(classes.size(), 3);
-            for (int i = 0; i < maxIndicators; i++) {
-                ScheduledClass sc = classes.get(i);
-                JPanel dot = new JPanel() {
-                    @Override
-                    protected void paintComponent(Graphics g) {
-                        super.paintComponent(g);
-                        Graphics2D g2d = (Graphics2D) g;
-                        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                        
-                        Color dotColor = sc.color;
-                        if (missedClasses.contains(sc)) {
-                            // Draw strikethrough for missed
-                            g2d.setColor(new Color(dotColor.getRed(), dotColor.getGreen(), dotColor.getBlue(), 100));
-                            g2d.fillOval(0, 0, getWidth(), getHeight());
-                            g2d.setColor(ACCENT_RED);
-                            g2d.setStroke(new BasicStroke(2));
-                            g2d.drawLine(0, getHeight()/2, getWidth(), getHeight()/2);
-                        } else {
-                            g2d.setColor(dotColor);
-                            g2d.fillOval(0, 0, getWidth(), getHeight());
-                        }
-                    }
-                };
-                dot.setOpaque(false);
-                dot.setPreferredSize(new Dimension(10, 10));
-                classIndicators.add(dot);
-            }
-            
-            if (classes.size() > 3) {
-                JLabel moreLabel = new JLabel("+" + (classes.size() - 3));
-                moreLabel.setFont(new Font("Segoe UI", Font.PLAIN, 9));
-                moreLabel.setForeground(TEXT_SECONDARY);
-                classIndicators.add(moreLabel);
-            }
-            
-            cell.add(classIndicators, BorderLayout.SOUTH);
-        }
-
-        // Click to show details
-        cell.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                showClassesForDate(date, classes);
-            }
-        });
-
-        return cell;
-    }
-
-    private void showClassesForDate(LocalDate date, List<ScheduledClass> classes) {
-        updateClassListPanel(date, classes);
-    }
-
-    private JPanel createClassListContainer() {
+    private JPanel createWeekViewPanel() {
         JPanel container = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
                 g2d.setColor(new Color(0, 0, 0, 10));
-                g2d.fillRoundRect(2, 2, getWidth() - 4, getHeight() - 2, 20, 20);
-
+                g2d.fillRoundRect(2, 2, getWidth() - 4, getHeight() - 4, 20, 20);
                 g2d.setColor(CARD_BG);
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
             }
         };
         container.setOpaque(false);
-        container.setPreferredSize(new Dimension(280, 0));
-        container.setBorder(new EmptyBorder(20, 20, 20, 20));
+        container.setBorder(new EmptyBorder(20, 30, 30, 30));
 
-        JLabel headerLabel = new JLabel("Classes for Today");
-        headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        headerLabel.setForeground(TEXT_PRIMARY);
-        container.add(headerLabel, BorderLayout.NORTH);
+        // Create grid
+        JPanel gridPanel = new JPanel(new GridBagLayout());
+        gridPanel.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 0, 0, 0);
 
-        classListPanel = new JPanel();
-        classListPanel.setLayout(new BoxLayout(classListPanel, BoxLayout.Y_AXIS));
-        classListPanel.setOpaque(false);
+        // Header row - Days
+        gbc.gridy = 0;
+        gbc.weightx = 0.08;
+        gbc.weighty = 0;
+        gbc.gridx = 0;
+        gridPanel.add(createHeaderCell("Times", true), gbc);
 
-        JScrollPane scrollPane = new JScrollPane(classListPanel);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        gbc.weightx = 0.15;
+        for (int i = 0; i < DAYS.length; i++) {
+            gbc.gridx = i + 1;
+            LocalDate dayDate = currentWeekStart.plusDays(i);
+            String dayText = DAYS[i] + " (" + dayDate.getDayOfMonth() + ")";
+            JPanel headerCell = createDayHeaderCell(dayText, DAYS[i]);
+            gridPanel.add(headerCell, gbc);
+        }
 
-        container.add(scrollPane, BorderLayout.CENTER);
+        // Time slot rows
+        gbc.weighty = 1.0 / TIME_SLOTS.length;
+        for (int row = 0; row < TIME_SLOTS.length; row++) {
+            gbc.gridy = row + 1;
+            gbc.gridx = 0;
+            gbc.weightx = 0.08;
+            gridPanel.add(createTimeCell(TIME_SLOTS[row][0]), gbc);
 
-        // Show today's classes by default
-        updateClassListPanel(LocalDate.now(), scheduleData.getOrDefault(LocalDate.now(), new ArrayList<>()));
+            gbc.weightx = 0.15;
+            for (int col = 0; col < DAYS.length; col++) {
+                gbc.gridx = col + 1;
+                String day = DAYS[col];
+                String timeKey = TIME_SLOTS[row][1];
+                CourseInfo course = getCourse(currentWeekStart, day, timeKey);
+                JPanel cell = createCourseCell(course, day, timeKey);
+                gridPanel.add(cell, gbc);
+            }
+        }
+
+        // Legend
+        JPanel legendPanel = createLegendPanel();
+
+        container.add(gridPanel, BorderLayout.CENTER);
+        container.add(legendPanel, BorderLayout.SOUTH);
 
         return container;
     }
 
-    private void updateClassListPanel(LocalDate date, List<ScheduledClass> classes) {
-        classListPanel.removeAll();
-        classListPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        // Update header
-        Container parent = classListPanel.getParent();
-        while (parent != null) {
-            if (parent.getLayout() instanceof BorderLayout) {
-                BorderLayout layout = (BorderLayout) parent.getLayout();
-                Component north = layout.getLayoutComponent(BorderLayout.NORTH);
-                if (north instanceof JLabel) {
-                    ((JLabel) north).setText("Classes for " + date.getDayOfMonth() + " " + 
-                        date.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH));
-                }
-                break;
-            }
-            parent = parent.getParent();
-        }
-
-        if (classes.isEmpty()) {
-            JLabel emptyLabel = new JLabel("No classes scheduled");
-            emptyLabel.setFont(new Font("Segoe UI", Font.ITALIC, 13));
-            emptyLabel.setForeground(TEXT_SECONDARY);
-            emptyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            classListPanel.add(emptyLabel);
-        } else {
-            for (ScheduledClass sc : classes) {
-                classListPanel.add(createClassCard(sc, date));
-                classListPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-            }
-        }
-
-        classListPanel.revalidate();
-        classListPanel.repaint();
-    }
-
-    private JPanel createClassCard(ScheduledClass sc, LocalDate date) {
-        boolean isMissed = missedClasses.contains(sc);
-        
-        JPanel card = new JPanel() {
+    private JPanel createDayViewPanel(String day) {
+        JPanel container = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                g2d.setColor(new Color(248, 250, 252));
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
-
-                // Left color bar
-                g2d.setColor(isMissed ? new Color(sc.color.getRed(), sc.color.getGreen(), sc.color.getBlue(), 100) : sc.color);
-                g2d.fillRoundRect(0, 0, 5, getHeight(), 12, 12);
-                g2d.fillRect(5, 0, 5, getHeight());
-
-                // Strikethrough if missed
-                if (isMissed) {
-                    g2d.setColor(ACCENT_RED);
-                    g2d.setStroke(new BasicStroke(2));
-                    g2d.drawLine(15, getHeight()/2, getWidth() - 15, getHeight()/2);
-                }
+                g2d.setColor(new Color(0, 0, 0, 10));
+                g2d.fillRoundRect(2, 2, getWidth() - 4, getHeight() - 4, 20, 20);
+                g2d.setColor(CARD_BG);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
             }
         };
-        card.setLayout(new BorderLayout(10, 5));
-        card.setBorder(new EmptyBorder(12, 15, 12, 12));
-        card.setOpaque(false);
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
-        card.setAlignmentX(Component.LEFT_ALIGNMENT);
+        container.setOpaque(false);
+        container.setBorder(new EmptyBorder(20, 30, 30, 30));
 
-        JPanel textPanel = new JPanel();
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-        textPanel.setOpaque(false);
+        // Day header
+        JPanel dayHeader = new JPanel(new BorderLayout());
+        dayHeader.setOpaque(false);
+        dayHeader.setBorder(new EmptyBorder(0, 0, 20, 0));
 
-        JLabel nameLabel = new JLabel(sc.className);
-        nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        nameLabel.setForeground(isMissed ? TEXT_SECONDARY : TEXT_PRIMARY);
+        JLabel dayTitle = new JLabel("Schedule for " + day);
+        dayTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        dayTitle.setForeground(TEXT_PRIMARY);
 
-        JLabel timeLabel = new JLabel(sc.startTime + " - " + sc.endTime);
-        timeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        timeLabel.setForeground(TEXT_SECONDARY);
-
-        textPanel.add(nameLabel);
-        textPanel.add(Box.createRigidArea(new Dimension(0, 3)));
-        textPanel.add(timeLabel);
-
-        // Miss button
-        JButton missBtn = new JButton(isMissed ? "✓" : "✗") {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                if (getModel().isRollover()) {
-                    g2d.setColor(isMissed ? new Color(34, 197, 94, 30) : new Color(239, 68, 68, 30));
-                } else {
-                    g2d.setColor(new Color(241, 245, 249));
-                }
-                g2d.fillOval(0, 0, getWidth(), getHeight());
-
-                g2d.setColor(isMissed ? ACCENT_GREEN : ACCENT_RED);
-                g2d.setFont(getFont());
-                FontMetrics fm = g2d.getFontMetrics();
-                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
-                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
-                g2d.drawString(getText(), textX, textY);
-            }
-        };
-        missBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        missBtn.setContentAreaFilled(false);
-        missBtn.setBorderPainted(false);
-        missBtn.setFocusPainted(false);
-        missBtn.setPreferredSize(new Dimension(35, 35));
-        missBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        missBtn.setToolTipText(isMissed ? "Mark as attended" : "Mark as missed");
-
-        missBtn.addActionListener(e -> {
-            if (missedClasses.contains(sc)) {
-                missedClasses.remove(sc);
-            } else {
-                missedClasses.add(sc);
-            }
-            updateCalendarDays();
-            updateClassListPanel(date, scheduleData.getOrDefault(date, new ArrayList<>()));
+        JButton backToWeekBtn = createActionButton("← Back to Week View", ACCENT_PURPLE, () -> {
+            viewMode = "week";
+            selectedDay = null;
+            refreshView();
         });
 
-        card.add(textPanel, BorderLayout.CENTER);
-        card.add(missBtn, BorderLayout.EAST);
+        dayHeader.add(dayTitle, BorderLayout.WEST);
+        dayHeader.add(backToWeekBtn, BorderLayout.EAST);
 
-        return card;
-    }
+        // Time slots grid for single day
+        JPanel gridPanel = new JPanel(new GridLayout(TIME_SLOTS.length, 1, 0, 10));
+        gridPanel.setOpaque(false);
 
-    private JPanel createCalendarLegend() {
-        JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 5));
-        legendPanel.setOpaque(false);
-
-        for (ClassInfo classInfo : availableClasses) {
-            JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-            item.setOpaque(false);
-
-            JPanel colorDot = new JPanel() {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    Graphics2D g2d = (Graphics2D) g;
-                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g2d.setColor(classInfo.color);
-                    g2d.fillOval(0, 0, getWidth(), getHeight());
-                }
-            };
-            colorDot.setOpaque(false);
-            colorDot.setPreferredSize(new Dimension(12, 12));
-
-            JLabel label = new JLabel(classInfo.name);
-            label.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-            label.setForeground(TEXT_SECONDARY);
-
-            item.add(colorDot);
-            item.add(label);
-            legendPanel.add(item);
+        for (String[] slot : TIME_SLOTS) {
+            String timeKey = slot[1];
+            CourseInfo course = getCourse(currentWeekStart, day, timeKey);
+            JPanel slotPanel = createDayTimeSlotPanel(slot[0], timeKey, day, course);
+            gridPanel.add(slotPanel);
         }
 
+        JScrollPane scrollPane = new JScrollPane(gridPanel);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        container.add(dayHeader, BorderLayout.NORTH);
+        container.add(scrollPane, BorderLayout.CENTER);
+
+        return container;
+    }
+
+    private JPanel createDayTimeSlotPanel(String timeDisplay, String timeKey, String day, CourseInfo course) {
+        Color bgColor = course != null ? course.color : new Color(248, 250, 252);
+        
+        JPanel panel = new JPanel(new BorderLayout(20, 0)) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(bgColor);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+                g2d.setColor(GRID_BORDER);
+                g2d.setStroke(new BasicStroke(1));
+                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 15, 15);
+            }
+        };
+        panel.setOpaque(false);
+        panel.setBorder(new EmptyBorder(15, 20, 15, 20));
+        panel.setPreferredSize(new Dimension(0, 80));
+
+        // Time
+        JLabel timeLabel = new JLabel(timeDisplay);
+        timeLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        timeLabel.setForeground(TEXT_PRIMARY);
+        timeLabel.setPreferredSize(new Dimension(120, 0));
+
+        // Course info
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setOpaque(false);
+
+        if (course != null) {
+            JLabel typeLabel = new JLabel(course.type);
+            typeLabel.setFont(new Font("Segoe UI", Font.BOLD, 11));
+            typeLabel.setForeground(TEXT_SECONDARY);
+
+            JLabel nameLabel = new JLabel(course.name);
+            nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 15));
+            nameLabel.setForeground(TEXT_PRIMARY);
+
+            JLabel teacherLabel = new JLabel(course.teacher);
+            teacherLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            teacherLabel.setForeground(TEXT_SECONDARY);
+
+            JLabel roomLabel = new JLabel("Room " + course.room);
+            roomLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            roomLabel.setForeground(TEXT_SECONDARY);
+
+            infoPanel.add(typeLabel);
+            infoPanel.add(nameLabel);
+            infoPanel.add(teacherLabel);
+            infoPanel.add(roomLabel);
+        } else {
+            JLabel emptyLabel = new JLabel("No class scheduled");
+            emptyLabel.setFont(new Font("Segoe UI", Font.ITALIC, 13));
+            emptyLabel.setForeground(TEXT_SECONDARY);
+            infoPanel.add(emptyLabel);
+        }
+
+        // Add/Edit button
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        actionPanel.setOpaque(false);
+
+        if (course != null) {
+            JButton deleteBtn = createSmallButton("×", new Color(239, 68, 68), () -> {
+                int confirm = JOptionPane.showConfirmDialog(this, "Remove this class?", "Confirm", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    removeCourseFromSchedule(currentWeekStart, day, timeKey);
+                    refreshView();
+                }
+            });
+            actionPanel.add(deleteBtn);
+        }
+
+        JButton addBtn = createSmallButton(course != null ? "✎" : "+", ACCENT_PURPLE, () -> showAddCourseDialog(day, timeKey));
+        actionPanel.add(addBtn);
+
+        panel.add(timeLabel, BorderLayout.WEST);
+        panel.add(infoPanel, BorderLayout.CENTER);
+        panel.add(actionPanel, BorderLayout.EAST);
+
+        return panel;
+    }
+
+    private JPanel createHeaderCell(String text, boolean isCorner) {
+        JPanel cell = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setColor(HEADER_BG);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
+        cell.setBorder(new LineBorder(GRID_BORDER, 1));
+
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        label.setForeground(Color.WHITE);
+        cell.add(label);
+
+        return cell;
+    }
+
+    private JPanel createDayHeaderCell(String text, String day) {
+        JPanel cell = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setColor(HEADER_BG);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
+        cell.setBorder(new LineBorder(GRID_BORDER, 1));
+        cell.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        label.setForeground(Color.WHITE);
+        cell.add(label);
+
+        // Double click to switch to day view
+        cell.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    viewMode = "day";
+                    selectedDay = day;
+                    refreshView();
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                cell.setBackground(new Color(71, 85, 105));
+                cell.repaint();
+            }
+        });
+
+        return cell;
+    }
+
+    private JPanel createTimeCell(String time) {
+        JPanel cell = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setColor(new Color(241, 245, 249));
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
+        cell.setBorder(new LineBorder(GRID_BORDER, 1));
+
+        JLabel label = new JLabel("<html><center>" + time.replace(" - ", "<br>") + "</center></html>");
+        label.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        label.setForeground(TEXT_PRIMARY);
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        cell.add(label);
+
+        return cell;
+    }
+
+    private JPanel createCourseCell(CourseInfo course, String day, String timeKey) {
+        Color bgColor = course != null ? course.color : Color.WHITE;
+        
+        JPanel cell = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setColor(bgColor);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
+        cell.setBorder(new LineBorder(GRID_BORDER, 1));
+        cell.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        if (course != null) {
+            JPanel content = new JPanel();
+            content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+            content.setOpaque(false);
+            content.setBorder(new EmptyBorder(5, 8, 5, 8));
+
+            JLabel typeLabel = new JLabel(course.type);
+            typeLabel.setFont(new Font("Segoe UI", Font.BOLD, 9));
+            typeLabel.setForeground(new Color(100, 100, 100));
+            typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            JLabel nameLabel = new JLabel("<html><b>" + course.name + "</b></html>");
+            nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 11));
+            nameLabel.setForeground(TEXT_PRIMARY);
+            nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            JLabel teacherLabel = new JLabel(course.teacher);
+            teacherLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+            teacherLabel.setForeground(TEXT_SECONDARY);
+            teacherLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            JLabel roomLabel = new JLabel("Room " + course.room);
+            roomLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+            roomLabel.setForeground(TEXT_SECONDARY);
+            roomLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            content.add(typeLabel);
+            content.add(nameLabel);
+            content.add(teacherLabel);
+            content.add(roomLabel);
+
+            cell.add(content, BorderLayout.CENTER);
+        }
+
+        // Click handlers
+        cell.addMouseListener(new MouseAdapter() {
+            private Color originalBg = bgColor;
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    showAddCourseDialog(day, timeKey);
+                } else if (e.getClickCount() == 1 && course != null && e.getButton() == MouseEvent.BUTTON3) {
+                    // Right click to delete
+                    int confirm = JOptionPane.showConfirmDialog(SchedulePage.this, "Remove this class?", "Confirm", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        removeCourseFromSchedule(currentWeekStart, day, timeKey);
+                        refreshView();
+                    }
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                cell.setBackground(course != null ? course.color.darker() : new Color(241, 245, 249));
+                cell.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                cell.repaint();
+            }
+        });
+
+        return cell;
+    }
+
+    private JPanel createLegendPanel() {
+        JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
+        legendPanel.setOpaque(false);
+        legendPanel.setBorder(new EmptyBorder(15, 0, 0, 0));
+
+        legendPanel.add(createLegendItem("Lecture", LECTURE_COLOR));
+        legendPanel.add(createLegendItem("Tutorial", TUTORIAL_COLOR));
+        legendPanel.add(createLegendItem("Practical", PRACTICAL_COLOR));
+        legendPanel.add(createLegendItem("Lab", LAB_COLOR));
+        legendPanel.add(createLegendItem("Seminar", SEMINAR_COLOR));
+
+        JLabel tipLabel = new JLabel("  •  Double-click on a cell to add/edit  •  Right-click to delete  •  Double-click day header for day view");
+        tipLabel.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+        tipLabel.setForeground(TEXT_SECONDARY);
+        legendPanel.add(tipLabel);
+
         return legendPanel;
+    }
+
+    private JPanel createLegendItem(String text, Color color) {
+        JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        item.setOpaque(false);
+
+        JPanel colorBox = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(color);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 4, 4);
+                g2d.setColor(GRID_BORDER);
+                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 4, 4);
+            }
+        };
+        colorBox.setOpaque(false);
+        colorBox.setPreferredSize(new Dimension(16, 16));
+
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        label.setForeground(TEXT_SECONDARY);
+
+        item.add(colorBox);
+        item.add(label);
+
+        return item;
+    }
+
+    private void showAddCourseDialog(String day, String timeKey) {
+        CourseInfo existing = getCourse(currentWeekStart, day, timeKey);
+        
+        JDialog dialog = new JDialog(this, existing != null ? "Edit Class" : "Add Class", true);
+        dialog.setSize(450, 400);
+        dialog.setLocationRelativeTo(this);
+        dialog.setLayout(new BorderLayout());
+
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBorder(new EmptyBorder(25, 25, 25, 25));
+        content.setBackground(Color.WHITE);
+
+        // Type dropdown
+        JLabel typeLabel = new JLabel("Class Type:");
+        typeLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        String[] types = {"Lecture", "Tutorial", "Practical", "Lab", "Seminar"};
+        JComboBox<String> typeCombo = new JComboBox<>(types);
+        typeCombo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        typeCombo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        if (existing != null) typeCombo.setSelectedItem(existing.type);
+
+        // Course dropdown
+        JLabel courseLabel = new JLabel("Course:");
+        courseLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        courseLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JComboBox<String> courseCombo = new JComboBox<>();
+        for (String c : availableCourses) courseCombo.addItem(c);
+        courseCombo.setEditable(true);
+        courseCombo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        courseCombo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        if (existing != null) courseCombo.setSelectedItem(existing.name);
+
+        // Teacher field
+        JLabel teacherLabel = new JLabel("Teacher:");
+        teacherLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        teacherLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JTextField teacherField = new JTextField(existing != null ? existing.teacher : "Mr. ");
+        teacherField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        teacherField.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Room field
+        JLabel roomLabel = new JLabel("Room:");
+        roomLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        roomLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JTextField roomField = new JTextField(existing != null ? existing.room : "A-101");
+        roomField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        roomField.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        content.add(typeLabel);
+        content.add(Box.createRigidArea(new Dimension(0, 5)));
+        content.add(typeCombo);
+        content.add(Box.createRigidArea(new Dimension(0, 15)));
+        content.add(courseLabel);
+        content.add(Box.createRigidArea(new Dimension(0, 5)));
+        content.add(courseCombo);
+        content.add(Box.createRigidArea(new Dimension(0, 15)));
+        content.add(teacherLabel);
+        content.add(Box.createRigidArea(new Dimension(0, 5)));
+        content.add(teacherField);
+        content.add(Box.createRigidArea(new Dimension(0, 15)));
+        content.add(roomLabel);
+        content.add(Box.createRigidArea(new Dimension(0, 5)));
+        content.add(roomField);
+
+        // Buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
+        buttonPanel.setBackground(Color.WHITE);
+
+        JButton cancelBtn = new JButton("Cancel");
+        cancelBtn.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        cancelBtn.addActionListener(e -> dialog.dispose());
+
+        JButton saveBtn = new JButton(existing != null ? "Update" : "Add");
+        saveBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        saveBtn.setBackground(ACCENT_PURPLE);
+        saveBtn.setForeground(Color.WHITE);
+        saveBtn.addActionListener(e -> {
+            String type = (String) typeCombo.getSelectedItem();
+            String course = (String) courseCombo.getSelectedItem();
+            String teacher = teacherField.getText().trim();
+            String room = roomField.getText().trim();
+
+            if (course == null || course.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Please select a course!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Color color = getColorForType(type);
+            CourseInfo newCourse = new CourseInfo(type, course, teacher, room, color);
+            addCourseToSchedule(currentWeekStart, day, timeKey, newCourse);
+            refreshView();
+            dialog.dispose();
+        });
+
+        buttonPanel.add(cancelBtn);
+        buttonPanel.add(saveBtn);
+
+        dialog.add(content, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        dialog.setVisible(true);
+    }
+
+    private Color getColorForType(String type) {
+        switch (type) {
+            case "Lecture": return LECTURE_COLOR;
+            case "Tutorial": return TUTORIAL_COLOR;
+            case "Practical": return PRACTICAL_COLOR;
+            case "Lab": return LAB_COLOR;
+            case "Seminar": return SEMINAR_COLOR;
+            default: return LECTURE_COLOR;
+        }
+    }
+
+    private void refreshView() {
+        weekLabel.setText(getWeekDisplayText());
+        
+        Container parent = mainContentPanel.getParent();
+        parent.remove(mainContentPanel);
+        
+        if (viewMode.equals("day") && selectedDay != null) {
+            mainContentPanel = createDayViewPanel(selectedDay);
+        } else {
+            mainContentPanel = createWeekViewPanel();
+        }
+        
+        parent.add(mainContentPanel, BorderLayout.CENTER);
+        parent.revalidate();
+        parent.repaint();
+
+        // Refresh header for view mode buttons
+        Component[] components = getContentPane().getComponents();
+        for (Component c : components) {
+            if (c instanceof JPanel) {
+                JPanel p = (JPanel) c;
+                if (p != mainContentPanel) {
+                    Container headerParent = p.getParent();
+                    headerParent.remove(p);
+                    headerParent.add(createHeaderPanel(), BorderLayout.NORTH);
+                    break;
+                }
+            }
+        }
+        revalidate();
+        repaint();
     }
 
     private JButton createNavButton(String text, Runnable onClick) {
@@ -646,7 +852,6 @@ public class SchedulePage extends JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
                 if (getModel().isPressed()) {
                     g2d.setColor(new Color(226, 232, 240));
                 } else if (getModel().isRollover()) {
@@ -654,9 +859,7 @@ public class SchedulePage extends JFrame {
                 } else {
                     g2d.setColor(Color.WHITE);
                 }
-
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
-
                 g2d.setColor(TEXT_PRIMARY);
                 g2d.setFont(getFont());
                 FontMetrics fm = g2d.getFontMetrics();
@@ -665,26 +868,22 @@ public class SchedulePage extends JFrame {
                 g2d.drawString(getText(), textX, textY);
             }
         };
-
         button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
         button.setPreferredSize(new Dimension(40, 35));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
         button.addActionListener(e -> onClick.run());
-
         return button;
     }
 
-    private JButton createAddClassButton() {
-        JButton button = new JButton("+ Add Class") {
+    private JButton createTodayButton() {
+        JButton button = new JButton("Today") {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
                 if (getModel().isPressed()) {
                     g2d.setColor(new Color(126, 34, 206));
                 } else if (getModel().isRollover()) {
@@ -692,9 +891,7 @@ public class SchedulePage extends JFrame {
                 } else {
                     g2d.setColor(ACCENT_PURPLE);
                 }
-
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
                 g2d.setColor(Color.WHITE);
                 g2d.setFont(getFont());
                 FontMetrics fm = g2d.getFontMetrics();
@@ -703,119 +900,80 @@ public class SchedulePage extends JFrame {
                 g2d.drawString(getText(), textX, textY);
             }
         };
-
-        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
-        button.setPreferredSize(new Dimension(120, 38));
+        button.setPreferredSize(new Dimension(70, 35));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        button.addActionListener(e -> showAddClassDialog());
-
+        button.addActionListener(e -> {
+            currentWeekStart = getStartOfWeek(LocalDate.now());
+            if (viewMode.equals("day")) {
+                selectedDay = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+            }
+            refreshView();
+        });
         return button;
     }
 
-    private void showAddClassDialog() {
-        JDialog dialog = new JDialog(this, "Add New Class", true);
-        dialog.setSize(400, 350);
-        dialog.setLocationRelativeTo(this);
-        dialog.setLayout(new BorderLayout());
+    private JButton createActionButton(String text, Color color, Runnable onClick) {
+        JButton button = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (getModel().isPressed()) {
+                    g2d.setColor(color.darker());
+                } else if (getModel().isRollover()) {
+                    g2d.setColor(color.brighter());
+                } else {
+                    g2d.setColor(color);
+                }
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                g2d.setColor(Color.WHITE);
+                g2d.setFont(getFont());
+                FontMetrics fm = g2d.getFontMetrics();
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2d.drawString(getText(), textX, textY);
+            }
+        };
+        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(150, 35));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.addActionListener(e -> onClick.run());
+        return button;
+    }
 
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        contentPanel.setBackground(Color.WHITE);
-
-        // Class selection
-        JLabel classLabel = new JLabel("Select Class:");
-        classLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        classLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
-        JComboBox<String> classCombo = new JComboBox<>();
-        for (ClassInfo ci : availableClasses) {
-            classCombo.addItem(ci.name);
-        }
-        classCombo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
-        classCombo.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Date selection
-        JLabel dateLabel = new JLabel("Select Date:");
-        dateLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        dateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        SpinnerDateModel dateModel = new SpinnerDateModel();
-        JSpinner dateSpinner = new JSpinner(dateModel);
-        JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "yyyy-MM-dd");
-        dateSpinner.setEditor(dateEditor);
-        dateSpinner.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
-        dateSpinner.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Time selection
-        JLabel startTimeLabel = new JLabel("Start Time (HH:MM):");
-        startTimeLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        startTimeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JTextField startTimeField = new JTextField("09:00");
-        startTimeField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
-        startTimeField.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel endTimeLabel = new JLabel("End Time (HH:MM):");
-        endTimeLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        endTimeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JTextField endTimeField = new JTextField("10:30");
-        endTimeField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
-        endTimeField.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        contentPanel.add(classLabel);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        contentPanel.add(classCombo);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        contentPanel.add(dateLabel);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        contentPanel.add(dateSpinner);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        contentPanel.add(startTimeLabel);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        contentPanel.add(startTimeField);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        contentPanel.add(endTimeLabel);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        contentPanel.add(endTimeField);
-
-        // Buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.setBackground(Color.WHITE);
-
-        JButton cancelBtn = new JButton("Cancel");
-        cancelBtn.addActionListener(e -> dialog.dispose());
-
-        JButton addBtn = new JButton("Add");
-        addBtn.setBackground(ACCENT_PURPLE);
-        addBtn.setForeground(Color.WHITE);
-        addBtn.addActionListener(e -> {
-            String className = (String) classCombo.getSelectedItem();
-            Date selectedDate = (Date) dateSpinner.getValue();
-            LocalDate date = selectedDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
-            String startTime = startTimeField.getText();
-            String endTime = endTimeField.getText();
-
-            Color classColor = CLASS_COLORS[classCombo.getSelectedIndex() % CLASS_COLORS.length];
-            ScheduledClass newClass = new ScheduledClass(className, startTime, endTime, classColor);
-            addClassToDate(date, newClass);
-            updateCalendarDays();
-            dialog.dispose();
-
-            JOptionPane.showMessageDialog(this, "Class added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-        });
-
-        buttonPanel.add(cancelBtn);
-        buttonPanel.add(addBtn);
-
-        dialog.add(contentPanel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
-        dialog.setVisible(true);
+    private JButton createSmallButton(String text, Color color, Runnable onClick) {
+        JButton button = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (getModel().isRollover()) {
+                    g2d.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 40));
+                    g2d.fillOval(0, 0, getWidth(), getHeight());
+                }
+                g2d.setColor(color);
+                g2d.setFont(getFont());
+                FontMetrics fm = g2d.getFontMetrics();
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2d.drawString(getText(), textX, textY);
+            }
+        };
+        button.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(32, 32));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.addActionListener(e -> onClick.run());
+        return button;
     }
 
     private JButton createBackButton() {
@@ -824,7 +982,6 @@ public class SchedulePage extends JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
                 if (getModel().isPressed()) {
                     g2d.setColor(new Color(226, 232, 240));
                 } else if (getModel().isRollover()) {
@@ -832,9 +989,7 @@ public class SchedulePage extends JFrame {
                 } else {
                     g2d.setColor(Color.WHITE);
                 }
-
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-
                 g2d.setColor(TEXT_PRIMARY);
                 g2d.setFont(getFont());
                 FontMetrics fm = g2d.getFontMetrics();
@@ -843,14 +998,12 @@ public class SchedulePage extends JFrame {
                 g2d.drawString(getText(), textX, textY);
             }
         };
-
         button.setFont(new Font("Segoe UI", Font.BOLD, 13));
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
-        button.setPreferredSize(new Dimension(100, 38));
+        button.setPreferredSize(new Dimension(90, 35));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
         button.addActionListener(e -> {
             if (isTeacher) {
                 mainpageTeacher teacherPage = new mainpageTeacher();
@@ -861,31 +1014,22 @@ public class SchedulePage extends JFrame {
             }
             dispose();
         });
-
         return button;
     }
 
-    // Inner classes for data structures
-    private static class ScheduledClass {
-        String className;
-        String startTime;
-        String endTime;
-        Color color;
-
-        ScheduledClass(String className, String startTime, String endTime, Color color) {
-            this.className = className;
-            this.startTime = startTime;
-            this.endTime = endTime;
-            this.color = color;
-        }
-    }
-
-    private static class ClassInfo {
+    // Inner class for course information
+    private static class CourseInfo {
+        String type;
         String name;
+        String teacher;
+        String room;
         Color color;
 
-        ClassInfo(String name, Color color) {
+        CourseInfo(String type, String name, String teacher, String room, Color color) {
+            this.type = type;
             this.name = name;
+            this.teacher = teacher;
+            this.room = room;
             this.color = color;
         }
     }

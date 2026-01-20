@@ -1,13 +1,13 @@
 package Frontend.ui;
 
+import Backend.src.database.CourseManager;
+import Backend.src.database.StudentInfoManager;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 public class ManageStudentsPage extends JFrame {
 
@@ -20,6 +20,8 @@ public class ManageStudentsPage extends JFrame {
     private static final Color ACCENT_PURPLE = new Color(168, 85, 247);
     private static final Color ACCENT_RED = new Color(239, 68, 68);
     private static final Color ACCENT_BLUE = new Color(59, 130, 246);
+    private static final Color ACCENT_TEAL = new Color(20, 184, 166);
+    private static final Color SEARCH_BG = new Color(248, 250, 252);
 
     // Filter components
     private JTextField searchField;
@@ -28,53 +30,65 @@ public class ManageStudentsPage extends JFrame {
     private JComboBox<String> departmentCombo;
     private JPanel studentsPanel;
 
-    // Sample data
+    // Data from database
     private List<StudentInfo> allStudents = new ArrayList<>();
     private List<String> classes = new ArrayList<>();
     private List<String> majors = new ArrayList<>();
     private List<String> departments = new ArrayList<>();
 
     public ManageStudentsPage() {
-        initSampleData();
+        loadDataFromDatabase();
         initComponent();
     }
 
-    private void initSampleData() {
-        // Departments
+    private void loadDataFromDatabase() {
+        // Load departments from database
         departments.add("All Departments");
-        departments.add("Engineering");
-        departments.add("Science");
-        departments.add("Arts");
-        departments.add("Business");
+        String[] dbDepartments = CourseManager.getAllDepartments();
+        if (dbDepartments != null && dbDepartments.length > 0) {
+            for (String dept : dbDepartments) {
+                if (dept != null && !dept.isEmpty()) {
+                    departments.add(dept);
+                }
+            }
+        }
 
-        // Majors
+        // Load majors from database
         majors.add("All Majors");
-        majors.add("Computer Science");
-        majors.add("Mathematics");
-        majors.add("Physics");
-        majors.add("Chemistry");
-        majors.add("English Literature");
-        majors.add("Business Administration");
+        String[] dbMajors = CourseManager.getAllMajors();
+        if (dbMajors != null && dbMajors.length > 0) {
+            for (String major : dbMajors) {
+                if (major != null && !major.isEmpty()) {
+                    majors.add(major);
+                }
+            }
+        }
 
-        // Classes
+        // Load courses/classes from database
         classes.add("All Classes");
-        classes.add("CS101 - Intro to Programming");
-        classes.add("CS201 - Data Structures");
-        classes.add("MATH101 - Calculus I");
-        classes.add("PHYS101 - Physics I");
-        classes.add("ENG101 - English Composition");
+        String[] dbCourses = CourseManager.getAllCoursesArray();
+        if (dbCourses != null && dbCourses.length > 0) {
+            for (String course : dbCourses) {
+                if (course != null && !course.isEmpty()) {
+                    classes.add(course);
+                }
+            }
+        }
 
-        // Sample students
-        allStudents.add(new StudentInfo("John Smith", "S001", "Computer Science", "Engineering", "CS101 - Intro to Programming"));
-        allStudents.add(new StudentInfo("Emily Johnson", "S002", "Mathematics", "Science", "MATH101 - Calculus I"));
-        allStudents.add(new StudentInfo("Michael Brown", "S003", "Computer Science", "Engineering", "CS201 - Data Structures"));
-        allStudents.add(new StudentInfo("Sarah Davis", "S004", "Physics", "Science", "PHYS101 - Physics I"));
-        allStudents.add(new StudentInfo("James Wilson", "S005", "English Literature", "Arts", "ENG101 - English Composition"));
-        allStudents.add(new StudentInfo("Jessica Martinez", "S006", "Computer Science", "Engineering", "CS101 - Intro to Programming"));
-        allStudents.add(new StudentInfo("David Anderson", "S007", "Business Administration", "Business", "CS101 - Intro to Programming"));
-        allStudents.add(new StudentInfo("Ashley Taylor", "S008", "Chemistry", "Science", "PHYS101 - Physics I"));
-        allStudents.add(new StudentInfo("Christopher Thomas", "S009", "Mathematics", "Science", "MATH101 - Calculus I"));
-        allStudents.add(new StudentInfo("Amanda Jackson", "S010", "Computer Science", "Engineering", "CS201 - Data Structures"));
+        // Load students from database
+        String[][] dbStudents = StudentInfoManager.getAllStudentsWithDepartment();
+        if (dbStudents != null && dbStudents.length > 0) {
+            for (String[] student : dbStudents) {
+                if (student != null && student.length >= 5) {
+                    String name = student[0] != null ? student[0] : "";
+                    String id = student[1] != null ? student[1] : "";
+                    String major = student[2] != null ? student[2] : "Not Assigned";
+                    String dept = student[3] != null ? student[3] : "Not Assigned";
+                    String course = student[4] != null ? student[4] : "Not Assigned";
+                    allStudents.add(new StudentInfo(name, id, major, dept, course));
+                }
+            }
+        }
     }
 
     public void initComponent() {
@@ -211,195 +225,187 @@ public class ManageStudentsPage extends JFrame {
     }
 
     private JPanel createFilterPanel() {
-        JPanel filterPanel = new JPanel() {
+        JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                g2d.setColor(new Color(0, 0, 0, 10));
+                // Simple shadow
+                g2d.setColor(new Color(0, 0, 0, 8));
                 g2d.fillRoundRect(2, 2, getWidth() - 4, getHeight() - 2, 15, 15);
 
+                // Card background
                 g2d.setColor(CARD_BG);
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
             }
         };
-        filterPanel.setOpaque(false);
-        filterPanel.setLayout(new GridBagLayout());
-        filterPanel.setBorder(new EmptyBorder(20, 25, 20, 25));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 10, 5, 10);
+        panel.setOpaque(false);
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 12));
+        panel.setBorder(new EmptyBorder(8, 15, 8, 15));
 
         // Search field
-        gbc.gridx = 0; gbc.gridy = 0;
-        gbc.gridwidth = 4;
-        gbc.weightx = 1.0;
+        JPanel searchContainer = createStyledTextField("Search by name or ID...", 200);
         
-        JPanel searchContainer = createSearchField();
-        filterPanel.add(searchContainer, gbc);
+        JButton searchBtn = createGradientButton("Search", ACCENT_BLUE, new Color(37, 99, 235));
+        searchBtn.addActionListener(e -> applyFilters());
 
-        // Filter labels and combos
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.33;
-        gbc.gridy = 1;
+        // Class filter label and dropdown
+        JLabel classLabel = new JLabel("Class:");
+        classLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        classLabel.setForeground(TEXT_PRIMARY);
 
-        // Class filter
-        gbc.gridx = 0;
-        JPanel classFilterPanel = createFilterCombo("Class", classes, true);
-        filterPanel.add(classFilterPanel, gbc);
+        classCombo = createStyledComboBox(classes.toArray(new String[0]));
+        classCombo.addActionListener(e -> applyFilters());
 
         // Major filter
-        gbc.gridx = 1;
-        JPanel majorFilterPanel = createFilterCombo("Major", majors, false);
-        filterPanel.add(majorFilterPanel, gbc);
+        JLabel majorLabel = new JLabel("Major:");
+        majorLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        majorLabel.setForeground(TEXT_PRIMARY);
+
+        majorCombo = createStyledComboBox(majors.toArray(new String[0]));
+        majorCombo.addActionListener(e -> applyFilters());
 
         // Department filter
-        gbc.gridx = 2;
-        JPanel deptFilterPanel = createFilterCombo("Department", departments, false);
-        filterPanel.add(deptFilterPanel, gbc);
+        JLabel deptLabel = new JLabel("Department:");
+        deptLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        deptLabel.setForeground(TEXT_PRIMARY);
 
-        // Clear filters button
-        gbc.gridx = 3;
-        gbc.weightx = 0;
-        JButton clearBtn = createClearFiltersButton();
-        filterPanel.add(clearBtn, gbc);
+        departmentCombo = createStyledComboBox(departments.toArray(new String[0]));
+        departmentCombo.addActionListener(e -> applyFilters());
 
-        return filterPanel;
+        // Action buttons
+        JButton refreshBtn = createGradientButton("Refresh", ACCENT_TEAL, new Color(13, 148, 136));
+        refreshBtn.addActionListener(e -> {
+            clearFilters();
+            applyFilters();
+        });
+
+        JButton clearBtn = createGradientButton("Clear", ACCENT_RED, new Color(220, 38, 38));
+        clearBtn.addActionListener(e -> clearFilters());
+
+        panel.add(searchContainer);
+        panel.add(searchBtn);
+        panel.add(Box.createRigidArea(new Dimension(10, 0)));
+        panel.add(classLabel);
+        panel.add(classCombo);
+        panel.add(Box.createRigidArea(new Dimension(10, 0)));
+        panel.add(majorLabel);
+        panel.add(majorCombo);
+        panel.add(Box.createRigidArea(new Dimension(10, 0)));
+        panel.add(deptLabel);
+        panel.add(departmentCombo);
+        panel.add(Box.createRigidArea(new Dimension(10, 0)));
+        panel.add(refreshBtn);
+        panel.add(clearBtn);
+
+        return panel;
     }
 
-    private JPanel createSearchField() {
-        JPanel container = new JPanel(new BorderLayout(10, 0));
-        container.setOpaque(false);
-
-        JLabel searchIcon = new JLabel("🔍");
-        searchIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
-
-        searchField = new JTextField() {
+    private JPanel createStyledTextField(String placeholder, int width) {
+        JPanel container = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 
-                g2d.setColor(new Color(248, 250, 252));
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                g2d.setColor(SEARCH_BG);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
                 
-                super.paintComponent(g);
+                g2d.setColor(new Color(203, 213, 225));
+                g2d.setStroke(new BasicStroke(1.5f));
+                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
             }
         };
-        searchField.setOpaque(false);
+        container.setOpaque(false);
+        container.setBorder(new EmptyBorder(0, 15, 0, 15));
+        container.setPreferredSize(new Dimension(width, 42));
+
+        searchField = new JTextField();
         searchField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        searchField.setBorder(new EmptyBorder(12, 15, 12, 15));
+        searchField.setBorder(null);
+        searchField.setOpaque(false);
         searchField.setForeground(TEXT_PRIMARY);
         
         // Placeholder text
-        searchField.setText("Search by name or student ID...");
+        searchField.setText(placeholder);
         searchField.setForeground(TEXT_SECONDARY);
-        
         searchField.addFocusListener(new java.awt.event.FocusAdapter() {
-            @Override
             public void focusGained(java.awt.event.FocusEvent e) {
-                if (searchField.getText().equals("Search by name or student ID...")) {
+                if (searchField.getText().equals(placeholder)) {
                     searchField.setText("");
                     searchField.setForeground(TEXT_PRIMARY);
                 }
             }
-            @Override
             public void focusLost(java.awt.event.FocusEvent e) {
                 if (searchField.getText().isEmpty()) {
-                    searchField.setText("Search by name or student ID...");
+                    searchField.setText(placeholder);
                     searchField.setForeground(TEXT_SECONDARY);
                 }
             }
         });
 
-        searchField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) { applyFilters(); }
-            @Override
-            public void removeUpdate(DocumentEvent e) { applyFilters(); }
-            @Override
-            public void changedUpdate(DocumentEvent e) { applyFilters(); }
-        });
-
-        JPanel fieldContainer = new JPanel(new BorderLayout(10, 0)) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                g2d.setColor(new Color(248, 250, 252));
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                
-                g2d.setColor(new Color(226, 232, 240));
-                g2d.setStroke(new BasicStroke(1));
-                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
-            }
-        };
-        fieldContainer.setOpaque(false);
-        fieldContainer.setBorder(new EmptyBorder(0, 15, 0, 10));
-        fieldContainer.add(searchIcon, BorderLayout.WEST);
-        fieldContainer.add(searchField, BorderLayout.CENTER);
-
-        container.add(fieldContainer, BorderLayout.CENTER);
+        container.add(searchField, BorderLayout.CENTER);
         return container;
     }
 
-    private JPanel createFilterCombo(String label, List<String> options, boolean isClass) {
-        JPanel panel = new JPanel(new BorderLayout(0, 5));
-        panel.setOpaque(false);
-
-        JLabel titleLabel = new JLabel(label);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        titleLabel.setForeground(TEXT_SECONDARY);
-
-        JComboBox<String> combo = new JComboBox<>(options.toArray(new String[0]));
-        combo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        combo.setBackground(new Color(248, 250, 252));
-        combo.setBorder(new EmptyBorder(8, 10, 8, 10));
-
-        combo.addActionListener(e -> applyFilters());
-
-        // Store reference for filtering
-        if (isClass) {
-            classCombo = combo;
-        } else if (label.equals("Major")) {
-            majorCombo = combo;
-        } else {
-            departmentCombo = combo;
-        }
-
-        panel.add(titleLabel, BorderLayout.NORTH);
-        panel.add(combo, BorderLayout.CENTER);
-
-        return panel;
+    private JComboBox<String> createStyledComboBox(String[] items) {
+        JComboBox<String> comboBox = new JComboBox<>(items);
+        comboBox.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        comboBox.setPreferredSize(new Dimension(150, 36));
+        comboBox.setBackground(CARD_BG);
+        comboBox.setForeground(TEXT_PRIMARY);
+        comboBox.setBorder(BorderFactory.createEmptyBorder(2, 8, 2, 8));
+        comboBox.setFocusable(false);
+        comboBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Custom UI to hide the blue arrow box
+        comboBox.setUI(new javax.swing.plaf.basic.BasicComboBoxUI() {
+            @Override
+            protected JButton createArrowButton() {
+                JButton button = new JButton();
+                button.setBorder(BorderFactory.createEmptyBorder());
+                button.setContentAreaFilled(false);
+                button.setFocusPainted(false);
+                button.setBorderPainted(false);
+                button.setText("▼");
+                button.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+                button.setForeground(TEXT_SECONDARY);
+                return button;
+            }
+        });
+        
+        return comboBox;
     }
 
-    private JButton createClearFiltersButton() {
-        JButton button = new JButton("Clear Filters") {
+    private JButton createGradientButton(String text, Color color1, Color color2) {
+        JButton button = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+                GradientPaint gradient;
                 if (getModel().isPressed()) {
-                    g2d.setColor(new Color(220, 38, 38));
+                    gradient = new GradientPaint(0, 0, color2.darker(), 0, getHeight(), color1.darker());
                 } else if (getModel().isRollover()) {
-                    g2d.setColor(ACCENT_RED);
+                    gradient = new GradientPaint(0, 0, color1.brighter(), 0, getHeight(), color2.brighter());
                 } else {
-                    g2d.setColor(new Color(254, 226, 226));
+                    gradient = new GradientPaint(0, 0, color1, 0, getHeight(), color2);
                 }
-
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-
-                if (getModel().isRollover() || getModel().isPressed()) {
-                    g2d.setColor(Color.WHITE);
-                } else {
-                    g2d.setColor(ACCENT_RED);
+                
+                // Shadow on hover
+                if (getModel().isRollover()) {
+                    g2d.setColor(new Color(0, 0, 0, 20));
+                    g2d.fillRoundRect(2, 2, getWidth() - 2, getHeight() - 2, 12, 12);
                 }
+                
+                g2d.setPaint(gradient);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+
+                g2d.setColor(Color.WHITE);
                 g2d.setFont(getFont());
                 FontMetrics fm = g2d.getFontMetrics();
                 int textX = (getWidth() - fm.stringWidth(getText())) / 2;
@@ -407,21 +413,17 @@ public class ManageStudentsPage extends JFrame {
                 g2d.drawString(getText(), textX, textY);
             }
         };
-
-        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
-        button.setPreferredSize(new Dimension(120, 40));
+        button.setPreferredSize(new Dimension(90, 42));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        button.addActionListener(e -> clearFilters());
-
         return button;
     }
 
     private void clearFilters() {
-        searchField.setText("Search by name or student ID...");
+        searchField.setText("Search by name or ID...");
         searchField.setForeground(TEXT_SECONDARY);
         classCombo.setSelectedIndex(0);
         majorCombo.setSelectedIndex(0);
@@ -431,7 +433,7 @@ public class ManageStudentsPage extends JFrame {
 
     private void applyFilters() {
         String searchText = searchField.getText();
-        if (searchText.equals("Search by name or student ID...")) {
+        if (searchText.equals("Search by name or ID...")) {
             searchText = "";
         }
         searchText = searchText.toLowerCase();

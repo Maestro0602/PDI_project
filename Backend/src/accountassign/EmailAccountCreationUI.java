@@ -1,8 +1,8 @@
 package Backend.src.accountassign;
 
+import Backend.Main.MainPageOwner;
 import Backend.src.database.EmailManager;
 import Backend.src.database.EmailManager.AccountType;
-import Backend.Main.MainPageOwner;
 import java.util.Scanner;
 
 /**

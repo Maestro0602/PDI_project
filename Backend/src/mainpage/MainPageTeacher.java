@@ -1,19 +1,18 @@
-package Backend.Main;
+package Backend.src.mainpage;
 
-import java.util.Scanner;
 import Backend.src.department.ManageDepartment;
 import Backend.src.studentassign.studentassign;
+import java.util.Scanner;
 
 public class MainPageTeacher {
 
-    // New method that accepts Scanner parameter
-   public static void main(String[] args) {
+    public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         boolean exit = false;
         try {
-            System.out.println("=".repeat(30));
+            System.out.println("========================================");
             System.out.println("Welcome To Teacher main page");
-            System.out.println("=".repeat(30));
+            System.out.println("========================================");
             System.out.println("1. Manage Students information");
             System.out.println("2. Manage grades and GPA");
             System.out.println("3. Manage Attendance");
@@ -26,25 +25,21 @@ public class MainPageTeacher {
             while (!exit) {
                 System.out.print("Choose an option to proceed: ");
                 int choice = input.nextInt();
-                input.nextLine(); 
+                input.nextLine();
 
                 switch (choice) {
                     case 1:
                         System.out.println("Managing Students information...");
                         studentassign.main(null);
-                        // Add your student management logic here
                         break;
                     case 2:
                         System.out.println("Managing grades and GPA...");
-                        // Add your grades management logic here
                         break;
                     case 3:
                         System.out.println("Managing Attendance...");
-                        // Add your attendance management logic here
                         break;
                     case 4:
                         System.out.println("Generating Reports...");
-                        // Add your reports generation logic here
                         break;
                     case 5:
                         System.out.println("Managing Department...");
@@ -55,7 +50,7 @@ public class MainPageTeacher {
                         break;
                     case 7:
                         System.out.println("Logging out...");
-                        Main.main(null);
+                        exit = true;
                         break;
                     default:
                         System.out.println("Invalid option. Please try again.");

@@ -340,7 +340,8 @@ public class StudentInfoManager {
                 rs = stmt.executeQuery(sql);
 
                 if (rs.next()) {
-                    return rs.getInt("total");
+                    int count = rs.getInt("total");
+                    return count >= 0 ? count : 0; // Ensure non-negative
                 }
             }
         } catch (SQLException e) {
@@ -349,6 +350,112 @@ public class StudentInfoManager {
             closeResources(conn, stmt, rs);
         }
         return 0;
+    }
+
+    /**
+     * Get all students as a 2D array for UI usage
+     * Returns array of [studentName, studentID, gender, year]
+     */
+    public static String[][] getAllStudentsArray() {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                // First count total records
+                String countSql = "SELECT COUNT(*) as total FROM studentInfo";
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery(countSql);
+                
+                int count = 0;
+                if (rs.next()) {
+                    count = rs.getInt("total");
+                }
+                
+                if (count == 0) {
+                    return new String[0][4];
+                }
+                
+                // Get all students
+                String sql = "SELECT studentName, studentID, gender, year FROM studentInfo ORDER BY studentName";
+                rs = stmt.executeQuery(sql);
+                
+                String[][] results = new String[count][4];
+                int index = 0;
+                
+                while (rs.next() && index < count) {
+                    results[index][0] = rs.getString("studentName") != null ? rs.getString("studentName") : "";
+                    results[index][1] = rs.getString("studentID") != null ? rs.getString("studentID") : "";
+                    results[index][2] = rs.getString("gender") != null ? rs.getString("gender") : "";
+                    results[index][3] = rs.getString("year") != null ? rs.getString("year") : "";
+                    index++;
+                }
+                
+                return results;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting all students: " + e.getMessage());
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return new String[0][4];
+    }
+
+    /**
+     * Get all students with department and major info
+     * Returns array of [studentName, studentID, major, department, class]
+     */
+    public static String[][] getAllStudentsWithDepartment() {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                String sql = "SELECT si.studentName, si.studentID, " +
+                        "COALESCE(dm.major, 'Not Assigned') as major, " +
+                        "COALESCE(dm.department, 'Not Assigned') as department, " +
+                        "COALESCE(dm.Course1, 'Not Assigned') as course " +
+                        "FROM studentInfo si " +
+                        "LEFT JOIN departmentMajor dm ON si.studentID = dm.stuId " +
+                        "ORDER BY si.studentName";
+                
+                stmt = conn.createStatement();
+                
+                // First count
+                rs = stmt.executeQuery(sql);
+                int count = 0;
+                while (rs.next()) count++;
+                
+                if (count == 0) {
+                    return new String[0][5];
+                }
+                
+                // Get data
+                rs = stmt.executeQuery(sql);
+                String[][] results = new String[count][5];
+                int index = 0;
+                
+                while (rs.next() && index < count) {
+                    results[index][0] = rs.getString("studentName") != null ? rs.getString("studentName") : "";
+                    results[index][1] = rs.getString("studentID") != null ? rs.getString("studentID") : "";
+                    results[index][2] = rs.getString("major") != null ? rs.getString("major") : "Not Assigned";
+                    results[index][3] = rs.getString("department") != null ? rs.getString("department") : "Not Assigned";
+                    results[index][4] = rs.getString("course") != null ? rs.getString("course") : "Not Assigned";
+                    index++;
+                }
+                
+                return results;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting students with department: " + e.getMessage());
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return new String[0][5];
     }
 
     /**

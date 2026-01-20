@@ -1,16 +1,16 @@
 package Backend.src.database;
 
-import java.sql.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.*;
 
 public class DatabaseManager {
 
     // ====== DATABASE CONNECTION CLASS ======
     public static class DatabaseConnection {
         private static final String DB_URL = "jdbc:mysql://localhost:3306/login_system";
-        private static final String DB_USER = "myuser";
-        private static final String DB_PASSWORD = "mypassword";
+        private static final String DB_USER = "root";
+        private static final String DB_PASSWORD = "MRHENGXD123";
         private static final String DB_ROOT_URL = "jdbc:mysql://localhost:3306";
 
         /**
@@ -58,38 +58,6 @@ public class DatabaseManager {
         }
 
         /**
-         * Create users table if it doesn't exist
-         */
-        public static void createUserTable() {
-            Connection conn = null;
-            Statement stmt = null;
-
-            try {
-                conn = connectDB();
-                if (conn != null) {
-                    String sql = "CREATE TABLE IF NOT EXISTS users (" +
-                            "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                            "UserID VARCHAR(30), " +
-                            "Name VARCHAR(50) UNIQUE NOT NULL, " +
-                            "email VARCHAR(100) UNIQUE NOT NULL, " +
-                            "password VARCHAR(100) NOT NULL, " +
-                            "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
-
-                    stmt = conn.createStatement();
-                    stmt.executeUpdate(sql);
-                   // System.out.println("✓ Users table initialized successfully");
-                } else {
-                    System.out.println("✗ Failed to connect to login_system database");
-                }
-            } catch (SQLException e) {
-                System.out.println("Error creating table: " + e.getMessage());
-                e.printStackTrace();
-            } finally {
-                closeResources(conn, stmt, null);
-            }
-        }
-
-        /**
          * Close database resources safely
          */
         public static void closeResources(Connection conn, Statement stmt, ResultSet rs) {
@@ -102,6 +70,32 @@ public class DatabaseManager {
                     conn.close();
             } catch (SQLException e) {
                 System.out.println("Error closing resources: " + e.getMessage());
+            }
+        }
+
+        /**
+         * Create the `users` table if it does not exist
+         */
+        public static void createUserTable() {
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                conn = connectDB();
+                if (conn != null) {
+                    stmt = conn.createStatement();
+                    String sql = "CREATE TABLE IF NOT EXISTS users ("
+                            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                            + "EmailName VARCHAR(100) NOT NULL, "
+                            + "email VARCHAR(150) NOT NULL UNIQUE, "
+                            + "password VARCHAR(256) NOT NULL, "
+                            + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+                            + ") ENGINE=InnoDB;";
+                    stmt.executeUpdate(sql);
+                }
+            } catch (SQLException e) {
+                System.out.println("Error creating users table: " + e.getMessage());
+            } finally {
+                closeResources(conn, stmt, null);
             }
         }
     }
@@ -251,6 +245,45 @@ public class DatabaseManager {
         }
 
         /**
+         * Verify login and return user info including email for role detection
+         * Returns String array [username, email] if successful, null if failed
+         */
+        public static String[] verifyLoginWithEmail(String usernameOrEmail, String password) {
+            Connection conn = null;
+            PreparedStatement pstmt = null;
+            ResultSet rs = null;
+
+            try {
+                conn = DatabaseConnection.connectDB();
+                if (conn != null) {
+                    // Hash the input password for comparison
+                    String hashedPassword = hashPassword(password);
+                    String sql = "SELECT Name, email FROM users WHERE " +
+                            "(Name = ? OR email = ?) AND password = ?";
+
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.setString(1, usernameOrEmail);
+                    pstmt.setString(2, usernameOrEmail);
+                    pstmt.setString(3, hashedPassword);
+
+                    rs = pstmt.executeQuery();
+
+                    if (rs.next()) {
+                        return new String[] {
+                            rs.getString("Name"),
+                            rs.getString("email")
+                        };
+                    }
+                }
+            } catch (SQLException e) {
+                System.out.println("Error verifying login: " + e.getMessage());
+            } finally {
+                DatabaseConnection.closeResources(conn, pstmt, rs);
+            }
+            return null;
+        }
+
+        /**
          * Get user details by username or email
          */
         public static void getUserDetails(String usernameOrEmail) {
@@ -388,6 +421,10 @@ public class DatabaseManager {
 
     public static boolean checkEmailExists(String email) {
         return ConditionChecker.checkEmailExists(email);
+    }
+
+    public static String[] verifyLoginWithEmail(String usernameOrEmail, String password) {
+        return ConditionChecker.verifyLoginWithEmail(usernameOrEmail, password);
     }
 
     public static boolean resetPassword(String email, String newPassword) {

@@ -232,7 +232,8 @@ public class CourseManager {
                 stmt = conn.createStatement();
                 rs = stmt.executeQuery(sql);
                 if (rs.next()) {
-                    return rs.getInt("count");
+                    int count = rs.getInt("count");
+                    return count >= 0 ? count : 0; // Ensure non-negative
                 }
             }
         } catch (SQLException e) {
@@ -241,6 +242,121 @@ public class CourseManager {
             closeResources(conn, stmt, rs);
         }
         return 0;
+    }
+
+    /**
+     * READ - Get all courses as array for UI
+     * Returns array of course names
+     */
+    public static String[] getAllCoursesArray() {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                // First count
+                String countSql = "SELECT COUNT(*) as count FROM course";
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery(countSql);
+                
+                int count = 0;
+                if (rs.next()) {
+                    count = rs.getInt("count");
+                }
+                
+                if (count == 0) {
+                    return new String[0];
+                }
+                
+                // Get all courses
+                String sql = "SELECT course_name FROM course ORDER BY course_id";
+                rs = stmt.executeQuery(sql);
+                
+                String[] results = new String[count];
+                int index = 0;
+                
+                while (rs.next() && index < count) {
+                    String courseName = rs.getString("course_name");
+                    results[index] = courseName != null ? courseName : "";
+                    index++;
+                }
+                
+                return results;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting all courses: " + e.getMessage());
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return new String[0];
+    }
+
+    /**
+     * READ - Get all unique departments from departmentMajor table
+     */
+    public static String[] getAllDepartments() {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                String sql = "SELECT DISTINCT department FROM departmentMajor ORDER BY department";
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery(sql);
+                
+                java.util.List<String> departments = new java.util.ArrayList<>();
+                while (rs.next()) {
+                    String dept = rs.getString("department");
+                    if (dept != null && !dept.isEmpty()) {
+                        departments.add(dept);
+                    }
+                }
+                
+                return departments.toArray(new String[0]);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting departments: " + e.getMessage());
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return new String[0];
+    }
+
+    /**
+     * READ - Get all unique majors from departmentMajor table
+     */
+    public static String[] getAllMajors() {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                String sql = "SELECT DISTINCT major FROM departmentMajor ORDER BY major";
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery(sql);
+                
+                java.util.List<String> majors = new java.util.ArrayList<>();
+                while (rs.next()) {
+                    String major = rs.getString("major");
+                    if (major != null && !major.isEmpty()) {
+                        majors.add(major);
+                    }
+                }
+                
+                return majors.toArray(new String[0]);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting majors: " + e.getMessage());
+        } finally {
+            closeResources(conn, stmt, rs);
+        }
+        return new String[0];
     }
 
     /**

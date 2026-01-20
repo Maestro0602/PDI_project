@@ -1,9 +1,9 @@
 package Backend.Main;
 
-import Backend.src.login.LoginApplication;
-import Backend.src.register.RegistrationManager;
 import Backend.src.database.DatabaseManager;
 import Backend.src.database.EmailManager;
+import Backend.src.login.LoginApplication;
+import Backend.src.register.RegistrationManager;
 import java.util.Scanner;
 
 public class Main {

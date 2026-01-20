@@ -1,5 +1,7 @@
 package Frontend.ui;
 
+import Backend.src.database.MajorManager;
+import Backend.src.database.StudentInfoManager;
 import java.awt.*;
 import java.awt.print.PrinterException;
 import java.util.ArrayList;
@@ -9,7 +11,7 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * StudentReportPage - Displays comprehensive student academic reports
- * Uses fake data for demonstration - no database required
+ * Loads data from database - grades default to 0 if not available
  */
 public class StudentReportPage extends JFrame {
 
@@ -38,75 +40,51 @@ public class StudentReportPage extends JFrame {
     private JPanel reportsContainer;
 
     public StudentReportPage() {
-        initFakeData();
+        loadDataFromDatabase();
         initComponent();
         loadAllReports();
     }
 
-    // ==================== FAKE DATA SECTION ====================
+    // ==================== DATABASE DATA LOADING ====================
     
-    private void initFakeData() {
+    private void loadDataFromDatabase() {
         allStudentReports = new ArrayList<>();
         
-        // Student 1 - High performer
-        List<GradeEntry> grades1 = new ArrayList<>();
-        grades1.add(new GradeEntry("Mathematics", 95.5, 4, "Fall 2025"));
-        grades1.add(new GradeEntry("Physics", 88.0, 3, "Fall 2025"));
-        grades1.add(new GradeEntry("Computer Science", 92.0, 4, "Fall 2025"));
-        grades1.add(new GradeEntry("English", 85.0, 3, "Fall 2025"));
-        grades1.add(new GradeEntry("Chemistry", 90.0, 3, "Fall 2025"));
-        grades1.add(new GradeEntry("Biology", 87.5, 3, "Fall 2025"));
-        allStudentReports.add(new StudentReport("STU001", "Sokha Vann", "Male", "Year 2", grades1));
-        
-        // Student 2 - Good student
-        List<GradeEntry> grades2 = new ArrayList<>();
-        grades2.add(new GradeEntry("Mathematics", 78.0, 4, "Fall 2025"));
-        grades2.add(new GradeEntry("Physics", 82.0, 3, "Fall 2025"));
-        grades2.add(new GradeEntry("Computer Science", 85.0, 4, "Fall 2025"));
-        grades2.add(new GradeEntry("English", 88.0, 3, "Fall 2025"));
-        grades2.add(new GradeEntry("Chemistry", 75.0, 3, "Fall 2025"));
-        grades2.add(new GradeEntry("Biology", 80.0, 3, "Fall 2025"));
-        allStudentReports.add(new StudentReport("STU002", "Channary Kim", "Female", "Year 1", grades2));
-        
-        // Student 3 - Average student
-        List<GradeEntry> grades3 = new ArrayList<>();
-        grades3.add(new GradeEntry("Mathematics", 72.0, 4, "Fall 2025"));
-        grades3.add(new GradeEntry("Physics", 68.0, 3, "Fall 2025"));
-        grades3.add(new GradeEntry("Computer Science", 75.0, 4, "Fall 2025"));
-        grades3.add(new GradeEntry("English", 70.0, 3, "Fall 2025"));
-        grades3.add(new GradeEntry("Chemistry", 65.0, 3, "Fall 2025"));
-        grades3.add(new GradeEntry("Biology", 73.0, 3, "Fall 2025"));
-        allStudentReports.add(new StudentReport("STU003", "Dara Sok", "Male", "Year 3", grades3));
-        
-        // Student 4 - Excellent student
-        List<GradeEntry> grades4 = new ArrayList<>();
-        grades4.add(new GradeEntry("Mathematics", 98.0, 4, "Fall 2025"));
-        grades4.add(new GradeEntry("Physics", 96.0, 3, "Fall 2025"));
-        grades4.add(new GradeEntry("Computer Science", 99.0, 4, "Fall 2025"));
-        grades4.add(new GradeEntry("English", 94.0, 3, "Fall 2025"));
-        grades4.add(new GradeEntry("Chemistry", 97.0, 3, "Fall 2025"));
-        grades4.add(new GradeEntry("Biology", 95.0, 3, "Fall 2025"));
-        allStudentReports.add(new StudentReport("STU004", "Sreymom Chea", "Female", "Year 4", grades4));
-        
-        // Student 5 - Needs improvement
-        List<GradeEntry> grades5 = new ArrayList<>();
-        grades5.add(new GradeEntry("Mathematics", 55.0, 4, "Fall 2025"));
-        grades5.add(new GradeEntry("Physics", 60.0, 3, "Fall 2025"));
-        grades5.add(new GradeEntry("Computer Science", 58.0, 4, "Fall 2025"));
-        grades5.add(new GradeEntry("English", 62.0, 3, "Fall 2025"));
-        grades5.add(new GradeEntry("Chemistry", 50.0, 3, "Fall 2025"));
-        grades5.add(new GradeEntry("Biology", 55.0, 3, "Fall 2025"));
-        allStudentReports.add(new StudentReport("STU005", "Vibol Heng", "Male", "Year 1", grades5));
-        
-        // Student 6 - Good performer
-        List<GradeEntry> grades6 = new ArrayList<>();
-        grades6.add(new GradeEntry("Mathematics", 83.0, 4, "Fall 2025"));
-        grades6.add(new GradeEntry("Physics", 79.0, 3, "Fall 2025"));
-        grades6.add(new GradeEntry("Computer Science", 88.0, 4, "Fall 2025"));
-        grades6.add(new GradeEntry("English", 91.0, 3, "Fall 2025"));
-        grades6.add(new GradeEntry("Chemistry", 84.0, 3, "Fall 2025"));
-        grades6.add(new GradeEntry("Biology", 86.0, 3, "Fall 2025"));
-        allStudentReports.add(new StudentReport("STU006", "Sothea Phan", "Female", "Year 2", grades6));
+        // Load students from database
+        String[][] dbStudents = StudentInfoManager.getAllStudentsArray();
+        if (dbStudents != null && dbStudents.length > 0) {
+            for (String[] student : dbStudents) {
+                if (student != null && student.length >= 4) {
+                    String studentId = student[1] != null ? student[1] : "";
+                    String studentName = student[0] != null ? student[0] : "";
+                    String gender = student[2] != null ? student[2] : "";
+                    String year = student[3] != null ? student[3] : "";
+                    
+                    // Get courses for this student from MajorManager
+                    String[] courseInfo = MajorManager.getFullDepartmentMajorCourse(studentId);
+                    
+                    List<GradeEntry> grades = new ArrayList<>();
+                    if (courseInfo != null && courseInfo.length >= 6) {
+                        // courseInfo: [department, major, Course1, Course2, Course3, Course4]
+                        for (int i = 2; i < 6; i++) {
+                            String courseName = courseInfo[i];
+                            if (courseName != null && !courseName.isEmpty()) {
+                                // Default grade is 0 (no grades assigned yet)
+                                grades.add(new GradeEntry(courseName, 0.0, 3, "Current Semester"));
+                            }
+                        }
+                    }
+                    
+                    // If no courses found, add placeholder
+                    if (grades.isEmpty()) {
+                        grades.add(new GradeEntry("No courses assigned", 0.0, 0, "N/A"));
+                    }
+                    
+                    allStudentReports.add(new StudentReport(studentId, studentName, gender, year, grades));
+                }
+            }
+        }
+        // If no students found, list will be empty (no fake data)
     }
 
     // ==================== UI INITIALIZATION ====================
@@ -1084,10 +1062,12 @@ public class StudentReportPage extends JFrame {
         String semester;
 
         GradeEntry(String subjectName, double score, int credits, String semester) {
-            this.subjectName = subjectName;
-            this.score = score;
-            this.credits = credits;
-            this.semester = semester;
+            this.subjectName = subjectName != null ? subjectName : "";
+            // Ensure score is never negative, default to 0
+            this.score = score >= 0 ? score : 0;
+            // Ensure credits is never negative, default to 0
+            this.credits = credits >= 0 ? credits : 0;
+            this.semester = semester != null ? semester : "";
         }
 
         String getLetterGrade() {
@@ -1130,11 +1110,11 @@ public class StudentReportPage extends JFrame {
         List<GradeEntry> grades;
 
         StudentReport(String studentID, String studentName, String gender, String year, List<GradeEntry> grades) {
-            this.studentID = studentID;
-            this.studentName = studentName;
-            this.gender = gender;
-            this.year = year;
-            this.grades = grades;
+            this.studentID = studentID != null ? studentID : "";
+            this.studentName = studentName != null ? studentName : "";
+            this.gender = gender != null ? gender : "";
+            this.year = year != null ? year : "";
+            this.grades = grades != null ? grades : new ArrayList<>();
         }
 
         double calculateGPA() {

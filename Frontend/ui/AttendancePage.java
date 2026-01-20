@@ -1,5 +1,6 @@
 package Frontend.ui;
 
+import Backend.src.database.StudentInfoManager;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,13 +26,21 @@ public class AttendancePage extends JFrame {
     private List<String> students = new ArrayList<>();
 
     public AttendancePage() {
-        // testing
-        students.add("Nak");
-        students.add("vattey");
-        students.add("kimchun");
-        students.add("both");
-
+        loadStudentsFromDatabase();
         initComponent();
+    }
+
+    private void loadStudentsFromDatabase() {
+        // Load students from database
+        String[][] dbStudents = StudentInfoManager.getAllStudentsArray();
+        if (dbStudents != null && dbStudents.length > 0) {
+            for (String[] student : dbStudents) {
+                if (student != null && student.length > 0 && student[0] != null && !student[0].isEmpty()) {
+                    students.add(student[0]); // studentName
+                }
+            }
+        }
+        // If no students found, list will be empty (no fake data)
     }
 
     public void initComponent() {

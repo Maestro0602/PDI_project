@@ -1,5 +1,7 @@
 package Frontend.ui;
 
+import Backend.src.database.CourseManager;
+import Backend.src.database.StudentInfoManager;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -19,6 +21,7 @@ public class Grades extends JFrame {
     private static final Color ACCENT_PURPLE = new Color(168, 85, 247);
     private static final Color ACCENT_RED = new Color(239, 68, 68);
     private static final Color ACCENT_BLUE = new Color(59, 130, 246);
+    private static final Color SEARCH_BG = new Color(248, 250, 252);
 
     // Grade tracking
     private Map<String, Map<String, Double>> studentGrades = new HashMap<>();
@@ -29,25 +32,38 @@ public class Grades extends JFrame {
     private JPanel studentsPanel;
 
     public Grades() {
-        // Sample data
-        students.add("Nak");
-        students.add("Vattey");
-        students.add("Kimchun");
-        students.add("Both");
+        loadDataFromDatabase();
 
-        subjects.add("Mathematics");
-        subjects.add("Physics");
-        subjects.add("Chemistry");
-        subjects.add("Biology");
-        subjects.add("English");
-        subjects.add("Computer Science");
-
-        // Initialize grade maps for each student
+        // Initialize grade maps for each student with default 0 grades
         for (String student : students) {
             studentGrades.put(student, new HashMap<>());
         }
 
         initComponent();
+    }
+
+    private void loadDataFromDatabase() {
+        // Load students from database
+        String[][] dbStudents = StudentInfoManager.getAllStudentsArray();
+        if (dbStudents != null && dbStudents.length > 0) {
+            for (String[] student : dbStudents) {
+                if (student != null && student.length > 0 && student[0] != null && !student[0].isEmpty()) {
+                    students.add(student[0]); // studentName
+                }
+            }
+        }
+
+        // Load subjects/courses from database
+        String[] dbCourses = CourseManager.getAllCoursesArray();
+        if (dbCourses != null && dbCourses.length > 0) {
+            for (String course : dbCourses) {
+                if (course != null && !course.isEmpty()) {
+                    subjects.add(course);
+                }
+            }
+        }
+
+        // If no data from database, show empty state (no fake data)
     }
 
     public void initComponent() {
@@ -232,29 +248,30 @@ public class Grades extends JFrame {
 
     @SuppressWarnings("unchecked")
     private JComboBox<String> createStyledComboBox() {
-        JComboBox<String> comboBox = new JComboBox<String>() {
-            @Override
-            public void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                g2d.setColor(new Color(248, 250, 252));
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                
-                g2d.setColor(new Color(203, 213, 225));
-                g2d.setStroke(new BasicStroke(1));
-                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
-                
-                super.paintComponent(g);
-            }
-        };
-        
+        JComboBox<String> comboBox = new JComboBox<String>();
         comboBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         comboBox.setPreferredSize(new Dimension(250, 40));
-        comboBox.setBackground(new Color(248, 250, 252));
+        comboBox.setBackground(CARD_BG);
         comboBox.setForeground(TEXT_PRIMARY);
-        comboBox.setBorder(new EmptyBorder(5, 15, 5, 15));
+        comboBox.setBorder(BorderFactory.createEmptyBorder(2, 8, 2, 8));
+        comboBox.setFocusable(false);
         comboBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Custom UI to hide the blue arrow box
+        comboBox.setUI(new javax.swing.plaf.basic.BasicComboBoxUI() {
+            @Override
+            protected JButton createArrowButton() {
+                JButton button = new JButton();
+                button.setBorder(BorderFactory.createEmptyBorder());
+                button.setContentAreaFilled(false);
+                button.setFocusPainted(false);
+                button.setBorderPainted(false);
+                button.setText("▼");
+                button.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+                button.setForeground(TEXT_SECONDARY);
+                return button;
+            }
+        });
         
         return comboBox;
     }
@@ -541,13 +558,23 @@ public class Grades extends JFrame {
             try {
                 String text = gradeField.getText().trim();
                 if (text.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Please enter a grade!", "Warning", JOptionPane.WARNING_MESSAGE);
+                    // Default to 0 if empty
+                    double grade = 0;
+                    studentGrades.get(studentName).put(selectedSubject, grade);
+                    statusLabel.setText("Grade: 0 ✓");
+                    statusLabel.setForeground(ACCENT_GREEN);
+                    gradeField.setText("0");
                     return;
                 }
                 
                 double grade = Double.parseDouble(text);
-                if (grade < 0 || grade > 100) {
-                    JOptionPane.showMessageDialog(this, "Grade must be between 0 and 100!", "Invalid Grade", JOptionPane.WARNING_MESSAGE);
+                // Ensure grade is never negative - clamp to 0
+                if (grade < 0) {
+                    grade = 0;
+                    gradeField.setText("0");
+                }
+                if (grade > 100) {
+                    JOptionPane.showMessageDialog(this, "Grade must not exceed 100!", "Invalid Grade", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
                 
