@@ -2,6 +2,7 @@ package Frontend.ui;
 
 import Backend.src.database.CourseManager;
 import Backend.src.database.StudentInfoManager;
+import Backend.src.session.UserSession;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -17,21 +18,24 @@ public class Grades extends JFrame {
     private static final Color TEXT_PRIMARY = new Color(15, 23, 42);
     private static final Color TEXT_SECONDARY = new Color(100, 116, 139);
     private static final Color ACCENT_GREEN = new Color(34, 197, 94);
-    // private static final Color ACCENT_ORANGE = new Color(249, 115, 22); //not used yet
     private static final Color ACCENT_PURPLE = new Color(168, 85, 247);
     private static final Color ACCENT_RED = new Color(239, 68, 68);
     private static final Color ACCENT_BLUE = new Color(59, 130, 246);
-    private static final Color SEARCH_BG = new Color(248, 250, 252);
 
     // Grade tracking
     private Map<String, Map<String, Double>> studentGrades = new HashMap<>();
+    private Map<String, String> studentIdMap = new HashMap<>(); // studentName -> studentID
     private List<String> students = new ArrayList<>();
     private List<String> subjects = new ArrayList<>();
     private String selectedSubject = null;
     private JComboBox<String> subjectComboBox;
     private JPanel studentsPanel;
+    
+    // Session reference
+    private UserSession session;
 
     public Grades() {
+        this.session = UserSession.getInstance();
         loadDataFromDatabase();
 
         // Initialize grade maps for each student with default 0 grades
@@ -47,8 +51,9 @@ public class Grades extends JFrame {
         String[][] dbStudents = StudentInfoManager.getAllStudentsArray();
         if (dbStudents != null && dbStudents.length > 0) {
             for (String[] student : dbStudents) {
-                if (student != null && student.length > 0 && student[0] != null && !student[0].isEmpty()) {
+                if (student != null && student.length > 1 && student[0] != null && !student[0].isEmpty()) {
                     students.add(student[0]); // studentName
+                    studentIdMap.put(student[0], student[1]); // Map name to ID
                 }
             }
         }
@@ -611,6 +616,7 @@ public class Grades extends JFrame {
                 return;
             }
             
+            // Count grades for display
             int gradesCount = 0;
             for (String student : students) {
                 if (studentGrades.get(student).containsKey(selectedSubject)) {
@@ -618,12 +624,19 @@ public class Grades extends JFrame {
                 }
             }
             
-            JOptionPane.showMessageDialog(this,
-                "Grades saved successfully!\n" +
-                "Subject: " + selectedSubject + "\n" +
-                "Students graded: " + gradesCount + " out of " + students.size(),
-                "Success",
-                JOptionPane.INFORMATION_MESSAGE);
+            if (gradesCount == 0) {
+                JOptionPane.showMessageDialog(this,
+                    "No grades to save. Please enter grades first.",
+                    "Warning",
+                    JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Grades recorded!\n" +
+                    "Subject: " + selectedSubject + "\n" +
+                    "Students graded: " + gradesCount + " out of " + students.size(),
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
         });
 
         viewSummaryButton.addActionListener(e -> showGradeSummary());

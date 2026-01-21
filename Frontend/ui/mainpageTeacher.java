@@ -1,5 +1,7 @@
 package Frontend.ui;
 
+import Backend.src.mainpage.TeacherMainPageService;
+import Backend.src.session.UserSession;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -16,9 +18,31 @@ public class mainpageTeacher extends JFrame {
     private static final Color ACCENT_RED = new Color(239, 68, 68);
     private static final Color ACCENT_BLUE = new Color(59, 130, 246);
     private static final Color ACCENT_PINK = new Color(236, 72, 153);
-    private static final Color ACCENT_CYAN = new Color(63,240,199);
+    
+    // Session reference
+    private UserSession session;
+    // Backend service
+    private TeacherMainPageService teacherService;
 
     public mainpageTeacher() {
+        this.session = UserSession.getInstance();
+        this.teacherService = new TeacherMainPageService();
+        
+        // Verify user is a teacher or owner
+        if (!teacherService.isTeacher() && !teacherService.isOwner()) {
+            JOptionPane.showMessageDialog(this,
+                "Access Denied: You must be a teacher to access this page.",
+                "Access Denied",
+                JOptionPane.ERROR_MESSAGE);
+            // Redirect to login
+            SwingUtilities.invokeLater(() -> {
+                loginpage login = new loginpage();
+                login.setVisible(true);
+                dispose();
+            });
+            return;
+        }
+        
         initComponent();
     }
 
@@ -132,17 +156,27 @@ public class mainpageTeacher extends JFrame {
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
         titlePanel.setOpaque(false);
 
-        JLabel welcomeLabel = new JLabel("Teacher Mainpage");
+        JLabel welcomeLabel = new JLabel("Teacher Dashboard");
         welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         welcomeLabel.setForeground(TEXT_PRIMARY);
 
-        JLabel subtitleLabel = new JLabel("Welcome to mainpage!");
+        // Personalized welcome message using backend service
+        String welcomeText = teacherService.getWelcomeMessage();
+        JLabel subtitleLabel = new JLabel(welcomeText);
         subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         subtitleLabel.setForeground(TEXT_SECONDARY);
+        
+        // Department and course info from backend
+        String infoText = teacherService.getSubtitleInfo();
+        JLabel infoLabel = new JLabel(infoText);
+        infoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+        infoLabel.setForeground(new Color(59, 130, 246));
 
         titlePanel.add(welcomeLabel);
         titlePanel.add(Box.createRigidArea(new Dimension(0, 4)));
         titlePanel.add(subtitleLabel);
+        titlePanel.add(Box.createRigidArea(new Dimension(0, 2)));
+        titlePanel.add(infoLabel);
 
         titleContainer.add(iconBadge);
         titleContainer.add(titlePanel);
@@ -393,6 +427,8 @@ public class mainpageTeacher extends JFrame {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         button.addActionListener(e -> {
+            // Clear user session on logout using backend service
+            teacherService.logout();
             loginpage login = new loginpage();
             login.setVisible(true);
             dispose();

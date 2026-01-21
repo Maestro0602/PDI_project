@@ -1,5 +1,6 @@
 package Frontend.ui;
 
+import Backend.src.session.UserSession;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -14,9 +15,12 @@ public class mainpageStudent extends JFrame {
     private static final Color ACCENT_PURPLE = new Color(168, 85, 247);
     private static final Color ACCENT_RED = new Color(239, 68, 68);
     private static final Color ACCENT_BLUE = new Color(59, 130, 246);
-    private static final Color ACCENT_PINK = new Color(236, 72, 153);
+    
+    // Session reference
+    private UserSession session;
 
     public mainpageStudent() {
+        this.session = UserSession.getInstance();
         initComponent();
     }
 
@@ -134,7 +138,11 @@ public class mainpageStudent extends JFrame {
         welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         welcomeLabel.setForeground(TEXT_PRIMARY);
 
-        JLabel subtitleLabel = new JLabel("Welcome to mainpage!");
+        // Personalized welcome message using session
+        String welcomeText = session.isLoggedIn() 
+            ? "Welcome back, " + session.getDisplayName() + "!"
+            : "Welcome to mainpage!";
+        JLabel subtitleLabel = new JLabel(welcomeText);
         subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         subtitleLabel.setForeground(TEXT_SECONDARY);
 
@@ -341,6 +349,8 @@ public class mainpageStudent extends JFrame {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         button.addActionListener(e -> {
+            // Clear user session on logout
+            UserSession.getInstance().clearSession();
             loginpage login = new loginpage();
             login.setVisible(true);
             dispose();

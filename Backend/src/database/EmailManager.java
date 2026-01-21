@@ -235,7 +235,6 @@ public class EmailManager {
         } finally {
             AccountDatabaseConnection.closeResources(conn, pstmt, rs);
         }
-
         return ownerEmails;
     }
 

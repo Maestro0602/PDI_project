@@ -1,6 +1,7 @@
 package Frontend.ui;
 
 import Backend.src.database.StudentInfoManager;
+import Backend.src.session.UserSession;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,13 +20,17 @@ public class AttendancePage extends JFrame {
     private static final Color ACCENT_ORANGE = new Color(249, 115, 22);
     private static final Color ACCENT_YELLOW = new Color(255, 255, 0);
     private static final Color ACCENT_RED = new Color(239, 68, 68);
-    // private static final Color ACCENT_BLUE = new Color(59, 130, 246); // for later use
 
     // Attendance status tracking
     private Map<String, String> attendanceStatus = new HashMap<>();
+    private Map<String, String> studentIdMap = new HashMap<>(); // studentName -> studentID
     private List<String> students = new ArrayList<>();
+    
+    // Session reference
+    private UserSession session;
 
     public AttendancePage() {
+        this.session = UserSession.getInstance();
         loadStudentsFromDatabase();
         initComponent();
     }
@@ -35,8 +40,9 @@ public class AttendancePage extends JFrame {
         String[][] dbStudents = StudentInfoManager.getAllStudentsArray();
         if (dbStudents != null && dbStudents.length > 0) {
             for (String[] student : dbStudents) {
-                if (student != null && student.length > 0 && student[0] != null && !student[0].isEmpty()) {
+                if (student != null && student.length > 1 && student[0] != null && !student[0].isEmpty()) {
                     students.add(student[0]); // studentName
+                    studentIdMap.put(student[0], student[1]); // Map name to ID
                 }
             }
         }
@@ -388,10 +394,19 @@ public class AttendancePage extends JFrame {
         JButton clearButton = createActionButton("Clear All", ACCENT_RED, false);
 
         saveButton.addActionListener(e -> {
+            if (attendanceStatus.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                    "No attendance marked. Please mark attendance for at least one student.",
+                    "Warning",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
             int marked = attendanceStatus.size();
             int total = students.size();
+            
             JOptionPane.showMessageDialog(this,
-                "Attendance saved successfully!\n" +
+                "Attendance recorded!\n" +
                 "Marked: " + marked + " out of " + total + " students",
                 "Success",
                 JOptionPane.INFORMATION_MESSAGE);

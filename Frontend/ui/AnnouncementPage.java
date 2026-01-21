@@ -1,5 +1,7 @@
     package Frontend.ui;
 
+    import Backend.src.database.AnnouncementManager;
+    import Backend.src.session.UserSession;
     import java.awt.*;
     import java.text.SimpleDateFormat;
     import java.util.ArrayList;
@@ -24,8 +26,12 @@
         private List<Announcement> announcements = new ArrayList<>();
         private JPanel feedPanel;
         
+        // Session reference
+        private UserSession session;
+        
         // Inner class for Announcement
         private static class Announcement {
+            int id;
             String author;
             String title;
             String content;
@@ -35,21 +41,56 @@
             String category;
             
             Announcement(String author, String title, String content, String category) {
+                this.id = 0;
                 this.author = author != null ? author : "";
                 this.title = title != null ? title : "";
                 this.content = content != null ? content : "";
                 this.timestamp = new Date();
-                this.upvotes = 0; // Default to 0, never negative
-                this.comments = 0; // Default to 0, never negative
+                this.upvotes = 0;
+                this.comments = 0;
+                this.category = category != null ? category : "";
+            }
+            
+            Announcement(int id, String author, String title, String content, String category, int upvotes, Date timestamp) {
+                this.id = id;
+                this.author = author != null ? author : "";
+                this.title = title != null ? title : "";
+                this.content = content != null ? content : "";
+                this.timestamp = timestamp != null ? timestamp : new Date();
+                this.upvotes = upvotes;
+                this.comments = 0;
                 this.category = category != null ? category : "";
             }
         }
 
         public AnnouncementPage() {
-            // No fake data - announcements list starts empty
-            // Users can add announcements using the "New Post" button
-            
+            this.session = UserSession.getInstance();
+            loadAnnouncementsFromDatabase();
             initComponent();
+        }
+        
+        private void loadAnnouncementsFromDatabase() {
+            // Load announcements from database
+            String[][] dbAnnouncements = AnnouncementManager.getAllAnnouncements();
+            if (dbAnnouncements != null && dbAnnouncements.length > 0) {
+                for (String[] ann : dbAnnouncements) {
+                    if (ann != null && ann.length >= 7) {
+                        try {
+                            int id = Integer.parseInt(ann[0]);
+                            String title = ann[1];
+                            String content = ann[2];
+                            String author = ann[3];
+                            String category = ann[4];
+                            int upvotes = Integer.parseInt(ann[5]);
+                            Date timestamp = new Date(); // Simplified - could parse the actual date
+                            
+                            announcements.add(new Announcement(id, author, title, content, category, upvotes, timestamp));
+                        } catch (NumberFormatException e) {
+                            // Skip invalid records
+                        }
+                    }
+                }
+            }
         }
 
         public void initComponent() {
@@ -520,6 +561,10 @@
             upvoteBtn.setPreferredSize(new Dimension(40, 35));
             upvoteBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
             upvoteBtn.addActionListener(e -> {
+                // Save upvote to database
+                if (announcement.id > 0) {
+                    AnnouncementManager.upvoteAnnouncement(announcement.id);
+                }
                 announcement.upvotes++;
                 refreshFeed();
             });
@@ -787,11 +832,23 @@
                     JOptionPane.showMessageDialog(dialog, "Please fill in all fields!", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-
-                announcements.add(0, new Announcement("You", title, content, category));
-                refreshFeed();
-                dialog.dispose();
-                JOptionPane.showMessageDialog(this, "Announcement posted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                
+                // Get author info from session
+                String author = session.isLoggedIn() ? session.getUsername() : "Anonymous";
+                String authorId = session.isLoggedIn() ? session.getUserId() : null;
+                
+                // Save to database
+                boolean saved = AnnouncementManager.createAnnouncement(title, content, author, authorId, category);
+                
+                if (saved) {
+                    // Add to local list for immediate display
+                    announcements.add(0, new Announcement(author, title, content, category));
+                    refreshFeed();
+                    dialog.dispose();
+                    JOptionPane.showMessageDialog(this, "Announcement posted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(dialog, "Failed to save announcement to database!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             });
 
             JButton cancelButton = new JButton("Cancel");

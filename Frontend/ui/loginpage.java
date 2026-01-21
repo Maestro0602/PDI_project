@@ -2,6 +2,7 @@ package Frontend.ui;
 
 import Backend.src.database.CheckEmail;
 import Backend.src.database.DatabaseManager;
+import Backend.src.session.UserSession;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -122,6 +123,13 @@ public class loginpage extends JFrame {
                     return;
                 }
                 
+                // Get user ID from email
+                String userId = CheckEmail.getIdFromEmail(userEmail);
+                
+                // Create session with user data
+                UserSession session = UserSession.getInstance();
+                session.createSession(loggedInUser, userEmail, userId, userType);
+                
                 // Navigate directly to the appropriate UI based on user type
                 switch (userType) {
                     case "STUDENT":
@@ -133,8 +141,8 @@ public class loginpage extends JFrame {
                         teacherPage.setVisible(true);
                         break;
                     case "OWNER":
-                        // Owner page for now redirect to teacher page
-                        mainpageTeacher ownerPage = new mainpageTeacher();
+                        // Navigate to Owner dashboard
+                        mainpageOwner ownerPage = new mainpageOwner();
                         ownerPage.setVisible(true);
                         break;
                     default:
@@ -145,16 +153,16 @@ public class loginpage extends JFrame {
                         return;
                 }
                 
-            //     JOptionPane.showMessageDialog(this,
-            //         "Welcome, " + loggedInUser + "!",
-            //         "Login Successful",
-            //         JOptionPane.INFORMATION_MESSAGE);
-            //     dispose();
-            // } else {
-            //     JOptionPane.showMessageDialog(this,
-            //         "Invalid username/email or password",
-            //         "Login Failed",
-            //         JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                    "Welcome, " + loggedInUser + "!",
+                    "Login Successful",
+                    JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Invalid username/email or password",
+                    "Login Failed",
+                    JOptionPane.ERROR_MESSAGE);
             }
         });
 
