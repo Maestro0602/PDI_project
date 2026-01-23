@@ -40,6 +40,23 @@ public class AttendanceStatus
                 return "Unknown";
         }
     }
+    
+    public static int getStatusFromText(String statusText)
+    {
+        switch (statusText)
+        {
+            case "Present":
+                return PRESENT;
+            case "Late":
+                return LATE;
+            case "Absent":
+                return ABSENT;
+            case "Excused":
+                return EXCUSED;
+            default:
+                return 0;
+        }
+    }
 
     public static boolean isValid(int status)
     {

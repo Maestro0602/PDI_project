@@ -1,7 +1,7 @@
 package Backend.main;
 
 import java.util.Scanner;
-
+import Backend.src.studentDisplay.Displaystdgrade;
 import Backend.src.searching.Searching;
 
 public class MainPageStudent {
@@ -30,6 +30,7 @@ public class MainPageStudent {
                         break;
                     case 2:
                         System.out.println("See Grades and GPA...");
+                        Displaystdgrade.main(null);
                         // Add your grades management logic here
                         break;
                     case 3:
