@@ -1,23 +1,29 @@
 package Frontend;
+
+import Backend.src.department.LogHeadTeacher;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class MainPageStudentGUI extends JFrame {
+public class MainpageTeacher extends JFrame {
     
-    // Colors (matching modern teacher page theme)
+    // Colors (matching modern theme)
     private static final Color CARD_BG = Color.WHITE;
     private static final Color TEXT_PRIMARY = new Color(15, 23, 42);
     private static final Color TEXT_SECONDARY = new Color(100, 116, 139);
     private static final Color ACCENT_GREEN = new Color(34, 197, 94);
+    private static final Color ACCENT_ORANGE = new Color(249, 115, 22);
+    private static final Color ACCENT_PURPLE = new Color(168, 85, 247);
+    private static final Color ACCENT_RED = new Color(239, 68, 68);
     private static final Color ACCENT_BLUE = new Color(59, 130, 246);
+    private static final Color ACCENT_PINK = new Color(236, 72, 153);
     
-    public MainPageStudentGUI() {
+    public MainpageTeacher() {
         initializeUI();
     }
     
     private void initializeUI() {
-        setTitle("Student Portal");
+        setTitle("Teacher Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(880, 680);
         setLocationRelativeTo(null);
@@ -97,7 +103,7 @@ public class MainPageStudentGUI extends JFrame {
         JPanel titleContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         titleContainer.setOpaque(false);
 
-        // Student icon badge
+        // Teacher icon badge
         JPanel iconBadge = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -118,7 +124,7 @@ public class MainPageStudentGUI extends JFrame {
         iconBadge.setPreferredSize(new Dimension(55, 55));
         iconBadge.setLayout(new GridBagLayout());
 
-        JLabel iconLabel = new JLabel("🎓");
+        JLabel iconLabel = new JLabel("👨‍🏫");
         iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 28));
         iconBadge.add(iconLabel);
 
@@ -127,7 +133,7 @@ public class MainPageStudentGUI extends JFrame {
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
         titlePanel.setOpaque(false);
 
-        JLabel welcomeLabel = new JLabel("Student Portal");
+        JLabel welcomeLabel = new JLabel("Teacher Management Portal");
         welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         welcomeLabel.setForeground(TEXT_PRIMARY);
 
@@ -160,27 +166,64 @@ public class MainPageStudentGUI extends JFrame {
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(15, 15, 15, 15);
+        gbc.insets = new Insets(8, 8, 8, 8);
         gbc.weightx = 1;
         gbc.weighty = 1;
 
-        // Create two cards side by side
+        // Row 1
         gbc.gridx = 0; gbc.gridy = 0;
         container.add(createOptionCard(
-                "Search Student",
-                "Search and view student information",
-                ACCENT_BLUE,
-                "🔍",
+                "Manage Students",
+                "View and manage student information",
+                ACCENT_ORANGE,
+                "📚",
                 1
         ), gbc);
 
         gbc.gridx = 1;
         container.add(createOptionCard(
-                "Grades & GPA",
-                "View your grades and academic performance",
-                ACCENT_GREEN,
+                "Score & Grades",
+                "Assign grades and manage scoring",
+                ACCENT_BLUE,
                 "📊",
                 2
+        ), gbc);
+
+        gbc.gridx = 2;
+        container.add(createOptionCard(
+                "Attendance",
+                "Mark and track student attendance",
+                ACCENT_GREEN,
+                "✓",
+                3
+        ), gbc);
+
+        // Row 2
+        gbc.gridx = 0; gbc.gridy = 1;
+        container.add(createOptionCard(
+                "Generate Reports",
+                "Create academic reports",
+                ACCENT_PINK,
+                "📄",
+                4
+        ), gbc);
+
+        gbc.gridx = 1;
+        container.add(createOptionCard(
+                "Department",
+                "Manage department settings",
+                ACCENT_PURPLE,
+                "🏢",
+                5
+        ), gbc);
+
+        gbc.gridx = 2;
+        container.add(createOptionCard(
+                "Search Students",
+                "Find and view student details",
+                ACCENT_RED,
+                "🔍",
+                6
         ), gbc);
 
         return container;
@@ -228,7 +271,7 @@ public class MainPageStudentGUI extends JFrame {
         };
 
         card.setLayout(new BorderLayout(0, 12));
-        card.setBorder(BorderFactory.createEmptyBorder(30, 25, 30, 25));
+        card.setBorder(BorderFactory.createEmptyBorder(20, 18, 20, 18));
         card.setOpaque(false);
         card.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -245,11 +288,11 @@ public class MainPageStudentGUI extends JFrame {
             }
         };
         iconContainer.setOpaque(false);
-        iconContainer.setPreferredSize(new Dimension(70, 70));
+        iconContainer.setPreferredSize(new Dimension(50, 50));
         iconContainer.setLayout(new GridBagLayout());
 
         JLabel iconLabel = new JLabel(icon);
-        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 40));
+        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 28));
         iconContainer.add(iconLabel);
 
         // Text panel
@@ -258,17 +301,17 @@ public class MainPageStudentGUI extends JFrame {
         textPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
         titleLabel.setForeground(TEXT_PRIMARY);
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel descLabel = new JLabel("<html>" + description + "</html>");
-        descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        descLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         descLabel.setForeground(TEXT_SECONDARY);
         descLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         textPanel.add(titleLabel);
-        textPanel.add(Box.createRigidArea(new Dimension(0, 6)));
+        textPanel.add(Box.createRigidArea(new Dimension(0, 4)));
         textPanel.add(descLabel);
 
         card.add(iconContainer, BorderLayout.NORTH);
@@ -303,7 +346,7 @@ public class MainPageStudentGUI extends JFrame {
                 if (getModel().isPressed()) {
                     g2d.setColor(new Color(220, 38, 38));
                 } else if (getModel().isRollover()) {
-                    g2d.setColor(new Color(239, 68, 68));
+                    g2d.setColor(ACCENT_RED);
                 } else {
                     g2d.setColor(new Color(248, 250, 252));
                 }
@@ -345,20 +388,32 @@ public class MainPageStudentGUI extends JFrame {
     private void handleMenuClick(int option, String title) {
         switch (option) {
             case 1:
-                System.out.println("Searching Students information...");
-                this.dispose(); // Close the main menu
-                SwingUtilities.invokeLater(() -> {
-                    TeacherSearchGUI searchGUIFrame = new TeacherSearchGUI();
-                    searchGUIFrame.setVisible(true);
-                });
+                System.out.println("Managing Students information...");
+                StudentAssignGUI.main(null);
                 break;
             case 2:
-                System.out.println("See Grades and GPA...");
-                this.dispose(); // Close the main menu
-                SwingUtilities.invokeLater(() -> {
-                    GenerateStudentReportGUI ReportFrame = new GenerateStudentReportGUI();
-                    ReportFrame.setVisible(true);
-                });
+                System.out.println("Managing grades and GPA...");
+                this.dispose();
+                GradingGUI.main(null);
+                break;
+            case 3:
+                System.out.println("Managing Attendance...");
+                this.dispose();
+                AttendanceSwingUI.main(null);
+                break;
+            case 4:
+                System.out.println("Generating Reports...");
+                this.dispose();
+                GenerateStudentReportGUI.main(null);
+                break;
+            case 5:
+                System.out.println("Managing Department...");
+                LogHeadTeacher.main(null);
+                break;
+            case 6:
+                System.out.println("Searching Students...");
+                this.dispose();
+                StudentSearchGUI.main(null);
                 break;
             default:
                 JOptionPane.showMessageDialog(this, "Invalid option selected.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -392,7 +447,7 @@ public class MainPageStudentGUI extends JFrame {
         }
         
         SwingUtilities.invokeLater(() -> {
-            MainPageStudentGUI frame = new MainPageStudentGUI();
+            MainpageTeacher frame = new MainpageTeacher();
             frame.setVisible(true);
         });
     }
