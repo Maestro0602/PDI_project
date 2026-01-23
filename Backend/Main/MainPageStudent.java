@@ -1,8 +1,8 @@
 package Backend.main;
 
 import java.util.Scanner;
-import Backend.src.studentDisplay.Displaystdgrade;
-import Backend.src.searching.Searching;
+import studentDisplay.Displaystdgrade;
+import searching.Searching;
 
 public class MainPageStudent {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package Backend.src.database;
+package database;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,8 +13,8 @@ public class EmailManager {
     // ====== DATABASE CONNECTION FOR ACCOUNT DATABASE ======
     public static class AccountDatabaseConnection {
         private static final String DB_URL = "jdbc:mysql://localhost:3306/account";
-        private static final String DB_USER = "myuser";
-        private static final String DB_PASSWORD = "mypassword";
+        private static final String DB_USER = "root";
+        private static final String DB_PASSWORD = "MRHENGXD123";
         private static final String DB_ROOT_URL = "jdbc:mysql://localhost:3306";
 
         /**

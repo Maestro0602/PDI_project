@@ -1,4 +1,4 @@
-package Backend.src.report;
+package report;
 
 import Backend.src.database.Genreport;
 import java.util.Scanner;

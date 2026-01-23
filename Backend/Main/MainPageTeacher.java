@@ -1,12 +1,12 @@
 package Backend.main;
 
 import java.util.Scanner;
-import Backend.src.department.LogHeadTeacher;
-import Backend.src.searching.SearchingTeacher;
-import Backend.src.studentassign.studentassign;
-import Backend.src.grading.Grading;
-import Backend.src.report.GenerateStudentReport;
-import Backend.src.attendance.AttendanceUI;
+import department.LogHeadTeacher;
+import searching.SearchingTeacher;
+import studentassign.studentassign;
+import grading.Grading;
+import report.GenerateStudentReport;
+import attendance.AttendanceUI;
 public class MainPageTeacher {
 
     // New method that accepts Scanner parameter

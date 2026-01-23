@@ -1,4 +1,4 @@
-package Backend.src.database;
+package database;
 
 import java.sql.*;
 

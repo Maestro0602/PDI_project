@@ -1,4 +1,4 @@
-package Backend.src.department;
+package department;
 
 public enum Department {
     GIC("GIC"),

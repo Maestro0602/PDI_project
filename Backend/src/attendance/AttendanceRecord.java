@@ -1,4 +1,4 @@
-package Backend.src.attendance;
+package attendance;
 
 import java.time.LocalDate;
 

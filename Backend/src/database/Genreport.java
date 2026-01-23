@@ -1,5 +1,6 @@
-package Backend.src.database;
+package database;
 
+import Backend.src.report.Report;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,12 +9,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import Backend.src.report.Report;
 
 public class Genreport {
      private static final String URL = "jdbc:mysql://localhost:3306/login_system";
-    private static final String USER = "myuser";
-    private static final String PASSWORD = "mypassword";
+    private static final String USER = "root";
+    private static final String PASSWORD = "MRHENGXD123";
 
 public static void createDatabase() {
         Connection conn = null;

@@ -3,8 +3,8 @@ package Backend.src.studentDisplay;
 import java.util.Scanner;
 
 import Backend.main.MainPageStudent;
-import Backend.src.database.Genreport;
-import Backend.src.report.Report;
+import database.Genreport;
+import report.Report;
 
 public class Displaystdgrade {
     

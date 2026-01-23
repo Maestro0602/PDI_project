@@ -1,4 +1,4 @@
-package Backend.src.course;
+package course;
 
 public class CourseModel {
     private String courseId;

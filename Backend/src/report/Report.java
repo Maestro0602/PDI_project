@@ -1,4 +1,4 @@
-package Backend.src.report;
+package report;
 
 import java.util.List;
 

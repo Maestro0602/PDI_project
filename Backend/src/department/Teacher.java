@@ -1,4 +1,4 @@
-package Backend.src.department;
+package department;
 
 public class Teacher {
     private String teacherId;

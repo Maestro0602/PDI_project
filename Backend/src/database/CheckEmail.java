@@ -1,4 +1,4 @@
-package Backend.src.database;
+package database;
 
 import java.sql.*;
 
@@ -11,8 +11,8 @@ public class CheckEmail {
     // ====== DATABASE CONNECTION FOR ACCOUNT DATABASE ======
     private static class AccountDatabaseConnection {
         private static final String DB_URL = "jdbc:mysql://localhost:3306/account";
-        private static final String DB_USER = "myuser";
-        private static final String DB_PASSWORD = "mypassword";
+        private static final String DB_USER = "root";
+        private static final String DB_PASSWORD = "MRHENGXD123";
 
         /**
          * Connect to account database

@@ -1,4 +1,4 @@
-package Backend.src.register;
+package register;
 
 import java.util.Scanner;
 import Backend.src.utils.PasswordUtils;

@@ -1,19 +1,19 @@
-package Backend.src.database;
+package database;
 
+import Backend.src.attendance.AttendanceRecord;
+import Backend.src.department.Student;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import Backend.src.attendance.AttendanceRecord;
-import Backend.src.department.Student;
 
 public class Attendance {
     private Connection connection;
     
     public static class AccountDatabaseConnection {
         private static final String DB_URL = "jdbc:mysql://localhost:3306/login_system";
-        private static final String DB_USER = "myuser";
-        private static final String DB_PASSWORD = "mypassword";
+        private static final String DB_USER = "root";
+        private static final String DB_PASSWORD = "MRHENGXD123";
         private static final String DB_ROOT_URL = "jdbc:mysql://localhost:3306";
 
         /**

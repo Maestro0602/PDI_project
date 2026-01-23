@@ -1,4 +1,4 @@
-package Backend.src.database;
+package database;
 
 import java.sql.*;
 import java.security.MessageDigest;
@@ -9,8 +9,8 @@ public class DatabaseManager {
     // ====== DATABASE CONNECTION CLASS ======
     public static class DatabaseConnection {
         private static final String DB_URL = "jdbc:mysql://localhost:3306/login_system";
-        private static final String DB_USER = "myuser";
-        private static final String DB_PASSWORD = "mypassword";
+        private static final String DB_USER = "root";
+        private static final String DB_PASSWORD = "MRHENGXD123";
         private static final String DB_ROOT_URL = "jdbc:mysql://localhost:3306";
 
         /**

@@ -7,7 +7,6 @@ import java.util.Scanner;
 import Backend.main.MainPageTeacher;
 import Backend.src.database.Attendance;
 import Backend.src.department.Student;
-
 public class AttendanceUI {
     private Scanner scanner;
     private Attendance database;

@@ -1,12 +1,12 @@
-package Backend.src.database;
+package database;
 
 import java.sql.*;
 import java.util.*;
 
 public class GradingManagement {
     private static final String URL = "jdbc:mysql://localhost:3306/login_system";
-    private static final String USER = "myuser";
-    private static final String PASSWORD = "mypassword";
+    private static final String USER = "root";
+    private static final String PASSWORD = "MRHENGXD123";
 
     // Get database connection
     // ===== CONNECT DATABASE =====

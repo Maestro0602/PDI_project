@@ -4,8 +4,8 @@ package Frontend;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import Backend.src.database.DatabaseManager;
-import Backend.src.database.CheckEmail;
+import database.DatabaseManager;
+import database.CheckEmail;
 import Frontend.LoginApplicationGUI;;
 
 public class RegistrationManagerGUI extends JFrame {
