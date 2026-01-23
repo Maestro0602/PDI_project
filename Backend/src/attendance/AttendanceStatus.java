@@ -1,5 +1,6 @@
 package Backend.src.attendance;
 
+
 public class AttendanceStatus
 {
     public static final int PRESENT = 1;

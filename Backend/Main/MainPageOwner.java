@@ -1,9 +1,9 @@
 package Backend.main;
 
 import java.util.Scanner;
-import accountassign.EmailAccountCreationUI;
-import owner.AssignPassword;
-import owner.totalstudent;
+import Backend.src.accountassign.EmailAccountCreationUI;
+import Backend.src.owner.AssignPassword;
+import Backend.src.owner.totalstudent;
 public class MainPageOwner {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);

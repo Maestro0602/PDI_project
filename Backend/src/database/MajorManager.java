@@ -1,4 +1,4 @@
-package database;
+package Backend.src.database;
 
 import Backend.src.course.Course;
 import java.sql.*;

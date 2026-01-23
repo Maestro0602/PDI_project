@@ -1,11 +1,12 @@
-package database;
+package Backend.src.database;
 
-import Backend.src.attendance.AttendanceRecord;
-import Backend.src.department.Student;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import Backend.src.attendance.AttendanceRecord;
+import Backend.src.department.Student;
+
 
 public class Attendance {
     private Connection connection;

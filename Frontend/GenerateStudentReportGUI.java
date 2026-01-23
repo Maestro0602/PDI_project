@@ -1,8 +1,7 @@
 package Frontend;
 
 import Backend.src.database.Genreport;
-import Backend.main.Main;
-import Backend.main.MainPageTeacher;
+import Backend.src.report.Report;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -10,7 +9,6 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import Backend.src.report.Report;
 
 public class GenerateStudentReportGUI extends JFrame {
 
@@ -18,128 +16,114 @@ public class GenerateStudentReportGUI extends JFrame {
     private JPanel reportPanel;
     private JScrollPane reportScrollPane;
 
-    private Color primaryColor = new Color(41, 128, 185);
-    private Color accentColor = new Color(46, 204, 113);
-    private Color dangerColor = new Color(231, 76, 60);
-    private Color universityBlue = new Color(0, 51, 102);
-    private Color universityGold = new Color(218, 165, 32);
+    // Modern Color Palette
+    private Color BG_START = new Color(241, 245, 249);
+    private Color BG_END = new Color(226, 232, 240);
+    private Color TEXT_PRIMARY = new Color(15, 23, 42);
+    private Color TEXT_SECONDARY = new Color(100, 116, 139);
+    private Color ACCENT_BLUE = new Color(59, 130, 246);
+    private Color ACCENT_GREEN = new Color(34, 197, 94);
+    private Color ACCENT_RED = new Color(239, 68, 68);
 
     public GenerateStudentReportGUI() {
         initializeUI();
     }
 
     private void initializeUI() {
-        setTitle("Student Report System");
+        setTitle("Academic Report System");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(1000, 800);
+        setSize(1000, 850);
         setLocationRelativeTo(null);
-        setResizable(true);
 
-        // Main panel
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
-
-        // Top panel for search
-        JPanel topPanel = createTopPanel();
-        mainPanel.add(topPanel, BorderLayout.NORTH);
-
-        // Center panel for report display
-        reportPanel = new JPanel();
-        reportPanel.setLayout(new BorderLayout());
-        reportPanel.setBackground(Color.WHITE);
-
-        // Initial message
-        JLabel welcomeLabel = new JLabel("Enter Student ID to generate report");
-        welcomeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-        welcomeLabel.setForeground(new Color(127, 140, 141));
-        welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        reportPanel.add(welcomeLabel, BorderLayout.CENTER);
-
-        reportScrollPane = new JScrollPane(reportPanel);
-        reportScrollPane.setBorder(BorderFactory.createEmptyBorder());
-        mainPanel.add(reportScrollPane, BorderLayout.CENTER);
-
-        add(mainPanel);
-    }
-
-    private JPanel createTopPanel() {
-        JPanel panel = new JPanel() {
+        JPanel mainBackground = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                GradientPaint gp = new GradientPaint(0, 0, universityBlue, getWidth(), 0, new Color(0, 76, 153));
-                g2d.setPaint(gp);
+                g2d.setPaint(new GradientPaint(0, 0, BG_START, 0, getHeight(), BG_END));
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         };
-        panel.setLayout(null);
-        panel.setPreferredSize(new Dimension(1000, 120));
 
-        // Title
-        JLabel titleLabel = new JLabel("STUDENT REPORT SYSTEM");
-        titleLabel.setFont(new Font("Serif", Font.BOLD, 28));
-        titleLabel.setForeground(universityGold);
-        titleLabel.setBounds(0, 15, 1000, 35);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(titleLabel);
+        // Header
+        JPanel topPanel = createHeaderPanel();
+        mainBackground.add(topPanel, BorderLayout.NORTH);
 
-        // Search label
-        JLabel searchLabel = new JLabel("Student ID:");
-        searchLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        searchLabel.setForeground(Color.WHITE);
-        searchLabel.setBounds(280, 65, 100, 30);
-        panel.add(searchLabel);
+        // Content
+        reportPanel = new JPanel();
+        reportPanel.setLayout(new BoxLayout(reportPanel, BoxLayout.Y_AXIS));
+        reportPanel.setOpaque(false);
+        
+        JLabel welcomeLabel = new JLabel("Search for a student to view their academic profile");
+        welcomeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        welcomeLabel.setForeground(TEXT_SECONDARY);
+        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        reportPanel.add(Box.createVerticalStrut(100));
+        reportPanel.add(welcomeLabel);
 
-        // Student ID field
+        reportScrollPane = new JScrollPane(reportPanel);
+        reportScrollPane.setOpaque(false);
+        reportScrollPane.getViewport().setOpaque(false);
+        reportScrollPane.setBorder(null);
+        
+        mainBackground.add(reportScrollPane, BorderLayout.CENTER);
+        setContentPane(mainBackground);
+    }
+
+    private JPanel createHeaderPanel() {
+        JPanel panel = new JPanel(null);
+        panel.setOpaque(false);
+        panel.setPreferredSize(new Dimension(1000, 140));
+
+        // Search Card
+        JPanel searchCard = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.WHITE);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                g2.setColor(new Color(0, 0, 0, 20)); // Shadow
+                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 20, 20);
+            }
+        };
+        searchCard.setBounds(30, 20, 940, 100);
+
+        JLabel title = new JLabel("Academic Search");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        title.setForeground(TEXT_PRIMARY);
+        title.setBounds(25, 15, 300, 30);
+        searchCard.add(title);
+
         studentIDField = new JTextField();
-        studentIDField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        studentIDField.setBounds(380, 65, 200, 35);
+        studentIDField.setBounds(25, 50, 600, 35);
         studentIDField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(189, 195, 199), 2),
+                BorderFactory.createLineBorder(new Color(226, 232, 240), 2),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)));
-        panel.add(studentIDField);
+        searchCard.add(studentIDField);
 
-        // Generate button
-        JButton generateBtn = createStyledButton("Generate Report", accentColor, new Color(39, 174, 96));
-        generateBtn.setBounds(590, 65, 150, 35);
-        generateBtn.addActionListener(e -> generateReport());
-        panel.add(generateBtn);
+        JButton genBtn = createStyledButton("Generate Report", ACCENT_BLUE);
+        genBtn.setBounds(635, 50, 160, 35);
+        genBtn.addActionListener(e -> generateReport());
+        searchCard.add(genBtn);
 
-        // Back button
-        JButton backBtn = createStyledButton("← Back", dangerColor, new Color(192, 57, 43));
-        backBtn.setBounds(850, 15, 120, 35);
-        backBtn.addActionListener(e -> handleBack());
-        panel.add(backBtn);
+        JButton backBtn = createStyledButton("Back", ACCENT_RED);
+        backBtn.setBounds(810, 50, 100, 35);
+        backBtn.addActionListener(e -> dispose());
+        searchCard.add(backBtn);
 
-        // Enter key listener
-        studentIDField.addActionListener(e -> generateReport());
-
+        panel.add(searchCard);
         return panel;
     }
 
     private void generateReport() {
-        String studentID = studentIDField.getText().trim();
-
-        if (studentID.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter a Student ID", "Warning", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        if (studentID.equals("0")) {
-            handleBack();
-            return;
-        }
-
-        Report report = Genreport.getInformationByStudentID(studentID);
-
+        String id = studentIDField.getText().trim();
+        if (id.isEmpty()) return;
+        
+        Report report = Genreport.getInformationByStudentID(id);
         if (report == null) {
-            JOptionPane.showMessageDialog(this,
-                    "No report found for Student ID: " + studentID,
-                    "Not Found",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Student Not Found", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -147,313 +131,135 @@ public class GenerateStudentReportGUI extends JFrame {
     }
 
     private void displayReport(Report report) {
-        // Clear previous report
         reportPanel.removeAll();
-        reportPanel.setLayout(new BoxLayout(reportPanel, BoxLayout.Y_AXIS));
-        reportPanel.setBackground(Color.WHITE);
-
-        // Add spacing
-        reportPanel.add(Box.createVerticalStrut(30));
-
-        // University Header
-        JPanel headerPanel = createUniversityHeader();
-        reportPanel.add(headerPanel);
-
         reportPanel.add(Box.createVerticalStrut(20));
 
-        // Student Profile
-        JPanel profilePanel = createProfilePanel(report);
-        reportPanel.add(profilePanel);
-
+        // Profile Card
+        reportPanel.add(createReportCard(createProfileContent(report), "Student Profile", "👤"));
+        reportPanel.add(Box.createVerticalStrut(20));
+        
+        // Table Card
+        reportPanel.add(createReportCard(createCourseTable(report), "Course Results", "📊"));
         reportPanel.add(Box.createVerticalStrut(20));
 
-        // Course Results Table
-        JPanel coursePanel = createCoursePanel(report);
-        reportPanel.add(coursePanel);
+        // GPA Card
+        reportPanel.add(createReportCard(createGPAContent(report), "Academic Standing", "🎓"));
+        reportPanel.add(Box.createVerticalStrut(40));
 
-        reportPanel.add(Box.createVerticalStrut(20));
-
-        // GPA Panel
-        JPanel gpaPanel = createGPAPanel(report);
-        reportPanel.add(gpaPanel);
-
-        reportPanel.add(Box.createVerticalStrut(30));
-
-        // Refresh display
         reportPanel.revalidate();
         reportPanel.repaint();
-        reportScrollPane.getVerticalScrollBar().setValue(0);
     }
 
-    private JPanel createUniversityHeader() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        panel.setMaximumSize(new Dimension(900, 120));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(universityBlue, 3),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)));
+    private JPanel createReportCard(Component content, String title, String icon) {
+        JPanel card = new JPanel(new BorderLayout(0, 15));
+        card.setOpaque(false);
+        card.setMaximumSize(new Dimension(940, 400));
+        card.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 30));
 
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBackground(Color.WHITE);
-
-        JLabel universityName = new JLabel("Angkor UNIVERSITY OF PHNOM PENH");
-        universityName.setFont(new Font("Serif", Font.BOLD, 24));
-        universityName.setForeground(universityBlue);
-        universityName.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel reportTitle = new JLabel("ACADEMIC TRANSCRIPT");
-        reportTitle.setFont(new Font("Serif", Font.BOLD, 20));
-        reportTitle.setForeground(universityGold);
-        reportTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
-        JLabel dateLabel = new JLabel("Printed Date " + dateFormat.format(new Date()));
-        dateLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-        dateLabel.setForeground(new Color(127, 140, 141));
-        dateLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        centerPanel.add(universityName);
-        centerPanel.add(Box.createVerticalStrut(5));
-        centerPanel.add(reportTitle);
-        centerPanel.add(Box.createVerticalStrut(5));
-        centerPanel.add(dateLabel);
-
-        panel.add(centerPanel, BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    private JPanel createProfilePanel(Report report) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 2, 20, 10));
-        panel.setMaximumSize(new Dimension(900, 160));
-        panel.setBackground(new Color(236, 240, 241));
-        panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(
-                        BorderFactory.createLineBorder(new Color(52, 152, 219), 2),
-                        "STUDENT PROFILE",
-                        0, 0,
-                        new Font("Segoe UI", Font.BOLD, 16),
-                        universityBlue),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)));
-
-        panel.add(createInfoLabel("Student ID:", report.getStudentID()));
-        panel.add(createInfoLabel("Name:", report.getStudentName()));
-        panel.add(createInfoLabel("Gender:", report.getGender()));
-        panel.add(createInfoLabel("Year:", report.getYear()));
-        panel.add(createInfoLabel("Department:", report.getDepartment()));
-        panel.add(createInfoLabel("Major:", report.getMajor()));
-
-        return panel;
-    }
-
-    private JPanel createInfoLabel(String label, String value) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        panel.setBackground(new Color(236, 240, 241));
-
-        JLabel labelComp = new JLabel(label);
-        labelComp.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        labelComp.setForeground(new Color(52, 73, 94));
-
-        JLabel valueComp = new JLabel(value);
-        valueComp.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        valueComp.setForeground(new Color(44, 62, 80));
-
-        panel.add(labelComp);
-        panel.add(valueComp);
-
-        return panel;
-    }
-
-    private JPanel createCoursePanel(Report report) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setMaximumSize(new Dimension(900, 400));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(
-                        BorderFactory.createLineBorder(new Color(52, 152, 219), 2),
-                        "COURSE RESULTS",
-                        0, 0,
-                        new Font("Segoe UI", Font.BOLD, 16),
-                        universityBlue),
-                BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-
-        // Create table
-        String[] columns = { "Course ID", "Course Name", "Score", "Grade" };
-        DefaultTableModel model = new DefaultTableModel(columns, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        // Add data
-        for (int i = 0; i < report.getCourseIDs().size(); i++) {
-            Object[] row = {
-                    report.getCourseIDs().get(i),
-                    report.getCourseNames().get(i),
-                    String.format("%.2f", report.getScores().get(i)),
-                    report.getGrades().get(i)
-            };
-            model.addRow(row);
-        }
-
-        JTable table = new JTable(model);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        table.setRowHeight(30);
-        table.setGridColor(new Color(189, 195, 199));
-        table.setSelectionBackground(new Color(52, 152, 219));
-        table.setSelectionForeground(Color.WHITE);
-
-        // Header styling
-        JTableHeader header = table.getTableHeader();
-        header.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        header.setBackground(universityBlue);
-        header.setForeground(Color.WHITE);
-        header.setPreferredSize(new Dimension(header.getWidth(), 35));
-
-        // Center align score and grade columns
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
-        table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-
-        // Column widths
-        table.getColumnModel().getColumn(0).setPreferredWidth(100);
-        table.getColumnModel().getColumn(1).setPreferredWidth(400);
-        table.getColumnModel().getColumn(2).setPreferredWidth(80);
-        table.getColumnModel().getColumn(3).setPreferredWidth(80);
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(189, 195, 199)));
-        panel.add(scrollPane, BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    private JPanel createGPAPanel(Report report) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        panel.setMaximumSize(new Dimension(900, 120));
-        panel.setBackground(new Color(236, 240, 241));
-        panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(universityGold, 3),
-                BorderFactory.createEmptyBorder(20, 30, 20, 30)));
-
-        // Calculate GPA
-        double totalScore = 0.0;
-        for (double score : report.getScores()) {
-            totalScore += score;
-        }
-        double gpa = (totalScore / 400.0) * 4.0;
-        if (gpa > 4.0) {
-            gpa = 4.0;
-        }
-
-        JLabel gpaLabel = new JLabel(String.format("CUMULATIVE GPA: %.2f / 4.00", gpa));
-        gpaLabel.setFont(new Font("Serif", Font.BOLD, 26));
-        gpaLabel.setForeground(universityBlue);
-        gpaLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-        // Add classification
-        String classification = "";
-        Color classColor = universityBlue;
-        if (gpa >= 3.7) {
-            classification = "Valedictorian";
-            classColor = new Color(46, 204, 113);
-        } else if (gpa >= 3.3) {
-            classification = "Great Job! Try more";
-            classColor = new Color(52, 152, 219);
-        } else if (gpa >= 3.0) {
-            classification = "Good Effort! Keep Improving";
-            classColor = new Color(52, 152, 219);
-        }
-
-        JLabel classLabel = new JLabel(classification);
-        classLabel.setFont(new Font("Serif", Font.ITALIC, 18));
-        classLabel.setForeground(classColor);
-        classLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBackground(new Color(236, 240, 241));
-
-        gpaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        classLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        centerPanel.add(gpaLabel);
-        if (!classification.isEmpty()) {
-            centerPanel.add(Box.createVerticalStrut(5));
-            centerPanel.add(classLabel);
-        }
-
-        panel.add(centerPanel, BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    private JButton createStyledButton(String text, Color normalColor, Color hoverColor) {
-        JButton button = new JButton(text) {
+        JPanel inner = new JPanel(new BorderLayout(0, 10)) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                if (getModel().isPressed()) {
-                    g2.setColor(hoverColor.darker());
-                } else if (getModel().isRollover()) {
-                    g2.setColor(hoverColor);
-                } else {
-                    g2.setColor(normalColor);
-                }
-
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-
                 g2.setColor(Color.WHITE);
-                g2.setFont(getFont());
-                FontMetrics fm = g2.getFontMetrics();
-                int x = (getWidth() - fm.stringWidth(getText())) / 2;
-                int y = ((getHeight() - fm.getHeight()) / 2) + fm.getAscent();
-                g2.drawString(getText(), x, y);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
             }
         };
+        inner.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setContentAreaFilled(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        return button;
+        JLabel titleLbl = new JLabel(icon + " " + title);
+        titleLbl.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        titleLbl.setForeground(TEXT_PRIMARY);
+        
+        inner.add(titleLbl, BorderLayout.NORTH);
+        inner.add(content, BorderLayout.CENTER);
+        
+        card.add(inner);
+        return card;
     }
 
-    private void handleBack() {
-        int option = JOptionPane.showConfirmDialog(
-                this,
-                "Are you sure you want to exit?",
-                "Confirm Exit",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-
-        if (option == JOptionPane.YES_OPTION) {
-            this.dispose();
-            MainPageTeacherGUI.main(null);
+    private JPanel createProfileContent(Report r) {
+        JPanel p = new JPanel(new GridLayout(2, 3, 20, 10));
+        p.setOpaque(false);
+        String[][] details = {
+            {"ID", r.getStudentID()}, {"Name", r.getStudentName()}, {"Gender", r.getGender()},
+            {"Year", r.getYear()}, {"Dept", r.getDepartment()}, {"Major", r.getMajor()}
+        };
+        for (String[] d : details) {
+            JPanel chunk = new JPanel(new BorderLayout());
+            chunk.setOpaque(false);
+            JLabel l1 = new JLabel(d[0]);
+            l1.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            l1.setForeground(TEXT_SECONDARY);
+            JLabel l2 = new JLabel(d[1]);
+            l2.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            chunk.add(l1, BorderLayout.NORTH);
+            chunk.add(l2, BorderLayout.CENTER);
+            p.add(chunk);
         }
+        return p;
+    }
+
+    private JPanel createCourseTable(Report r) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setOpaque(false);
+        String[] cols = {"Course ID", "Name", "Score", "Grade"};
+        DefaultTableModel model = new DefaultTableModel(cols, 0);
+        for (int i = 0; i < r.getCourseIDs().size(); i++) {
+            model.addRow(new Object[]{r.getCourseIDs().get(i), r.getCourseNames().get(i), r.getScores().get(i), r.getGrades().get(i)});
+        }
+        JTable t = new JTable(model);
+        t.setRowHeight(30);
+        t.setShowGrid(false);
+        t.setIntercellSpacing(new Dimension(0, 0));
+        
+        JTableHeader h = t.getTableHeader();
+        h.setBackground(new Color(248, 250, 252));
+        h.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        
+        JScrollPane sp = new JScrollPane(t);
+        sp.setPreferredSize(new Dimension(800, 150));
+        sp.setBorder(BorderFactory.createLineBorder(new Color(241, 245, 249)));
+        p.add(sp);
+        return p;
+    }
+
+    private JPanel createGPAContent(Report r) {
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 10));
+        p.setOpaque(false);
+        double total = r.getScores().stream().mapToDouble(Double::doubleValue).sum();
+        double gpa = (total / 400.0) * 4.0;
+        
+        JLabel gpaLbl = new JLabel(String.format("GPA: %.2f / 4.00", gpa));
+        gpaLbl.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        gpaLbl.setForeground(ACCENT_BLUE);
+        p.add(gpaLbl);
+        
+        return p;
+    }
+
+    private JButton createStyledButton(String text, Color baseColor) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getModel().isPressed() ? baseColor.darker() : (getModel().isRollover() ? baseColor.brighter() : baseColor));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                g2.setColor(Color.WHITE);
+                FontMetrics fm = g2.getFontMetrics();
+                g2.drawString(getText(), (getWidth()-fm.stringWidth(getText()))/2, (getHeight()+fm.getAscent()-fm.getDescent())/2);
+            }
+        };
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
     }
 
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        SwingUtilities.invokeLater(() -> {
-            GenerateStudentReportGUI frame = new GenerateStudentReportGUI();
-            frame.setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new GenerateStudentReportGUI().setVisible(true));
     }
 }

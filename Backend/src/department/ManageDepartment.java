@@ -1,4 +1,4 @@
-package department;
+package Backend.src.department;
 
 import java.util.Scanner;
 import Backend.src.database.StudentInfoManager;

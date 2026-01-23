@@ -1,4 +1,4 @@
-package course;
+package Backend.src.course;
 
 public class Course {
 
