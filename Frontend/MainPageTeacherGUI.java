@@ -2,7 +2,6 @@ package Frontend;
 
 import javax.swing.*;
 
-import com.mysql.cj.log.Log;
 
 import java.awt.*;
 import java.awt.event.*;

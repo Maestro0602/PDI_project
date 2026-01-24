@@ -1,6 +1,9 @@
 package Backend.src.database;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class TeacherInfoManager {
 
@@ -240,114 +243,210 @@ public class TeacherInfoManager {
      * Get teachers by department
      * Now shows course count dynamically
      */
-    public static void displayTeachersByDepartment(String department) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
+    // public static void displayTeachersByDepartment(String department) {
+    //     Connection conn = null;
+    //     PreparedStatement pstmt = null;
+    //     ResultSet rs = null;
 
-        try {
-            conn = DatabaseManager.DatabaseConnection.connectDB();
-            if (conn != null) {
-                String sql = "SELECT t.teacherID, t.department, t.major, " +
-                        "COUNT(tc.course_id) as course_count " +
-                        "FROM teacherInfo t " +
-                        "LEFT JOIN teacher_course tc ON t.teacherID = tc.teacherID " +
-                        "WHERE t.department = ? " +
-                        "GROUP BY t.teacherID, t.department, t.major " +
-                        "ORDER BY t.teacherID";
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, department);
+    //     try {
+    //         conn = DatabaseManager.DatabaseConnection.connectDB();
+    //         if (conn != null) {
+    //             String sql = "SELECT t.teacherID, t.department, t.major, " +
+    //                     "COUNT(tc.course_id) as course_count " +
+    //                     "FROM teacherInfo t " +
+    //                     "LEFT JOIN teacher_course tc ON t.teacherID = tc.teacherID " +
+    //                     "WHERE t.department = ? " +
+    //                     "GROUP BY t.teacherID, t.department, t.major " +
+    //                     "ORDER BY t.teacherID";
+    //             pstmt = conn.prepareStatement(sql);
+    //             pstmt.setString(1, department);
 
-                rs = pstmt.executeQuery();
+    //             rs = pstmt.executeQuery();
 
-                System.out.println("\n" + "=".repeat(100));
-                System.out.println("                    TEACHERS IN " + department.toUpperCase() + " DEPARTMENT");
-                System.out.println("=".repeat(100));
-                System.out.printf("%-5s %-15s %-25s %-35s %-15s%n", "NO", "Teacher ID",
-                        "Department", "Major", "Course Count");
-                System.out.println("-".repeat(100));
+    //             System.out.println("\n" + "=".repeat(100));
+    //             System.out.println("                    TEACHERS IN " + department.toUpperCase() + " DEPARTMENT");
+    //             System.out.println("=".repeat(100));
+    //             System.out.printf("%-5s %-15s %-25s %-35s %-15s%n", "NO", "Teacher ID",
+    //                     "Department", "Major", "Course Count");
+    //             System.out.println("-".repeat(100));
 
-                int count = 1;
-                boolean hasData = false;
-                while (rs.next()) {
-                    hasData = true;
-                    System.out.printf("%-5d %-15s %-25s %-35s %-15d%n",
-                            count++,
-                            rs.getString("teacherID"),
-                            rs.getString("department"),
-                            rs.getString("major"),
-                            rs.getInt("course_count"));
-                }
+    //             int count = 1;
+    //             boolean hasData = false;
+    //             while (rs.next()) {
+    //                 hasData = true;
+    //                 System.out.printf("%-5d %-15s %-25s %-35s %-15d%n",
+    //                         count++,
+    //                         rs.getString("teacherID"),
+    //                         rs.getString("department"),
+    //                         rs.getString("major"),
+    //                         rs.getInt("course_count"));
+    //             }
 
-                if (!hasData) {
-                    System.out.println("No teachers found in " + department + " department.");
-                }
-                System.out.println("=".repeat(100));
+    //             if (!hasData) {
+    //                 System.out.println("No teachers found in " + department + " department.");
+    //             }
+    //             System.out.println("=".repeat(100));
+    //         }
+    //     } catch (SQLException e) {
+    //         System.out.println("Error displaying teachers by department: " + e.getMessage());
+    //     } finally {
+    //         closeResources(conn, pstmt, rs);
+    //     }
+    // }
+        public static List<String[]> getTeachersByDepartment(String department) {
+        List<String[]> list = new ArrayList<>();
+
+        String sql = """
+            SELECT t.teacherID, t.department, t.major,
+                COUNT(tc.course_id) AS course_count
+            FROM teacherInfo t
+            LEFT JOIN teacher_course tc ON t.teacherID = tc.teacherID
+            WHERE t.department = ?
+            GROUP BY t.teacherID, t.department, t.major
+            ORDER BY t.teacherID
+        """;
+
+        try (Connection conn = DatabaseManager.DatabaseConnection.connectDB();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, department);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(new String[]{
+                    rs.getString("teacherID"),
+                    rs.getString("department"),
+                    rs.getString("major"),
+                    String.valueOf(rs.getInt("course_count"))
+                });
             }
         } catch (SQLException e) {
-            System.out.println("Error displaying teachers by department: " + e.getMessage());
-        } finally {
-            closeResources(conn, pstmt, rs);
+            e.printStackTrace();
         }
+        return list;
     }
+
 
     /**
      * Get teachers by course
      * Now uses JOIN with studentInfo, course, and teacherInfo tables
      */
-    public static void displayTeachersByCourse(String courseID) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
+        public static List<String[]> getTeachersByCourse(String courseID) {
+        List<String[]> list = new ArrayList<>();
 
-        try {
-            conn = DatabaseManager.DatabaseConnection.connectDB();
-            if (conn != null) {
-                String sql = "SELECT DISTINCT " +
-                        "t.teacherID, t.department, t.major, " +
-                        "c.course_id, c.course_name " +
-                        "FROM teacher_course tc " +
-                        "JOIN teacherInfo t ON tc.teacherID = t.teacherID " +
-                        "JOIN course c ON tc.course_id = c.course_id " +
-                        "WHERE c.course_id = ? " +
-                        "ORDER BY t.teacherID";
+        String sql = """
+            SELECT t.teacherID, t.department, t.major,
+                COUNT(tc.course_id) AS course_count
+            FROM teacher_course tc
+            JOIN teacherInfo t ON tc.teacherID = t.teacherID
+            WHERE tc.course_id = ?
+            GROUP BY t.teacherID, t.department, t.major
+            ORDER BY t.teacherID
+        """;
 
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, courseID);
+        try (Connection conn = DatabaseManager.DatabaseConnection.connectDB();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
-                rs = pstmt.executeQuery();
+            ps.setString(1, courseID);
+            ResultSet rs = ps.executeQuery();
 
-                System.out.println("\n" + "=".repeat(120));
-                System.out.println("                    TEACHERS FOR COURSE ID " + courseID);
-                System.out.println("=".repeat(120));
-                System.out.printf("%-5s %-15s %-25s %-35s %-12s %-25s%n", "NO", "Teacher ID",
-                        "Department", "Major", "Course ID", "Course Name");
-                System.out.println("-".repeat(120));
-
-                int count = 1;
-                boolean hasData = false;
-                while (rs.next()) {
-                    hasData = true;
-                    System.out.printf("%-5d %-15s %-25s %-35s %-12s %-25s%n",
-                            count++,
-                            rs.getString("teacherID"),
-                            rs.getString("department"),
-                            rs.getString("major"),
-                            rs.getString("course_id"),
-                            rs.getString("course_name"));
-                }
-
-                if (!hasData) {
-                    System.out.println("No teachers found for course ID " + courseID + ".");
-                }
-                System.out.println("=".repeat(120));
+            while (rs.next()) {
+                list.add(new String[]{
+                    rs.getString("teacherID"),
+                    rs.getString("department"),
+                    rs.getString("major"),
+                    String.valueOf(rs.getInt("course_count"))
+                });
             }
         } catch (SQLException e) {
-            System.out.println("Error displaying teachers by course: " + e.getMessage());
-        } finally {
-            closeResources(conn, pstmt, rs);
+            e.printStackTrace();
         }
+        return list;
     }
+
+    // public static void displayTeachersByCourse(String courseID) {
+    //     Connection conn = null;
+    //     PreparedStatement pstmt = null;
+    //     ResultSet rs = null;
+
+    //     try {
+    //         conn = DatabaseManager.DatabaseConnection.connectDB();
+    //         if (conn != null) {
+    //             String sql = "SELECT DISTINCT " +
+    //                     "t.teacherID, t.department, t.major, " +
+    //                     "c.course_id, c.course_name " +
+    //                     "FROM teacher_course tc " +
+    //                     "JOIN teacherInfo t ON tc.teacherID = t.teacherID " +
+    //                     "JOIN course c ON tc.course_id = c.course_id " +
+    //                     "WHERE c.course_id = ? " +
+    //                     "ORDER BY t.teacherID";
+
+    //             pstmt = conn.prepareStatement(sql);
+    //             pstmt.setString(1, courseID);
+
+    //             rs = pstmt.executeQuery();
+
+    //             System.out.println("\n" + "=".repeat(120));
+    //             System.out.println("                    TEACHERS FOR COURSE ID " + courseID);
+    //             System.out.println("=".repeat(120));
+    //             System.out.printf("%-5s %-15s %-25s %-35s %-12s %-25s%n", "NO", "Teacher ID",
+    //                     "Department", "Major", "Course ID", "Course Name");
+    //             System.out.println("-".repeat(120));
+
+    //             int count = 1;
+    //             boolean hasData = false;
+    //             while (rs.next()) {
+    //                 hasData = true;
+    //                 System.out.printf("%-5d %-15s %-25s %-35s %-12s %-25s%n",
+    //                         count++,
+    //                         rs.getString("teacherID"),
+    //                         rs.getString("department"),
+    //                         rs.getString("major"),
+    //                         rs.getString("course_id"),
+    //                         rs.getString("course_name"));
+    //             }
+
+    //             if (!hasData) {
+    //                 System.out.println("No teachers found for course ID " + courseID + ".");
+    //             }
+    //             System.out.println("=".repeat(120));
+    //         }
+    //     } catch (SQLException e) {
+    //         System.out.println("Error displaying teachers by course: " + e.getMessage());
+    //     } finally {
+    //         closeResources(conn, pstmt, rs);
+    //     }
+    // }
+        public static List<String[]> getAllTeachers() {
+        List<String[]> list = new ArrayList<>();
+
+        String sql = """
+            SELECT t.teacherID, t.department, t.major,
+                COUNT(tc.course_id) AS course_count
+            FROM teacherInfo t
+            LEFT JOIN teacher_course tc ON t.teacherID = tc.teacherID
+            GROUP BY t.teacherID, t.department, t.major
+            ORDER BY t.teacherID
+        """;
+
+        try (Connection conn = DatabaseManager.DatabaseConnection.connectDB();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(new String[]{
+                    rs.getString("teacherID"),
+                    rs.getString("department"),
+                    rs.getString("major"),
+                    String.valueOf(rs.getInt("course_count"))
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 
     /**
      * Get course count for a teacher from teacher_course table

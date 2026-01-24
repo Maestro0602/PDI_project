@@ -1,7 +1,6 @@
 package Frontend;
 import Backend.src.database.StudentInfoManager;
 import Backend.src.database.MajorManager;
-import Backend.main.MainPageStudent;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;

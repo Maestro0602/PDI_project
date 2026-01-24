@@ -9,7 +9,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import Backend.main.MainPageTeacher;
 import Backend.src.database.GradingManagement;
 
 public class GradingGUI extends JFrame {

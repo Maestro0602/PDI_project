@@ -5,6 +5,7 @@ import java.awt.*;
 import Backend.src.database.*;
 import Backend.src.department.*;
 import Frontend.student.*;
+import Frontend.teacher.*;
 public class ManageDepartmentGUI extends JFrame {
     
     // Color scheme

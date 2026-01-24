@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 import Backend.src.database.DatabaseManager;
 import Backend.src.database.CheckEmail;
-import Frontend.LoginApplicationGUI;;
 
 public class RegistrationManagerGUI extends JFrame {
     
