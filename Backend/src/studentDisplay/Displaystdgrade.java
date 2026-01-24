@@ -1,10 +1,9 @@
 package Backend.src.studentDisplay;
 
-import java.util.Scanner;
-
 import Backend.main.MainPageStudent;
-import database.Genreport;
-import report.Report;
+import Backend.src.database.Genreport;
+import Backend.src.report.Report;
+import java.util.Scanner;
 
 public class Displaystdgrade {
     

@@ -1,9 +1,10 @@
-package register;
+package Backend.src.register;
 
-import java.util.Scanner;
-import Backend.src.utils.PasswordUtils;
-import Backend.src.database.DatabaseManager;
+
 import Backend.src.database.CheckEmail;
+import Backend.src.database.DatabaseManager;
+import Backend.src.utils.PasswordUtils;
+import java.util.Scanner;
 
 public class RegistrationManager {
 

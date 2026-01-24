@@ -1,10 +1,10 @@
-package department;
+package Backend.src.department;
 
-import java.util.Scanner;
-import Backend.src.database.StudentInfoManager;
-import Backend.src.database.MajorManager;
 import Backend.src.database.DatabaseManager;
+import Backend.src.database.MajorManager;
+import Backend.src.database.StudentInfoManager;
 import Backend.src.major.major;
+import java.util.Scanner;
 
 public class StudentManager {
     private Scanner input = new Scanner(System.in);

@@ -3,9 +3,9 @@ package Frontend;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import database.DatabaseManager;
-import database.MajorManager;
-import register.RegistrationManager;
+import Backend.src.database.DatabaseManager;
+import Backend.src.database.MajorManager;
+import Backend.src.register.RegistrationManager;
 import Backend.main.*;
 import javax.swing.border.EmptyBorder;
 
@@ -552,7 +552,7 @@ public class LoginApplicationGUI extends JFrame {
         if (loggedInUser.startsWith("TEACHER")) {
             System.out.println("\nRedirecting to Teacher Page...");
             SwingUtilities.invokeLater(() -> {
-                MainPageTeacherGUI teacherFrame = new MainPageTeacherGUI();
+                MainpageTeacher teacherFrame = new MainpageTeacher();
                 teacherFrame.setVisible(true);
             });
         } else if (loggedInUser.startsWith("STUDENT")) {
