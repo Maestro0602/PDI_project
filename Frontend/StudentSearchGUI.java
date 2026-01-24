@@ -1,5 +1,4 @@
 package Frontend;
-
 import Backend.src.database.StudentInfoManager;
 import Backend.src.database.MajorManager;
 import javax.swing.*;
@@ -10,7 +9,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class StudentSearchGUI extends JFrame {
-    
+        
     private JTextField searchField;
     private JComboBox<String> searchTypeCombo;
     private JTable resultsTable;
@@ -18,7 +17,6 @@ public class StudentSearchGUI extends JFrame {
     private JPanel detailsPanel;
     private JScrollPane detailsScrollPane;
     
-    private Color primaryColor = new Color(41, 128, 185);
     private Color accentColor = new Color(46, 204, 113);
     private Color dangerColor = new Color(231, 76, 60);
     private Color universityBlue = new Color(0, 51, 102);
@@ -67,7 +65,7 @@ public class StudentSearchGUI extends JFrame {
         panel.setPreferredSize(new Dimension(1200, 150));
         
         // Title
-        JLabel titleLabel = new JLabel("STUDENT SEARCH SYSTEM");
+        JLabel titleLabel = new JLabel("TEACHER SEARCH SYSTEM");
         titleLabel.setFont(new Font("Serif", Font.BOLD, 32));
         titleLabel.setForeground(universityGold);
         titleLabel.setBounds(0, 15, 1200, 40);
@@ -168,12 +166,23 @@ public class StudentSearchGUI extends JFrame {
         resultsTable.setSelectionForeground(Color.WHITE);
         resultsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
-        // Header styling
+        // Fix table header with custom renderer
         JTableHeader header = resultsTable.getTableHeader();
-        header.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        header.setBackground(universityBlue);
-        header.setForeground(Color.WHITE);
         header.setPreferredSize(new Dimension(header.getWidth(), 40));
+        header.setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = new JLabel(value.toString());
+                label.setFont(new Font("Segoe UI", Font.BOLD, 14));
+                label.setBackground(universityBlue);
+                label.setForeground(Color.WHITE);
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setOpaque(true);
+                label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                return label;
+            }
+        });
         
         // Center align # column
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -514,7 +523,7 @@ public class StudentSearchGUI extends JFrame {
         
         if (option == JOptionPane.YES_OPTION) {
             this.dispose();
-            MainPageTeacherGUI.main(new String[]{});
+            MainPageStudentGUI.main(null);
         }
     }
     
@@ -526,7 +535,7 @@ public class StudentSearchGUI extends JFrame {
         }
         
         SwingUtilities.invokeLater(() -> {
-            StudentSearchGUI frame = new StudentSearchGUI();
+            TeacherSearchGUI frame = new TeacherSearchGUI();
             frame.setVisible(true);
         });
     }

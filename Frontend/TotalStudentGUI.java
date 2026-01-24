@@ -6,6 +6,7 @@ import Backend.src.database.MajorManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 import java.awt.*;
 
@@ -120,11 +121,25 @@ public class TotalStudentGUI extends JFrame {
         statsTable = new JTable(tableModel);
         statsTable.setFont(new Font("Arial", Font.PLAIN, 14));
         statsTable.setRowHeight(30);
-        statsTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-        statsTable.getTableHeader().setBackground(new Color(52, 152, 219));
-        statsTable.getTableHeader().setForeground(Color.WHITE);
+        
+        // Fix table header with custom renderer
+        JTableHeader header = statsTable.getTableHeader();
+        header.setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = new JLabel(value.toString());
+                label.setFont(new Font("Arial", Font.BOLD, 14));
+                label.setBackground(new Color(52, 152, 219));
+                label.setForeground(Color.WHITE);
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setOpaque(true);
+                label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                return label;
+            }
+        });
+        
         statsTable.setSelectionBackground(new Color(174, 214, 241));
-        // 🔥 FIX HEADER HOVER / WHITE TEXT ISSUE
 
         // Center align all cells
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -148,7 +163,7 @@ public class TotalStudentGUI extends JFrame {
 
     private JPanel createFooterPanel() {
         JPanel footerPanel = new JPanel();
-        footerPanel.setLayout(new GridLayout(3, 1, 5, 5));
+        footerPanel.setLayout(new GridLayout(2, 1, 5, 5));
         footerPanel.setBackground(new Color(245, 245, 245));
         footerPanel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(new Color(41, 128, 185), 2),
@@ -166,17 +181,8 @@ public class TotalStudentGUI extends JFrame {
         femalePercentageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         femalePercentageLabel.setForeground(new Color(52, 73, 94));
 
-        JButton refreshButton = new JButton("Refresh Statistics");
-        refreshButton.setFont(new Font("Arial", Font.BOLD, 14));
-        refreshButton.setBackground(new Color(46, 204, 113));
-        refreshButton.setForeground(Color.WHITE);
-        refreshButton.setFocusPainted(false);
-        refreshButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        refreshButton.addActionListener(e -> loadStudentStatistics());
-
         footerPanel.add(malePercentageLabel);
         footerPanel.add(femalePercentageLabel);
-        footerPanel.add(refreshButton);
 
         return footerPanel;
     }

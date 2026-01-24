@@ -166,12 +166,23 @@ public class TeacherSearchGUI extends JFrame {
         resultsTable.setSelectionForeground(Color.WHITE);
         resultsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
-        // Header styling
+        // Fix table header with custom renderer
         JTableHeader header = resultsTable.getTableHeader();
-        header.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        header.setBackground(universityBlue);
-        header.setForeground(Color.WHITE);
         header.setPreferredSize(new Dimension(header.getWidth(), 40));
+        header.setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = new JLabel(value.toString());
+                label.setFont(new Font("Segoe UI", Font.BOLD, 14));
+                label.setBackground(universityBlue);
+                label.setForeground(Color.WHITE);
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setOpaque(true);
+                label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                return label;
+            }
+        });
         
         // Center align # column
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -512,7 +523,7 @@ public class TeacherSearchGUI extends JFrame {
         
         if (option == JOptionPane.YES_OPTION) {
             this.dispose();
-        MainPageStudentGUI.main(null);
+            MainPageStudentGUI.main(null);
         }
     }
     
@@ -524,7 +535,7 @@ public class TeacherSearchGUI extends JFrame {
         }
         
         SwingUtilities.invokeLater(() -> {
-            StudentSearchGUI frame = new StudentSearchGUI();
+            TeacherSearchGUI frame = new TeacherSearchGUI();
             frame.setVisible(true);
         });
     }

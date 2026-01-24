@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import Backend.src.report.Report;
 
-public class GenerateStudentReportGUI extends JFrame {
+public class GenerateTeacherReportGUI extends JFrame {
 
     private JTextField studentIDField;
     private JPanel reportPanel;
@@ -22,12 +22,12 @@ public class GenerateStudentReportGUI extends JFrame {
     private Color universityBlue = new Color(0, 51, 102);
     private Color universityGold = new Color(218, 165, 32);
 
-    public GenerateStudentReportGUI() {
+    public GenerateTeacherReportGUI() {
         initializeUI();
     }
 
     private void initializeUI() {
-        setTitle("Student Report System");
+        setTitle("Teacher Generate Report System");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(1000, 800);
         setLocationRelativeTo(null);
@@ -77,7 +77,7 @@ public class GenerateStudentReportGUI extends JFrame {
         panel.setPreferredSize(new Dimension(1000, 120));
 
         // Title
-        JLabel titleLabel = new JLabel("STUDENT REPORT SYSTEM");
+        JLabel titleLabel = new JLabel("Teacher Generate report SYSTEM");
         titleLabel.setFont(new Font("Serif", Font.BOLD, 28));
         titleLabel.setForeground(universityGold);
         titleLabel.setBounds(0, 15, 1000, 35);
@@ -438,7 +438,7 @@ public class GenerateStudentReportGUI extends JFrame {
 
         if (option == JOptionPane.YES_OPTION) {
             this.dispose();
-            MainPageStudentGUI.main(null);
+            MainPageTeacherGUI.main(null);
         }
     }
 

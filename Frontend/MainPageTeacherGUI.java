@@ -167,7 +167,7 @@ public class MainPageTeacherGUI extends JFrame {
             case 4:
                 System.out.println("Generating Reports...");
                 this.dispose();
-                GenerateStudentReportGUI.main(null);
+                GenerateTeacherReportGUI.main(null);
                 break;
             case 5:
                 System.out.println("Managing Department...");
