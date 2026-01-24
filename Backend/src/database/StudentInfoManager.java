@@ -1,6 +1,9 @@
 package Backend.src.database;
 
+import Backend.src.department.Student;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudentInfoManager {
 
@@ -276,53 +279,43 @@ public class StudentInfoManager {
     /**
      * Display students by department with proper join
      */
-    public static void displayStudentsByDepartment(String department) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
+    public static List<Student> getStudentsByDepartment(String department) {
+    List<Student> students = new ArrayList<>();
+    Connection conn = null;
+    PreparedStatement pstmt = null;
+    ResultSet rs = null;
 
-        try {
-            conn = DatabaseManager.connectDB();
-            if (conn != null) {
-                String sql = "SELECT si.studentName, si.studentID, dm.department " +
-                        "FROM departmentmajor dm " +
-                        "JOIN studentinfo si ON si.studentID = dm.stuID " +
-                        "WHERE dm.department = ? " +
-                        "ORDER BY si.studentName";
+    try {
+        conn = DatabaseManager.connectDB();
+        if (conn != null) {
+            String sql =
+                "SELECT si.studentID, si.studentName, dm.department, dm.major " +
+                "FROM departmentmajor dm " +
+                "JOIN studentinfo si ON si.studentID = dm.stuID " +
+                "WHERE dm.department = ? " +
+                "ORDER BY si.studentName";
 
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, department);
-                rs = pstmt.executeQuery();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, department);
+            rs = pstmt.executeQuery();
 
-                System.out.println("\n" + "=".repeat(80));
-                System.out.println("                    STUDENTS IN " + department + " DEPARTMENT");
-                System.out.println("=".repeat(80));
-                System.out.printf("%-5s %-25s %-15s %-20s%n", "NO", "Student Name", "Student ID", "Department");
-                System.out.println("-".repeat(80));
-
-                int count = 1;
-                boolean hasData = false;
-                while (rs.next()) {
-                    hasData = true;
-                    System.out.printf("%-5d %-25s %-15s %-20s%n",
-                            count++,
-                            rs.getString("studentName"),
-                            rs.getString("studentID"),
-                            rs.getString("department"));
-                }
-
-                if (!hasData) {
-                    System.out.println("No students found in " + department + " department.");
-                }
-
-                System.out.println("=".repeat(80));
+            while (rs.next()) {
+                students.add(new Student(
+                    rs.getString("studentID"),
+                    rs.getString("studentName"),
+                    rs.getString("department"),
+                    rs.getString("major")
+                ));
             }
-        } catch (SQLException e) {
-            System.out.println("Error displaying students by department: " + e.getMessage());
-        } finally {
-            closeResources(conn, pstmt, rs);
         }
+    } catch (SQLException e) {
+        System.out.println("Error fetching students: " + e.getMessage());
+    } finally {
+        closeResources(conn, pstmt, rs);
     }
+
+    return students;
+}
 
     /**
      * Get total count of students
