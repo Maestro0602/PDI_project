@@ -2,13 +2,10 @@ package Frontend;
 
 import Backend.src.database.Genreport;
 import Backend.src.report.Report;
+import java.awt.*;
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class GenerateStudentReportGUI extends JFrame {
 
@@ -110,6 +107,7 @@ public class GenerateStudentReportGUI extends JFrame {
 
         JButton backBtn = createStyledButton("Back", ACCENT_RED);
         backBtn.setBounds(810, 50, 100, 35);
+        backBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         backBtn.addActionListener(e -> dispose());
         searchCard.add(backBtn);
 

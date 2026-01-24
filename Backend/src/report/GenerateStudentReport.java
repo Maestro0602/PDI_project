@@ -1,8 +1,8 @@
 package Backend.src.report;
 
+import Backend.main.MainPageTeacher;
 import Backend.src.database.Genreport;
 import java.util.Scanner;
-import Backend.main.MainPageTeacher;
 public class GenerateStudentReport {
 
     public static void main(String[] args) {

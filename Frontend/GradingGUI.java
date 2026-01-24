@@ -1,16 +1,15 @@
 package Frontend;
 
+import Backend.src.database.GradingManagement;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import Backend.main.MainPageTeacher;
-import Backend.src.database.GradingManagement;
 
 public class GradingGUI extends JFrame {
 
@@ -667,7 +666,7 @@ public class GradingGUI extends JFrame {
         if (confirm == JOptionPane.YES_OPTION) {
             closeConnection();
             dispose();
-            MainPageTeacherGUI.main(null);
+            MainpageTeacher.main(null);
         }
     }
 

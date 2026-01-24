@@ -11,6 +11,7 @@ public class MainPageStudentGUI extends JFrame {
     private static final Color TEXT_SECONDARY = new Color(100, 116, 139);
     private static final Color ACCENT_GREEN = new Color(34, 197, 94);
     private static final Color ACCENT_BLUE = new Color(59, 130, 246);
+    private static final Color ACCENT_YELLOW = new Color(234, 179, 8);
     
     public MainPageStudentGUI() {
         initializeUI();
@@ -182,6 +183,14 @@ public class MainPageStudentGUI extends JFrame {
                 "📊",
                 2
         ), gbc);
+        gbc.gridx = 3;
+        container.add(createOptionCard(
+                "ANNOUNCEMENTS",
+                "View your grades and academic performance",
+                ACCENT_YELLOW,
+                "📢",
+                3
+        ), gbc);
 
         return container;
     }
@@ -348,7 +357,7 @@ public class MainPageStudentGUI extends JFrame {
                 System.out.println("Searching Students information...");
                 this.dispose(); // Close the main menu
                 SwingUtilities.invokeLater(() -> {
-                    TeacherSearchGUI searchGUIFrame = new TeacherSearchGUI();
+                    StudentSearchGUI searchGUIFrame = new StudentSearchGUI();
                     searchGUIFrame.setVisible(true);
                 });
                 break;
@@ -358,6 +367,15 @@ public class MainPageStudentGUI extends JFrame {
                 SwingUtilities.invokeLater(() -> {
                     GenerateStudentReportGUI ReportFrame = new GenerateStudentReportGUI();
                     ReportFrame.setVisible(true);
+                });
+                break;
+               
+            case 3:
+                System.out.println("Viewing Announcements...");
+                this.dispose(); // Close the main menu
+                SwingUtilities.invokeLater(() -> {
+                    AnnouncementPageStu announcementPage = new AnnouncementPageStu();
+                    announcementPage.setVisible(true);
                 });
                 break;
             default:

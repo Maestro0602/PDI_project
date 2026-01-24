@@ -1,16 +1,17 @@
 package Frontend;
 
-import attendance.AttendanceRecord;
-import attendance.AttendanceStatus;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
+import Backend.src.attendance.AttendanceRecord;
+import Backend.src.attendance.AttendanceStatus;
+import Backend.src.database.Attendance;
+import Backend.src.department.Student;
 import java.awt.*;
 import java.awt.event.*;
 import java.time.LocalDate;
 import java.util.List;
-import database.Attendance;
-import department.Student;
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 public class AttendanceSwingUI extends JFrame {
     
@@ -152,9 +153,8 @@ public class AttendanceSwingUI extends JFrame {
         iconBadge.setPreferredSize(new Dimension(55, 55));
         iconBadge.setLayout(new GridBagLayout());
 
-        JLabel iconLabel = new JLabel("✓");
-        iconLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
-        iconLabel.setForeground(Color.WHITE);
+        JLabel iconLabel = new JLabel("📅");
+        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 28));
         iconBadge.add(iconLabel);
 
         // Title panel
@@ -210,10 +210,6 @@ public class AttendanceSwingUI extends JFrame {
         tablePanel.setOpaque(false);
         tablePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Legend Panel
-        JPanel legendPanel = createLegendPanel();
-        tablePanel.add(legendPanel, BorderLayout.NORTH);
-        
         // Table
         String[] columnNames = {"#", "Student ID", "Student Name", "Attendance Status", "Score"};
         tableModel = new DefaultTableModel(columnNames, 0) {
@@ -230,26 +226,42 @@ public class AttendanceSwingUI extends JFrame {
         };
         
         studentTable = new JTable(tableModel);
-        studentTable.setRowHeight(40);
-        studentTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        studentTable.setShowGrid(false);
-        studentTable.setIntercellSpacing(new Dimension(0, 0));
-        studentTable.setSelectionBackground(new Color(226, 232, 240));
+        studentTable.setRowHeight(45);
+        studentTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        studentTable.setShowGrid(true);
+        studentTable.setGridColor(new Color(226, 232, 240));
+        studentTable.setIntercellSpacing(new Dimension(1, 1));
+        studentTable.setSelectionBackground(new Color(219, 234, 254));
         studentTable.setSelectionForeground(TEXT_PRIMARY);
         
         // Table header styling
-        studentTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        studentTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
         studentTable.getTableHeader().setBackground(new Color(248, 250, 252));
         studentTable.getTableHeader().setForeground(TEXT_PRIMARY);
-        studentTable.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(226, 232, 240)));
-        studentTable.getTableHeader().setPreferredSize(new Dimension(0, 45));
+        studentTable.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(203, 213, 225)));
+        studentTable.getTableHeader().setPreferredSize(new Dimension(0, 50));
         
         // Set column widths
-        studentTable.getColumnModel().getColumn(0).setPreferredWidth(50);
-        studentTable.getColumnModel().getColumn(1).setPreferredWidth(120);
-        studentTable.getColumnModel().getColumn(2).setPreferredWidth(250);
-        studentTable.getColumnModel().getColumn(3).setPreferredWidth(200);
+        studentTable.getColumnModel().getColumn(0).setPreferredWidth(60);
+        studentTable.getColumnModel().getColumn(1).setPreferredWidth(130);
+        studentTable.getColumnModel().getColumn(2).setPreferredWidth(280);
+        studentTable.getColumnModel().getColumn(3).setPreferredWidth(250);
         studentTable.getColumnModel().getColumn(4).setPreferredWidth(100);
+        
+        // Center align # and Score columns
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        centerRenderer.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        centerRenderer.setForeground(TEXT_PRIMARY);
+        studentTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        studentTable.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
+        
+        // Custom renderer for other text columns
+        DefaultTableCellRenderer textRenderer = new DefaultTableCellRenderer();
+        textRenderer.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        textRenderer.setForeground(TEXT_PRIMARY);
+        studentTable.getColumnModel().getColumn(1).setCellRenderer(textRenderer);
+        studentTable.getColumnModel().getColumn(2).setCellRenderer(textRenderer);
         
         // Custom renderer and editor for attendance status
         studentTable.getColumnModel().getColumn(3).setCellRenderer(new AttendanceComboBoxRenderer());
@@ -259,56 +271,10 @@ public class AttendanceSwingUI extends JFrame {
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240), 1));
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
+        scrollPane.getViewport().setBackground(Color.WHITE);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
         
         return tablePanel;
-    }
-    
-    private JPanel createLegendPanel() {
-        JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
-        legendPanel.setOpaque(false);
-        
-        JLabel legendTitle = new JLabel("Attendance Options:");
-        legendTitle.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        legendTitle.setForeground(TEXT_PRIMARY);
-        legendPanel.add(legendTitle);
-        
-        String[][] options = {
-            {"Present", "1.0", String.valueOf(ACCENT_GREEN.getRGB())},
-            {"Late", "0.8", String.valueOf(ACCENT_ORANGE.getRGB())},
-            {"Absent", "0.0", String.valueOf(ACCENT_RED.getRGB())},
-            {"Excused", "0.5", String.valueOf(ACCENT_BLUE.getRGB())}
-        };
-        
-        for (String[] option : options) {
-            JPanel optionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-            optionPanel.setOpaque(false);
-            
-            Color color = new Color(Integer.parseInt(option[2]));
-            
-            JPanel colorBox = new JPanel() {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    Graphics2D g2d = (Graphics2D) g;
-                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g2d.setColor(color);
-                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 6, 6);
-                }
-            };
-            colorBox.setOpaque(false);
-            colorBox.setPreferredSize(new Dimension(20, 20));
-            
-            JLabel textLabel = new JLabel(option[0] + " (" + option[1] + ")");
-            textLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-            textLabel.setForeground(TEXT_SECONDARY);
-            
-            optionPanel.add(colorBox);
-            optionPanel.add(textLabel);
-            legendPanel.add(optionPanel);
-        }
-        
-        return legendPanel;
     }
     
     private JPanel createButtonPanel() {
@@ -316,8 +282,8 @@ public class AttendanceSwingUI extends JFrame {
         buttonPanel.setOpaque(false);
         
         saveButton = createStyledButton("💾 Save Attendance", ACCENT_GREEN);
-        refreshButton = createStyledButton("🔄 Refresh", ACCENT_BLUE);
-        viewAllButton = createStyledButton("📋 View All Records", new Color(168, 85, 247));
+        refreshButton = createStyledButton("Refresh", ACCENT_BLUE);
+        viewAllButton = createStyledButton("View All Records", new Color(168, 85, 247));
         
         saveButton.addActionListener(e -> saveAttendance());
         refreshButton.addActionListener(e -> loadStudents());
@@ -551,7 +517,12 @@ public class AttendanceSwingUI extends JFrame {
             contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
             
             String[] columnNames = {"Student ID", "Student Name", "Date", "Status", "Score"};
-            DefaultTableModel viewTableModel = new DefaultTableModel(columnNames, 0);
+            DefaultTableModel viewTableModel = new DefaultTableModel(columnNames, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
             
             for (AttendanceRecord record : records) {
                 viewTableModel.addRow(new Object[]{
@@ -564,17 +535,34 @@ public class AttendanceSwingUI extends JFrame {
             }
             
             JTable viewTable = new JTable(viewTableModel);
-            viewTable.setRowHeight(35);
-            viewTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-            viewTable.setShowGrid(false);
-            viewTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+            viewTable.setRowHeight(40);
+            viewTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            viewTable.setShowGrid(true);
+            viewTable.setGridColor(new Color(226, 232, 240));
+            viewTable.setForeground(TEXT_PRIMARY);
+            viewTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
             viewTable.getTableHeader().setBackground(new Color(248, 250, 252));
             viewTable.getTableHeader().setForeground(TEXT_PRIMARY);
+            viewTable.getTableHeader().setPreferredSize(new Dimension(0, 45));
+            
+            // Center align score column
+            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+            centerRenderer.setForeground(TEXT_PRIMARY);
+            viewTable.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
+            
+            // Set text color for all columns
+            DefaultTableCellRenderer textRenderer = new DefaultTableCellRenderer();
+            textRenderer.setForeground(TEXT_PRIMARY);
+            for (int i = 0; i < 4; i++) {
+                viewTable.getColumnModel().getColumn(i).setCellRenderer(textRenderer);
+            }
             
             JScrollPane scrollPane = new JScrollPane(viewTable);
             scrollPane.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240), 1));
             scrollPane.setOpaque(false);
             scrollPane.getViewport().setOpaque(false);
+            scrollPane.getViewport().setBackground(Color.WHITE);
             
             JLabel countLabel = new JLabel("Total Records: " + records.size());
             countLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -610,7 +598,7 @@ public class AttendanceSwingUI extends JFrame {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            MainPageTeacherGUI.main(null);
+            MainpageTeacher.main(null);
             this.dispose();
         }
     }
@@ -619,7 +607,7 @@ public class AttendanceSwingUI extends JFrame {
     class AttendanceComboBoxRenderer extends JComboBox<String> implements TableCellRenderer {
         public AttendanceComboBoxRenderer() {
             super(new String[]{"-- Select --", "Present", "Late", "Absent", "Excused"});
-            setFont(new Font("Segoe UI", Font.PLAIN, 13));
+            setFont(new Font("Segoe UI", Font.PLAIN, 14));
         }
         
         @Override
@@ -645,6 +633,7 @@ public class AttendanceSwingUI extends JFrame {
                 setForeground(TEXT_SECONDARY);
             }
             
+            setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
             return this;
         }
     }
@@ -653,7 +642,10 @@ public class AttendanceSwingUI extends JFrame {
     class AttendanceComboBoxEditor extends DefaultCellEditor {
         public AttendanceComboBoxEditor() {
             super(new JComboBox<>(new String[]{"-- Select --", "Present", "Late", "Absent", "Excused"}));
-            ((JComboBox<?>)getComponent()).setFont(new Font("Segoe UI", Font.PLAIN, 13));
+            JComboBox<?> comboBox = (JComboBox<?>)getComponent();
+            comboBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            comboBox.setBackground(Color.WHITE);
+            comboBox.setForeground(TEXT_PRIMARY);
         }
     }
     

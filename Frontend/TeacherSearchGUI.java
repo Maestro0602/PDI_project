@@ -1,13 +1,12 @@
 package Frontend;
-import Backend.src.database.StudentInfoManager;
 import Backend.src.database.MajorManager;
-import Backend.main.MainPageStudent;
+import Backend.src.database.StudentInfoManager;
+import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import java.awt.*;
-import java.awt.event.*;
 
 public class TeacherSearchGUI extends JFrame {
         
@@ -525,7 +524,7 @@ public class TeacherSearchGUI extends JFrame {
         }
         
         SwingUtilities.invokeLater(() -> {
-            StudentSearchGUI frame = new StudentSearchGUI();
+            TeacherSearchGUI frame = new TeacherSearchGUI();
             frame.setVisible(true);
         });
     }

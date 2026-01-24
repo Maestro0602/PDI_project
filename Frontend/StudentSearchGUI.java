@@ -1,15 +1,13 @@
 package Frontend;
 
-import Backend.src.database.StudentInfoManager;
 import Backend.src.database.MajorManager;
-import Backend.main.Main;
-import Backend.main.MainPageStudent;
+import Backend.src.database.StudentInfoManager;
+import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import java.awt.*;
-import java.awt.event.*;
 
 public class StudentSearchGUI extends JFrame {
     
@@ -20,11 +18,15 @@ public class StudentSearchGUI extends JFrame {
     private JPanel detailsPanel;
     private JScrollPane detailsScrollPane;
     
-    private Color primaryColor = new Color(41, 128, 185);
-    private Color accentColor = new Color(46, 204, 113);
-    private Color dangerColor = new Color(231, 76, 60);
-    private Color universityBlue = new Color(0, 51, 102);
-    private Color universityGold = new Color(218, 165, 32);
+    // Modern color scheme
+    private static final Color CARD_BG = Color.WHITE;
+    private static final Color TEXT_PRIMARY = new Color(15, 23, 42);
+    private static final Color TEXT_SECONDARY = new Color(100, 116, 139);
+    private static final Color ACCENT_BLUE = new Color(59, 130, 246);
+    private static final Color ACCENT_GREEN = new Color(34, 197, 94);
+    private static final Color ACCENT_PURPLE = new Color(168, 85, 247);
+    private static final Color ACCENT_RED = new Color(239, 68, 68);
+    private static final Color BG_LIGHT = new Color(241, 245, 249);
     
     public StudentSearchGUI() {
         initializeUI();
@@ -34,95 +36,235 @@ public class StudentSearchGUI extends JFrame {
     private void initializeUI() {
         setTitle("Student Search System");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(1200, 700);
+        setSize(1300, 750);
         setLocationRelativeTo(null);
         setResizable(true);
         
-        // Main panel
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
-        
-        // Top panel for search
-        JPanel topPanel = createTopPanel();
-        mainPanel.add(topPanel, BorderLayout.NORTH);
-        
-        // Center panel with split view
-        JSplitPane splitPane = createSplitPane();
-        mainPanel.add(splitPane, BorderLayout.CENTER);
-        
-        add(mainPanel);
-    }
-    
-    private JPanel createTopPanel() {
-        JPanel panel = new JPanel() {
+        // Main background panel with gradient
+        JPanel backgroundPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                GradientPaint gp = new GradientPaint(0, 0, universityBlue, getWidth(), 0, new Color(0, 76, 153));
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                GradientPaint gp = new GradientPaint(
+                    0, 0, new Color(241, 245, 249),
+                    getWidth(), getHeight(), new Color(226, 232, 240)
+                );
                 g2d.setPaint(gp);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
+
+                // Decorative circles
+                g2d.setColor(new Color(147, 197, 253, 25));
+                g2d.fillOval(-80, -80, 240, 240);
+                g2d.fillOval(getWidth() - 160, getHeight() - 160, 240, 240);
             }
         };
-        panel.setLayout(null);
-        panel.setPreferredSize(new Dimension(1200, 150));
         
-        // Title
-        JLabel titleLabel = new JLabel("STUDENT SEARCH SYSTEM");
-        titleLabel.setFont(new Font("Serif", Font.BOLD, 32));
-        titleLabel.setForeground(universityGold);
-        titleLabel.setBounds(0, 15, 1200, 40);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(titleLabel);
+        // Header panel
+        JPanel headerPanel = createHeaderPanel();
         
-        // Subtitle
-        JLabel subtitleLabel = new JLabel("Find students by name or ID");
-        subtitleLabel.setFont(new Font("Segoe UI", Font.ITALIC, 14));
-        subtitleLabel.setForeground(Color.WHITE);
-        subtitleLabel.setBounds(0, 55, 1200, 20);
-        subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(subtitleLabel);
+        // Content panel
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setOpaque(false);
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
         
+        // Search panel
+        JPanel searchPanel = createSearchPanel();
+        contentPanel.add(searchPanel, BorderLayout.NORTH);
+        
+        // Results panel with split view
+        JSplitPane splitPane = createSplitPane();
+        contentPanel.add(splitPane, BorderLayout.CENTER);
+        
+        backgroundPanel.add(headerPanel, BorderLayout.NORTH);
+        backgroundPanel.add(contentPanel, BorderLayout.CENTER);
+        
+        setContentPane(backgroundPanel);
+    }
+    
+    private JPanel createHeaderPanel() {
+        JPanel headerPanel = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Shadow
+                g2d.setColor(new Color(0, 0, 0, 15));
+                g2d.fillRoundRect(4, 4, getWidth() - 8, getHeight() - 4, 20, 20);
+
+                // Card background
+                g2d.setColor(CARD_BG);
+                g2d.fillRoundRect(0, 0, getWidth() - 4, getHeight(), 20, 20);
+
+                // Blue gradient accent
+                GradientPaint blueGradient = new GradientPaint(
+                    0, 0, new Color(59, 130, 246, 200),
+                    0, getHeight(), new Color(96, 165, 250, 150)
+                );
+                g2d.setPaint(blueGradient);
+                g2d.fillRoundRect(0, 0, 6, getHeight(), 20, 20);
+
+                // Subtle background pattern
+                g2d.setColor(new Color(59, 130, 246, 8));
+                g2d.fillRoundRect(0, 0, getWidth() - 4, getHeight(), 20, 20);
+            }
+        };
+        headerPanel.setOpaque(false);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(25, 35, 25, 35));
+
+        // Icon and title container
+        JPanel titleContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        titleContainer.setOpaque(false);
+
+        // Icon badge
+        JPanel iconBadge = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                GradientPaint gradient = new GradientPaint(
+                    0, 0, ACCENT_BLUE,
+                    getWidth(), getHeight(), new Color(37, 99, 235)
+                );
+                g2d.setPaint(gradient);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16);
+            }
+        };
+        iconBadge.setOpaque(false);
+        iconBadge.setPreferredSize(new Dimension(55, 55));
+        iconBadge.setLayout(new GridBagLayout());
+
+        JLabel iconLabel = new JLabel("🔍");
+        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 28));
+        iconBadge.add(iconLabel);
+
+        // Title panel
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        titlePanel.setOpaque(false);
+
+        JLabel titleLabel = new JLabel("Student Search System");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        titleLabel.setForeground(TEXT_PRIMARY);
+
+        JLabel subtitleLabel = new JLabel("Find and view detailed student information");
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        subtitleLabel.setForeground(TEXT_SECONDARY);
+        
+        JLabel infoLabel = new JLabel("Search by Name or Student ID");
+        infoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+        infoLabel.setForeground(ACCENT_BLUE);
+
+        titlePanel.add(titleLabel);
+        titlePanel.add(Box.createRigidArea(new Dimension(0, 4)));
+        titlePanel.add(subtitleLabel);
+        titlePanel.add(Box.createRigidArea(new Dimension(0, 2)));
+        titlePanel.add(infoLabel);
+
+        titleContainer.add(iconBadge);
+        titleContainer.add(titlePanel);
+
+        // Back button
+        JButton backButton = createBackButton();
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(backButton);
+
+        headerPanel.add(titleContainer, BorderLayout.WEST);
+        headerPanel.add(buttonPanel, BorderLayout.EAST);
+
+        return headerPanel;
+    }
+    
+    private JPanel createSearchPanel() {
+        JPanel searchPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Shadow
+                g2d.setColor(new Color(0, 0, 0, 15));
+                g2d.fillRoundRect(4, 4, getWidth() - 8, getHeight() - 4, 16, 16);
+
+                // Card background
+                g2d.setColor(CARD_BG);
+                g2d.fillRoundRect(0, 0, getWidth() - 4, getHeight(), 16, 16);
+            }
+        };
+        searchPanel.setOpaque(false);
+        searchPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 20));
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
         // Search type label
         JLabel searchTypeLabel = new JLabel("Search By:");
         searchTypeLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        searchTypeLabel.setForeground(Color.WHITE);
-        searchTypeLabel.setBounds(250, 95, 100, 30);
-        panel.add(searchTypeLabel);
-        
+        searchTypeLabel.setForeground(TEXT_PRIMARY);
+
         // Search type combo box
         String[] searchTypes = {"Name", "ID"};
         searchTypeCombo = new JComboBox<>(searchTypes);
         searchTypeCombo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        searchTypeCombo.setBounds(350, 95, 120, 35);
+        searchTypeCombo.setPreferredSize(new Dimension(140, 40));
         searchTypeCombo.setBackground(Color.WHITE);
-        panel.add(searchTypeCombo);
-        
+        searchTypeCombo.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(203, 213, 225), 2),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+
         // Search field
         searchField = new JTextField();
         searchField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        searchField.setBounds(480, 95, 300, 35);
+        searchField.setPreferredSize(new Dimension(400, 40));
         searchField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(189, 195, 199), 2),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+            BorderFactory.createLineBorder(new Color(203, 213, 225), 2),
+            BorderFactory.createEmptyBorder(5, 15, 5, 15)
         ));
         searchField.addActionListener(e -> performSearch());
-        panel.add(searchField);
         
+        // Placeholder effect
+        searchField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                searchField.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(ACCENT_BLUE, 2),
+                    BorderFactory.createEmptyBorder(5, 15, 5, 15)
+                ));
+            }
+            
+            @Override
+            public void focusLost(FocusEvent e) {
+                searchField.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(203, 213, 225), 2),
+                    BorderFactory.createEmptyBorder(5, 15, 5, 15)
+                ));
+            }
+        });
+
         // Search button
-        JButton searchBtn = createStyledButton("Search", accentColor, new Color(39, 174, 96));
-        searchBtn.setBounds(790, 95, 120, 35);
+        JButton searchBtn = createActionButton("Search", ACCENT_BLUE, "");
+        searchBtn.setPreferredSize(new Dimension(130, 40));
         searchBtn.addActionListener(e -> performSearch());
-        panel.add(searchBtn);
-        
-        // Back button
-        JButton backBtn = createStyledButton("← Back", dangerColor, new Color(192, 57, 43));
-        backBtn.setBounds(1050, 15, 120, 35);
-        backBtn.addActionListener(e -> handleBack());
-        panel.add(backBtn);
-        
-        return panel;
+
+        // Clear button
+        JButton clearBtn = createActionButton("Clear", TEXT_SECONDARY, "");
+        clearBtn.setPreferredSize(new Dimension(100, 40));
+        clearBtn.addActionListener(e -> clearSearch());
+
+        searchPanel.add(searchTypeLabel);
+        searchPanel.add(searchTypeCombo);
+        searchPanel.add(searchField);
+        searchPanel.add(searchBtn);
+        searchPanel.add(clearBtn);
+
+        return searchPanel;
     }
     
     private JSplitPane createSplitPane() {
@@ -133,25 +275,44 @@ public class StudentSearchGUI extends JFrame {
         JPanel rightPanel = createDetailsPanel();
         
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-        splitPane.setDividerLocation(600);
+        splitPane.setDividerLocation(650);
         splitPane.setOneTouchExpandable(true);
+        splitPane.setBorder(BorderFactory.createEmptyBorder());
+        splitPane.setOpaque(false);
         
         return splitPane;
     }
     
     private JPanel createResultsPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createEmptyBorder(10, 10, 10, 5),
-            BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(52, 152, 219), 2),
-                "SEARCH RESULTS",
-                0, 0,
-                new Font("Segoe UI", Font.BOLD, 16),
-                universityBlue
-            )
-        ));
+        JPanel panel = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Shadow
+                g2d.setColor(new Color(0, 0, 0, 15));
+                g2d.fillRoundRect(4, 4, getWidth() - 8, getHeight() - 4, 16, 16);
+
+                // Card background
+                g2d.setColor(CARD_BG);
+                g2d.fillRoundRect(0, 0, getWidth() - 4, getHeight(), 16, 16);
+            }
+        };
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 5));
+        
+        // Title panel
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setOpaque(false);
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 10, 20));
+        
+        JLabel titleLabel = new JLabel("Search Results");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        titleLabel.setForeground(TEXT_PRIMARY);
+        
+        titlePanel.add(titleLabel, BorderLayout.WEST);
         
         // Create table
         String[] columns = {"#", "Student Name", "Student ID"};
@@ -164,18 +325,21 @@ public class StudentSearchGUI extends JFrame {
         
         resultsTable = new JTable(tableModel);
         resultsTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        resultsTable.setRowHeight(35);
-        resultsTable.setGridColor(new Color(189, 195, 199));
-        resultsTable.setSelectionBackground(new Color(52, 152, 219));
-        resultsTable.setSelectionForeground(Color.WHITE);
+        resultsTable.setRowHeight(40);
+        resultsTable.setGridColor(new Color(226, 232, 240));
+        resultsTable.setSelectionBackground(new Color(219, 234, 254));
+        resultsTable.setSelectionForeground(TEXT_PRIMARY);
         resultsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        resultsTable.setShowVerticalLines(true);
+        resultsTable.setIntercellSpacing(new Dimension(1, 1));
         
         // Header styling
         JTableHeader header = resultsTable.getTableHeader();
         header.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        header.setBackground(universityBlue);
-        header.setForeground(Color.WHITE);
-        header.setPreferredSize(new Dimension(header.getWidth(), 40));
+        header.setBackground(new Color(248, 250, 252));
+        header.setForeground(TEXT_PRIMARY);
+        header.setPreferredSize(new Dimension(header.getWidth(), 45));
+        header.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(226, 232, 240)));
         
         // Center align # column
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -183,8 +347,8 @@ public class StudentSearchGUI extends JFrame {
         resultsTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         
         // Column widths
-        resultsTable.getColumnModel().getColumn(0).setPreferredWidth(50);
-        resultsTable.getColumnModel().getColumn(1).setPreferredWidth(250);
+        resultsTable.getColumnModel().getColumn(0).setPreferredWidth(60);
+        resultsTable.getColumnModel().getColumn(1).setPreferredWidth(300);
         resultsTable.getColumnModel().getColumn(2).setPreferredWidth(150);
         
         // Add selection listener
@@ -205,33 +369,61 @@ public class StudentSearchGUI extends JFrame {
         });
         
         JScrollPane scrollPane = new JScrollPane(resultsTable);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(189, 195, 199)));
-        panel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.getViewport().setBackground(Color.WHITE);
         
-        // Info label
+        // Info panel
+        JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        infoPanel.setOpaque(false);
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(8, 0, 15, 0));
+        
         JLabel infoLabel = new JLabel("Click on a row to view details");
         infoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-        infoLabel.setForeground(new Color(127, 140, 141));
-        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        infoLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-        panel.add(infoLabel, BorderLayout.SOUTH);
+        infoLabel.setForeground(TEXT_SECONDARY);
+        infoPanel.add(infoLabel);
+        
+        JPanel tableContainer = new JPanel(new BorderLayout());
+        tableContainer.setOpaque(false);
+        tableContainer.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
+        tableContainer.add(scrollPane, BorderLayout.CENTER);
+        
+        panel.add(titlePanel, BorderLayout.NORTH);
+        panel.add(tableContainer, BorderLayout.CENTER);
+        panel.add(infoPanel, BorderLayout.SOUTH);
         
         return panel;
     }
     
     private JPanel createDetailsPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createEmptyBorder(10, 5, 10, 10),
-            BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(52, 152, 219), 2),
-                "STUDENT DETAILS",
-                0, 0,
-                new Font("Segoe UI", Font.BOLD, 16),
-                universityBlue
-            )
-        ));
+        JPanel panel = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Shadow
+                g2d.setColor(new Color(0, 0, 0, 15));
+                g2d.fillRoundRect(4, 4, getWidth() - 8, getHeight() - 4, 16, 16);
+
+                // Card background
+                g2d.setColor(CARD_BG);
+                g2d.fillRoundRect(0, 0, getWidth() - 4, getHeight(), 16, 16);
+            }
+        };
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 5, 0, 0));
+        
+        // Title panel
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setOpaque(false);
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 10, 20));
+        
+        JLabel titleLabel = new JLabel("Student Details");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        titleLabel.setForeground(TEXT_PRIMARY);
+        
+        titlePanel.add(titleLabel, BorderLayout.WEST);
         
         detailsPanel = new JPanel();
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
@@ -240,14 +432,17 @@ public class StudentSearchGUI extends JFrame {
         // Initial message
         JLabel emptyLabel = new JLabel("Select a student to view details");
         emptyLabel.setFont(new Font("Segoe UI", Font.ITALIC, 16));
-        emptyLabel.setForeground(new Color(127, 140, 141));
+        emptyLabel.setForeground(TEXT_SECONDARY);
         emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         detailsPanel.add(Box.createVerticalGlue());
         detailsPanel.add(emptyLabel);
         detailsPanel.add(Box.createVerticalGlue());
         
         detailsScrollPane = new JScrollPane(detailsPanel);
-        detailsScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        detailsScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
+        detailsScrollPane.getViewport().setBackground(Color.WHITE);
+        
+        panel.add(titlePanel, BorderLayout.NORTH);
         panel.add(detailsScrollPane, BorderLayout.CENTER);
         
         return panel;
@@ -257,10 +452,7 @@ public class StudentSearchGUI extends JFrame {
         String searchText = searchField.getText().trim();
         
         if (searchText.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Please enter a search term", 
-                "Warning", 
-                JOptionPane.WARNING_MESSAGE);
+            showModernDialog("Please enter a search term", "⚠️ Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
         
@@ -281,10 +473,11 @@ public class StudentSearchGUI extends JFrame {
         String[][] results = StudentInfoManager.searchStudentByName(searchName.toLowerCase());
         
         if (results == null || results.length == 0) {
-            JOptionPane.showMessageDialog(this, 
+            showModernDialog(
                 "No students found with name containing: " + searchName, 
-                "No Results", 
-                JOptionPane.INFORMATION_MESSAGE);
+                "ℹ️ No Results", 
+                JOptionPane.INFORMATION_MESSAGE
+            );
             return;
         }
         
@@ -304,10 +497,11 @@ public class StudentSearchGUI extends JFrame {
         String[] result = StudentInfoManager.getStudentInfo(searchID);
         
         if (result == null) {
-            JOptionPane.showMessageDialog(this, 
+            showModernDialog(
                 "No student found with ID: " + searchID, 
-                "No Results", 
-                JOptionPane.INFORMATION_MESSAGE);
+                "ℹ️ No Results", 
+                JOptionPane.INFORMATION_MESSAGE
+            );
             return;
         }
         
@@ -330,10 +524,11 @@ public class StudentSearchGUI extends JFrame {
         String[] studentInfo = StudentInfoManager.getStudentInfo(studentID);
         
         if (studentInfo == null) {
-            JOptionPane.showMessageDialog(this, 
+            showModernDialog(
                 "Failed to retrieve student details", 
-                "Error", 
-                JOptionPane.ERROR_MESSAGE);
+                "❌ Error", 
+                JOptionPane.ERROR_MESSAGE
+            );
             return;
         }
         
@@ -344,89 +539,66 @@ public class StudentSearchGUI extends JFrame {
         detailsPanel.removeAll();
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
         
-        detailsPanel.add(Box.createVerticalStrut(20));
+        detailsPanel.add(Box.createVerticalStrut(15));
         
-        // Student info panel
-        JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new GridLayout(4, 1, 10, 10));
-        infoPanel.setMaximumSize(new Dimension(500, 150));
-        infoPanel.setBackground(new Color(236, 240, 241));
-        infoPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(52, 152, 219), 2),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
-        ));
+        // Student basic info card
+        JPanel basicInfoCard = createInfoCard("👤 Basic Information", ACCENT_BLUE);
+        basicInfoCard.setLayout(new GridLayout(4, 1, 0, 12));
         
-        infoPanel.add(createDetailLabel("Name:", studentInfo[0]));
-        infoPanel.add(createDetailLabel("ID:", studentInfo[1]));
-        infoPanel.add(createDetailLabel("Gender:", studentInfo[2]));
-        infoPanel.add(createDetailLabel("Year:", studentInfo[3]));
+        basicInfoCard.add(createModernDetailRow("Name", studentInfo[0]));
+        basicInfoCard.add(createModernDetailRow("Student ID", studentInfo[1]));
+        basicInfoCard.add(createModernDetailRow("Gender", studentInfo[2]));
+        basicInfoCard.add(createModernDetailRow("Year", studentInfo[3]));
         
-        detailsPanel.add(infoPanel);
-        detailsPanel.add(Box.createVerticalStrut(20));
+        detailsPanel.add(basicInfoCard);
+        detailsPanel.add(Box.createVerticalStrut(15));
         
         // Department and Major
         String[] deptMajorCourses = MajorManager.getFullDepartmentMajorCourse(studentInfo[1]);
         
         if (deptMajorCourses != null && deptMajorCourses.length >= 6) {
-            // Department/Major panel
-            JPanel deptPanel = new JPanel();
-            deptPanel.setLayout(new GridLayout(2, 1, 10, 10));
-            deptPanel.setMaximumSize(new Dimension(500, 80));
-            deptPanel.setBackground(new Color(236, 240, 241));
-            deptPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(universityGold, 2),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)
-            ));
+            // Department/Major card
+            JPanel academicCard = createInfoCard("🎓 Academic Information", ACCENT_PURPLE);
+            academicCard.setLayout(new GridLayout(2, 1, 0, 12));
             
-            deptPanel.add(createDetailLabel("Department:", deptMajorCourses[0]));
-            deptPanel.add(createDetailLabel("Major:", deptMajorCourses[1]));
+            academicCard.add(createModernDetailRow("Department", deptMajorCourses[0]));
+            academicCard.add(createModernDetailRow("Major", deptMajorCourses[1]));
             
-            detailsPanel.add(deptPanel);
-            detailsPanel.add(Box.createVerticalStrut(20));
+            detailsPanel.add(academicCard);
+            detailsPanel.add(Box.createVerticalStrut(15));
             
-            // Courses panel
-            JPanel coursesPanel = new JPanel();
-            coursesPanel.setLayout(new BoxLayout(coursesPanel, BoxLayout.Y_AXIS));
-            coursesPanel.setMaximumSize(new Dimension(500, 200));
-            coursesPanel.setBackground(Color.WHITE);
-            coursesPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(
-                    BorderFactory.createLineBorder(accentColor, 2),
-                    "ENROLLED COURSES",
-                    0, 0,
-                    new Font("Segoe UI", Font.BOLD, 14),
-                    universityBlue
-                ),
-                BorderFactory.createEmptyBorder(10, 15, 10, 15)
-            ));
+            // Courses card
+            JPanel coursesCard = createInfoCard("📚 Enrolled Courses", ACCENT_GREEN);
+            coursesCard.setLayout(new BoxLayout(coursesCard, BoxLayout.Y_AXIS));
             
             for (int i = 2; i < 6; i++) {
+                JPanel courseRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+                courseRow.setOpaque(false);
+                
                 JLabel courseLabel = new JLabel((i - 1) + ". " + deptMajorCourses[i]);
-                courseLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-                courseLabel.setForeground(new Color(44, 62, 80));
-                courseLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-                coursesPanel.add(courseLabel);
+                courseLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+                courseLabel.setForeground(TEXT_PRIMARY);
+                
+                courseRow.add(courseLabel);
+                coursesCard.add(courseRow);
+                
                 if (i < 5) {
-                    coursesPanel.add(Box.createVerticalStrut(8));
+                    coursesCard.add(Box.createVerticalStrut(10));
                 }
             }
             
-            detailsPanel.add(coursesPanel);
+            detailsPanel.add(coursesCard);
         } else {
-            JPanel noDataPanel = new JPanel();
-            noDataPanel.setMaximumSize(new Dimension(500, 80));
-            noDataPanel.setBackground(new Color(255, 243, 224));
-            noDataPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(255, 165, 0), 2),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)
-            ));
+            // No data card
+            JPanel noDataCard = createInfoCard("⚠️ Missing Information", new Color(251, 146, 60));
             
-            JLabel noDataLabel = new JLabel("⚠ Department and Major not assigned");
-            noDataLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
-            noDataLabel.setForeground(new Color(255, 140, 0));
-            noDataPanel.add(noDataLabel);
+            JLabel noDataLabel = new JLabel("Department and Major not assigned");
+            noDataLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            noDataLabel.setForeground(TEXT_SECONDARY);
             
-            detailsPanel.add(noDataPanel);
+            noDataCard.add(noDataLabel);
+            
+            detailsPanel.add(noDataCard);
         }
         
         detailsPanel.add(Box.createVerticalGlue());
@@ -435,20 +607,59 @@ public class StudentSearchGUI extends JFrame {
         detailsPanel.repaint();
     }
     
-    private JPanel createDetailLabel(String label, String value) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        panel.setBackground(new Color(236, 240, 241));
+    private JPanel createInfoCard(String title, Color accentColor) {
+        JPanel card = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Background
+                g2d.setColor(new Color(248, 250, 252));
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                
+                // Left accent border
+                g2d.setColor(accentColor);
+                g2d.fillRoundRect(0, 0, 4, getHeight(), 12, 12);
+            }
+        };
+        card.setOpaque(false);
+        card.setLayout(new BorderLayout());
+        card.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        card.setMaximumSize(new Dimension(550, 1000));
         
-        JLabel labelComp = new JLabel(label);
+        // Title
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        titleLabel.setForeground(TEXT_PRIMARY);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 12, 0));
+        
+        JPanel contentPanel = new JPanel();
+        contentPanel.setOpaque(false);
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+        
+        card.add(titleLabel, BorderLayout.NORTH);
+        card.add(contentPanel, BorderLayout.CENTER);
+        
+        return card;
+    }
+    
+    private JPanel createModernDetailRow(String label, String value) {
+        JPanel panel = new JPanel(new BorderLayout(10, 0));
+        panel.setOpaque(false);
+        
+        JLabel labelComp = new JLabel(label + ":");
         labelComp.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        labelComp.setForeground(new Color(52, 73, 94));
+        labelComp.setForeground(TEXT_SECONDARY);
+        labelComp.setPreferredSize(new Dimension(100, 25));
         
         JLabel valueComp = new JLabel(value);
         valueComp.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        valueComp.setForeground(new Color(44, 62, 80));
+        valueComp.setForeground(TEXT_PRIMARY);
         
-        panel.add(labelComp);
-        panel.add(valueComp);
+        panel.add(labelComp, BorderLayout.WEST);
+        panel.add(valueComp, BorderLayout.CENTER);
         
         return panel;
     }
@@ -458,7 +669,7 @@ public class StudentSearchGUI extends JFrame {
         
         JLabel emptyLabel = new JLabel("Select a student to view details");
         emptyLabel.setFont(new Font("Segoe UI", Font.ITALIC, 16));
-        emptyLabel.setForeground(new Color(127, 140, 141));
+        emptyLabel.setForeground(TEXT_SECONDARY);
         emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         detailsPanel.add(Box.createVerticalGlue());
@@ -469,39 +680,108 @@ public class StudentSearchGUI extends JFrame {
         detailsPanel.repaint();
     }
     
-    private JButton createStyledButton(String text, Color normalColor, Color hoverColor) {
-        JButton button = new JButton(text) {
+    private void clearSearch() {
+        searchField.setText("");
+        tableModel.setRowCount(0);
+        clearDetailsPanel();
+        searchField.requestFocus();
+    }
+    
+    private JButton createActionButton(String text, Color normalColor, String icon) {
+        JButton button = new JButton(icon + " " + text) {
             @Override
             protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                Color currentColor;
                 if (getModel().isPressed()) {
-                    g2.setColor(hoverColor.darker());
+                    currentColor = normalColor.darker();
                 } else if (getModel().isRollover()) {
-                    g2.setColor(hoverColor);
+                    currentColor = new Color(
+                        Math.max(normalColor.getRed() - 20, 0),
+                        Math.max(normalColor.getGreen() - 20, 0),
+                        Math.max(normalColor.getBlue() - 20, 0)
+                    );
                 } else {
-                    g2.setColor(normalColor);
+                    currentColor = normalColor;
                 }
-                
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                
-                g2.setColor(Color.WHITE);
-                g2.setFont(getFont());
-                FontMetrics fm = g2.getFontMetrics();
-                int x = (getWidth() - fm.stringWidth(getText())) / 2;
-                int y = ((getHeight() - fm.getHeight()) / 2) + fm.getAscent();
-                g2.drawString(getText(), x, y);
+
+                g2d.setColor(currentColor);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+
+                g2d.setColor(Color.WHITE);
+                g2d.setFont(getFont());
+                FontMetrics fm = g2d.getFontMetrics();
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2d.drawString(getText(), textX, textY);
             }
         };
-        
+
         button.setFont(new Font("Segoe UI", Font.BOLD, 13));
         button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
         button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent evt) { button.repaint(); }
+            @Override
+            public void mouseExited(MouseEvent evt) { button.repaint(); }
+        });
+
+        return button;
+    }
+    
+    private JButton createBackButton() {
+        JButton button = new JButton("← Back") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                if (getModel().isPressed()) {
+                    g2d.setColor(new Color(220, 38, 38));
+                } else if (getModel().isRollover()) {
+                    g2d.setColor(ACCENT_RED);
+                } else {
+                    g2d.setColor(new Color(248, 250, 252));
+                }
+
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+
+                if (getModel().isRollover() || getModel().isPressed()) {
+                    g2d.setColor(Color.WHITE);
+                } else {
+                    g2d.setColor(TEXT_SECONDARY);
+                }
+                g2d.setFont(getFont());
+                FontMetrics fm = g2d.getFontMetrics();
+                int textX = (getWidth() - fm.stringWidth(getText())) / 2;
+                int textY = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2d.drawString(getText(), textX, textY);
+            }
+        };
+
+        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(100, 38));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        button.addActionListener(e -> handleBack());
+
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent evt) { button.repaint(); }
+            @Override
+            public void mouseExited(MouseEvent evt) { button.repaint(); }
+        });
+
         return button;
     }
     
@@ -516,8 +796,16 @@ public class StudentSearchGUI extends JFrame {
         
         if (option == JOptionPane.YES_OPTION) {
             this.dispose();
-            MainPageTeacherGUI.main(new String[]{});
+            MainPageStudentGUI.main(new String[]{});
         }
+    }
+    
+    private void showModernDialog(String message, String title, int messageType) {
+        UIManager.put("OptionPane.background", CARD_BG);
+        UIManager.put("Panel.background", CARD_BG);
+        UIManager.put("OptionPane.messageForeground", TEXT_PRIMARY);
+        
+        JOptionPane.showMessageDialog(this, message, title, messageType);
     }
     
     public static void main(String[] args) {
