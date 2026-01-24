@@ -1,15 +1,15 @@
 package Backend.src.department;
 
-import java.util.Scanner;
-import Backend.src.database.StudentInfoManager;
-import Backend.src.database.MajorManager;
-import Backend.src.database.TeacherInfoManager;
-import Backend.src.database.CourseManager;
-import Backend.src.database.TeacherCourseManager;
-import Backend.src.major.major;
 import Backend.main.MainPageTeacher;
 import Backend.src.course.Course;
+import Backend.src.database.CourseManager;
 import Backend.src.database.DatabaseManager;
+import Backend.src.database.MajorManager;
+import Backend.src.database.StudentInfoManager;
+import Backend.src.database.TeacherCourseManager;
+import Backend.src.database.TeacherInfoManager;
+import Backend.src.major.major;
+import java.util.Scanner;
 
 public class ManageDepartment {
 
@@ -197,7 +197,7 @@ public class ManageDepartment {
                 return;
         }
 
-        TeacherInfoManager.displayTeachersByDepartment(department);
+        //TeacherInfoManager.displayTeachersByDepartment(department);
     }
 
     private static void viewTeachersByCourse(Scanner input) {
@@ -217,7 +217,7 @@ public class ManageDepartment {
         System.out.print("Enter course ID: ");
         String course = input.nextLine();
 
-        TeacherInfoManager.displayTeachersByCourse(course);
+        //TeacherInfoManager.displayTeachersByCourse(course);
     }
 
     private static void addNewTeacher(Scanner input) {

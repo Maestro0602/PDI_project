@@ -1,9 +1,8 @@
 package Backend.src.department;
 
-import java.util.Scanner;
-
 import Backend.main.MainPageTeacher;
 import Backend.src.database.HeadTeacherpw;
+import java.util.Scanner;
 
 public class LogHeadTeacher {
     public static void main(String[] args) {

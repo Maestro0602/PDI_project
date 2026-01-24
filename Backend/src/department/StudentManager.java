@@ -39,7 +39,7 @@ public class StudentManager {
                 return;
         }
 
-        StudentInfoManager.displayStudentsByDepartment(selectedDepartment);
+       // StudentInfoManager.displayStudentsByDepartment(selectedDepartment);
     }
 
     public void addStudentToDepartment() {
