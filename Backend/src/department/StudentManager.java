@@ -150,8 +150,8 @@ public class StudentManager {
         if (deptMajor == null) {
             System.out.println(" Student is not assigned to any department!");
         } else {
-            if (MajorManager.updateDepartmentMajor(studentId, null, null)) {
-                System.out.println(" Student removed from " + deptMajor[0] + " department successfully!");
+            if (MajorManager.deleteDepartmentMajorByStudentId(studentId)) {
+                System.out.println(" Student removed from " + studentId + " department successfully!");
             } else {
                 System.out.println(" Failed to remove student from department.");
             }

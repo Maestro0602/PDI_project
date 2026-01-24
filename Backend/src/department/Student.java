@@ -4,11 +4,21 @@ public class Student {
     private String studentId;
     private String studentName;
     private String department;
+    private String major;
 
-    public Student(String studentId, String studentName, String department) {
+    public String getMajor() {
+        return major;
+    }
+
+    public void setMajor(String major) {
+        this.major = major;
+    }
+
+    public Student(String studentId, String studentName, String department, String major) {
         this.studentId = studentId;
         this.studentName = studentName;
         this.department = department;
+        this.major = major;
     }
 
     public Student(String studentId, String studentName) {
@@ -44,6 +54,7 @@ public class Student {
     @Override
     public String toString() {
         return "ID: " + studentId + " | Name: " + studentName + " | Department: "
-                + (department == null ? "Not Assigned" : department);
+                + (department == null ? "Not Assigned" : department) + " | Major: "
+                + (major == null ? "Not Assigned" : major);
     }
 }

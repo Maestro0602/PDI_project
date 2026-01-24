@@ -1,8 +1,6 @@
 package Frontend;
 
 import Backend.src.database.Genreport;
-import Backend.main.Main;
-import Backend.main.MainPageTeacher;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;

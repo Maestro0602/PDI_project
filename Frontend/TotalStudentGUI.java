@@ -6,6 +6,8 @@ import Backend.src.database.MajorManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+
 import java.awt.*;
 
 public class TotalStudentGUI extends JFrame {
@@ -54,27 +56,46 @@ public class TotalStudentGUI extends JFrame {
         add(mainPanel);
     }
 
-    private JPanel createHeaderPanel() {
-        JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new BorderLayout());
+        private JPanel createHeaderPanel() {
+        JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(41, 128, 185));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JLabel titleLabel = new JLabel("STUDENT STATISTICS REPORT");
+        // Back Button
+        JButton backButton = new JButton("← Back");
+        backButton.setFont(new Font("Arial", Font.BOLD, 14));
+        backButton.setForeground(Color.WHITE);
+        backButton.setBackground(new Color(41, 128, 185));
+        backButton.setFocusPainted(false);
+        backButton.setBorderPainted(false);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backButton.setPreferredSize(new Dimension(90, 35));
+
+        backButton.addActionListener(e -> {
+            dispose(); // close current window
+            new MainPageOwnerGUI().setVisible(true); // go back
+        });
+
+        JPanel titlePanel = new JPanel(new GridLayout(2, 1));
+        titlePanel.setOpaque(false);
+
+        JLabel titleLabel = new JLabel("STUDENT STATISTICS REPORT", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(Color.WHITE);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        totalStudentsLabel = new JLabel("Total Students: 0");
+        totalStudentsLabel = new JLabel("Total Students: 0", SwingConstants.CENTER);
         totalStudentsLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         totalStudentsLabel.setForeground(Color.WHITE);
-        totalStudentsLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        headerPanel.add(titleLabel, BorderLayout.NORTH);
-        headerPanel.add(totalStudentsLabel, BorderLayout.SOUTH);
+        titlePanel.add(titleLabel);
+        titlePanel.add(totalStudentsLabel);
+
+        headerPanel.add(backButton, BorderLayout.WEST);
+        headerPanel.add(titlePanel, BorderLayout.CENTER);
 
         return headerPanel;
     }
+
 
     private JPanel createTablePanel() {
         JPanel tablePanel = new JPanel();
@@ -104,6 +125,7 @@ public class TotalStudentGUI extends JFrame {
         statsTable.getTableHeader().setBackground(new Color(52, 152, 219));
         statsTable.getTableHeader().setForeground(Color.WHITE);
         statsTable.setSelectionBackground(new Color(174, 214, 241));
+        // 🔥 FIX HEADER HOVER / WHITE TEXT ISSUE
 
         // Center align all cells
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();

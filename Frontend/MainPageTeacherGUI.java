@@ -1,16 +1,11 @@
 package Frontend;
 
 import javax.swing.*;
+
+import com.mysql.cj.log.Log;
+
 import java.awt.*;
 import java.awt.event.*;
-import Backend.src.department.LogHeadTeacher;
-import Backend.src.searching.SearchingTeacher;
-import Backend.src.studentassign.studentassign;
-import Backend.src.grading.Grading;
-import Backend.src.report.GenerateStudentReport;
-import Backend.src.attendance.AttendanceUI;
-import Backend.main.Main;
-
 public class MainPageTeacherGUI extends JFrame {
     
     private JPanel mainPanel;
@@ -177,7 +172,8 @@ public class MainPageTeacherGUI extends JFrame {
                 break;
             case 5:
                 System.out.println("Managing Department...");
-                LogHeadTeacher.main(null);
+                this.dispose();
+                LogHeadTeacherGUI.main(null);
                 break;
             case 6:
                 System.out.println("Searching Students...");

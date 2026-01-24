@@ -1,7 +1,5 @@
 package Frontend;
 
-import Backend.src.login.LoginApplication;
-import Backend.src.register.RegistrationManager;
 import Backend.src.database.DatabaseManager;
 import Backend.src.database.EmailManager;
 import javax.swing.*;

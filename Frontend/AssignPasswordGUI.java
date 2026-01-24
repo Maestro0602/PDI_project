@@ -1,8 +1,5 @@
 package Frontend;
-
-
 import Backend.src.database.HeadTeacherpw;
-import Backend.main.MainPageOwner;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;

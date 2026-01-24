@@ -191,4 +191,30 @@ public class MajorManager {
             System.out.println("Error closing resources: " + e.getMessage());
         }
     }
+
+    /**
+ * Delete ALL department/major records for a student by ID
+ */
+    public static boolean deleteDepartmentMajorByStudentId(String stuId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                String sql = "DELETE FROM departmentMajor WHERE stuId = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, stuId);
+
+                int rowsAffected = pstmt.executeUpdate();
+                return rowsAffected > 0; // true if at least one row deleted
+            }
+        } catch (SQLException e) {
+            System.out.println("Error deleting department/major: " + e.getMessage());
+        } finally {
+            closeResources(conn, pstmt, null);
+        }
+        return false;
+    }
+
 }

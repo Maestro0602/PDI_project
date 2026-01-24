@@ -5,8 +5,6 @@ import java.awt.*;
 import java.awt.event.*;
 import Backend.src.database.DatabaseManager;
 import Backend.src.database.MajorManager;
-import Backend.src.register.RegistrationManager;
-import Backend.main.*;
 
 public class LoginApplicationGUI extends JFrame {
     
