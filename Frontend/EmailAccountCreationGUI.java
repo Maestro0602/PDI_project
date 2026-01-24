@@ -2,7 +2,6 @@ package Frontend;
 
 import Backend.src.database.EmailManager;
 import Backend.src.database.EmailManager.AccountType;
-import Backend.main.MainPageOwner;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;

@@ -3,7 +3,9 @@ package Frontend;
 import Backend.src.attendance.AttendanceRecord;
 import Backend.src.attendance.AttendanceStatus;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
@@ -107,10 +109,24 @@ public class AttendanceSwingUI extends JFrame {
         studentTable = new JTable(tableModel);
         studentTable.setRowHeight(35);
         studentTable.setFont(new Font("Arial", Font.PLAIN, 13));
-        studentTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-        studentTable.getTableHeader().setBackground(new Color(52, 73, 94));
-        studentTable.getTableHeader().setForeground(Color.WHITE);
         studentTable.setSelectionBackground(new Color(189, 195, 199));
+        
+        // Fix table header with custom renderer
+        JTableHeader header = studentTable.getTableHeader();
+        header.setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = new JLabel(value.toString());
+                label.setFont(new Font("Arial", Font.BOLD, 14));
+                label.setBackground(new Color(52, 73, 94));
+                label.setForeground(Color.WHITE);
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setOpaque(true);
+                label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                return label;
+            }
+        });
         
         // Set column widths
         studentTable.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -344,9 +360,23 @@ public class AttendanceSwingUI extends JFrame {
             JTable viewTable = new JTable(viewTableModel);
             viewTable.setRowHeight(30);
             viewTable.setFont(new Font("Arial", Font.PLAIN, 13));
-            viewTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-            viewTable.getTableHeader().setBackground(new Color(52, 73, 94));
-            viewTable.getTableHeader().setForeground(Color.WHITE);
+            
+            // Fix header for the view all table too
+            JTableHeader viewHeader = viewTable.getTableHeader();
+            viewHeader.setDefaultRenderer(new DefaultTableCellRenderer() {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value,
+                        boolean isSelected, boolean hasFocus, int row, int column) {
+                    JLabel label = new JLabel(value.toString());
+                    label.setFont(new Font("Arial", Font.BOLD, 14));
+                    label.setBackground(new Color(52, 73, 94));
+                    label.setForeground(Color.WHITE);
+                    label.setHorizontalAlignment(SwingConstants.CENTER);
+                    label.setOpaque(true);
+                    label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                    return label;
+                }
+            });
             
             JScrollPane scrollPane = new JScrollPane(viewTable);
             
