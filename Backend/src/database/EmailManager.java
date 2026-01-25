@@ -13,8 +13,8 @@ public class EmailManager {
     // ====== DATABASE CONNECTION FOR ACCOUNT DATABASE ======
     public static class AccountDatabaseConnection {
         private static final String DB_URL = "jdbc:mysql://localhost:3306/account";
-        private static final String DB_USER = "myuser";
-        private static final String DB_PASSWORD = "mypassword";
+        private static final String DB_USER = "root";
+        private static final String DB_PASSWORD = "MRHENGXD123";
         private static final String DB_ROOT_URL = "jdbc:mysql://localhost:3306";
 
         /**
@@ -31,7 +31,7 @@ public class EmailManager {
                     String sql = "CREATE DATABASE IF NOT EXISTS account";
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
-                   // System.out.println("✓ Account database initialized successfully");
+                    // System.out.println(" Account database initialized successfully");
                 }
             } catch (ClassNotFoundException e) {
                 System.out.println("MySQL JDBC Driver not found: " + e.getMessage());
@@ -94,7 +94,7 @@ public class EmailManager {
 
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
-                    //System.out.println("✓ Student email table initialized successfully");
+                    // System.out.println(" Student email table initialized successfully");
                 } else {
                     System.out.println(" Failed to connect to account database");
                 }
@@ -123,7 +123,7 @@ public class EmailManager {
 
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
-                   // System.out.println("✓ Teacher email table initialized successfully");
+                    // System.out.println(" Teacher email table initialized successfully");
                 } else {
                     System.out.println(" Failed to connect to account database");
                 }
@@ -152,9 +152,9 @@ public class EmailManager {
 
                     stmt = conn.createStatement();
                     stmt.executeUpdate(sql);
-                    //System.out.println("✓ Owner email table initialized successfully");
+                    // System.out.println(" Owner email table initialized successfully");
                 } else {
-                    System.out.println("✗ Failed to connect to account database");
+                    System.out.println(" Failed to connect to account database");
                 }
             } catch (SQLException e) {
                 System.out.println("Error creating owner email table: " + e.getMessage());
@@ -170,10 +170,6 @@ public class EmailManager {
         public static void initializeEmailTables() {
             // Create account database first
             createAccountDatabase();
-
-            System.out.println("\n========================================");
-            System.out.println("   INITIALIZING EMAIL TABLES");
-            System.out.println("========================================");
             createStudentEmailTable();
             createTeacherEmailTable();
             createOwnerEmailTable();

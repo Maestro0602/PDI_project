@@ -2,6 +2,7 @@ package Backend.src.studentassign;
 
 import java.util.Scanner;
 import Backend.src.database.StudentInfoManager;
+import Backend.main.MainPageTeacher;
 import Backend.src.database.DatabaseManager;
 
 public class studentassign {
@@ -43,6 +44,7 @@ public class studentassign {
                     System.out.print("Enter student year: ");
                     String year = scanner.next();
                     StudentInfoManager.saveStudentInfo(name, studentID, gender, year);
+                    MainPageTeacher.main(args);
                     break;
                 case 2:
                     System.out.println("Updating Student information...");
@@ -89,6 +91,7 @@ public class studentassign {
 
                     if (StudentInfoManager.updateStudentInfo(idToUpdate, studentInfo[0], updatedGender, updatedYear)) {
                         System.out.println(" Student information updated successfully!");
+                        MainPageTeacher.main(args);
                     } else {
                         System.out.println(" Failed to update student information.");
                     }
@@ -103,6 +106,7 @@ public class studentassign {
                 case 4:
                     System.out.println("Exiting...");
                     // Add your reports generation logic here
+                    MainPageTeacher.main(args);
                     exit = true;
                     break;
                 default:

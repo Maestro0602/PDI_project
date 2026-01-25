@@ -2,6 +2,7 @@ package Backend.src.searching;
 
 import java.util.Scanner;
 import Backend.src.database.StudentInfoManager;
+import Backend.main.MainPageStudent;
 import Backend.src.database.MajorManager;
 
 public class Searching {
@@ -34,10 +35,11 @@ public class Searching {
                     break;
                 case "3":
                     System.out.println("\n Exiting search system. Goodbye!");
+                    MainPageStudent.main(null);
                     searching = false;
                     break;
                 default:
-                    System.out.println("  Invalid choice. Please try again.");
+                    System.out.println("Invalid choice. Please try again.");
             }
         }
 
@@ -46,7 +48,7 @@ public class Searching {
 
     private static void searchByName(Scanner scanner) {
         System.out.print("\nEnter student name to search: ");
-        String searchName = scanner.nextLine().trim();
+        String searchName = scanner.nextLine().trim().toLowerCase();
 
         if (searchName.isEmpty()) {
             System.out.println(" Name cannot be empty!");
@@ -90,7 +92,7 @@ public class Searching {
                     System.out.println("  Invalid selection!");
                 }
             } catch (NumberFormatException e) {
-                System.out.println(" ✗ Please enter a valid number!");
+                System.out.println("  Please enter a valid number!");
             }
         }
     }
@@ -100,7 +102,7 @@ public class Searching {
         String searchID = scanner.nextLine().trim();
 
         if (searchID.isEmpty()) {
-            System.out.println(" ✗ ID cannot be empty!");
+            System.out.println(" ID cannot be empty!");
             return;
         }
 

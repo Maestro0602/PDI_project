@@ -1,5 +1,6 @@
 package Backend.src.course;
 
+
 public class CourseModel {
     private String courseId;
     private String courseName;

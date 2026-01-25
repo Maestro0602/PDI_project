@@ -26,12 +26,11 @@ public class totalstudent {
             return;
         }
 
-        System.out.println("\n" + "-".repeat(70));
+        System.out.println("\n" + "-".repeat(90));
         System.out.println("STUDENTS BY DEPARTMENT AND GENDER");
-        System.out.println("-".repeat(70));
-        System.out.printf("%-25s %-15s %-15s %-15s%n", "Department", "Total", "Male", "Female");
-        System.out.println("-".repeat(70));
-
+        System.out.println("-".repeat(90));
+        System.out.printf("%-50s %-15s %-15s %-15s%n", "Department", "Total", "Male", "Female");
+        System.out.println("-".repeat(90));
         // Departments to check
         String[] departments = { "GIC", "GIM", "GEE" };
         int grandTotalMale = 0;
@@ -48,17 +47,17 @@ public class totalstudent {
                 grandTotalFemale += females;
 
                 String deptName = getDepartmentFullName(dept);
-                System.out.printf("%-25s %-15d %-15d %-15d%n", deptName, total, males, females);
+                System.out.printf("%-50s %-15s %-15s %-15s%n", deptName, total, males, females);
             }
         }
 
-        System.out.println("-".repeat(70));
-        System.out.printf("%-25s %-15d %-15d %-15d%n", "TOTAL", totalStudents, grandTotalMale, grandTotalFemale);
-        System.out.println("=".repeat(70));
+        System.out.println("-".repeat(90));
+        System.out.printf("%-50s %-15s %-15s %-15s%n", "TOTAL", totalStudents, grandTotalMale, grandTotalFemale);
+        System.out.println("=".repeat(90));
 
         // Display percentage breakdown
         System.out.println("\nGENDER PERCENTAGE BREAKDOWN:");
-        System.out.println("-".repeat(70));
+        System.out.println("-".repeat(90));
         if (totalStudents > 0) {
             double malePercentage = (grandTotalMale * 100.0) / totalStudents;
             double femalePercentage = (grandTotalFemale * 100.0) / totalStudents;
@@ -66,7 +65,7 @@ public class totalstudent {
             System.out.printf("Male Students:   %d (%.2f%%)%n", grandTotalMale, malePercentage);
             System.out.printf("Female Students: %d (%.2f%%)%n", grandTotalFemale, femalePercentage);
         }
-        System.out.println("=".repeat(70));
+        System.out.println("=".repeat(90));
     }
 
     private static String getDepartmentFullName(String deptCode) {

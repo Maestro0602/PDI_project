@@ -44,7 +44,7 @@ public class LoginApplication {
 
             // Check if user exists
             if (!DatabaseManager.checkUserExists(name)) {
-                System.out.println("\n✗ User not found!");
+                System.out.println("\nUser not found!");
                 System.out.println("You need to register first.");
 
                 System.out.print("\nWould you like to register? (yes/no): ");
@@ -114,6 +114,15 @@ public class LoginApplication {
                             // Check if username starts with "TEACHER" (case sensitive)
                             if (loggedInUser.startsWith("TEACHER")) {
                                 System.out.println("\nRedirecting to Teacher Page...");
+                                MainPageTeacher.main(null);
+                            }
+                            if (loggedInUser.startsWith("STUDENT")) {
+                                System.out.println("\nRedirecting to Student Page...");
+                                MainPageStudent.main(null);
+                            }
+                            if (loggedInUser.startsWith("OWNER")) {
+                                System.out.println("\nRedirecting to Owner Page...");
+                                MainPageOwner.main(null);
                             }
 
                             return true;

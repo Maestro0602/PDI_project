@@ -1,7 +1,7 @@
 package Backend.src.database;
 
-import java.sql.*;
 import Backend.src.course.Course;
+import java.sql.*;
 
 public class MajorManager {
 

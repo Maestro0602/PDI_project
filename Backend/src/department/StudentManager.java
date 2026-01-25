@@ -1,10 +1,10 @@
 package Backend.src.department;
 
-import java.util.Scanner;
-import Backend.src.database.StudentInfoManager;
-import Backend.src.database.MajorManager;
 import Backend.src.database.DatabaseManager;
+import Backend.src.database.MajorManager;
+import Backend.src.database.StudentInfoManager;
 import Backend.src.major.major;
+import java.util.Scanner;
 
 public class StudentManager {
     private Scanner input = new Scanner(System.in);
@@ -39,7 +39,7 @@ public class StudentManager {
                 return;
         }
 
-        StudentInfoManager.displayStudentsByDepartment(selectedDepartment);
+       // StudentInfoManager.displayStudentsByDepartment(selectedDepartment);
     }
 
     public void addStudentToDepartment() {
@@ -61,7 +61,7 @@ public class StudentManager {
             // Check if UserID exists in users table
             boolean userIDExists = DatabaseManager.ConditionChecker.checkUserIDExists(studentId);
             if (!userIDExists) {
-                System.out.println(" ✗ UserID not found in users table. Please try again.");
+                System.out.println(" UserID not found in users table. Please try again.");
                 continue;
             }
 

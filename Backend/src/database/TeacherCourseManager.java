@@ -18,14 +18,14 @@ public class TeacherCourseManager {
                         "id INT AUTO_INCREMENT PRIMARY KEY, " +
                         "teacherID VARCHAR(20) NOT NULL, " +
                         "course_id VARCHAR(10) NOT NULL, " +
-                        "UNIQUE KEY unique_teacher_course (teacherID, course_id), ";
+                        "UNIQUE KEY unique_teacher_course (teacherID, course_id))";
 
                 stmt = conn.createStatement();
                 stmt.executeUpdate(sql);
-               // System.out.println("teachercourse table created/verified successfully.");
+                // System.out.println("teachercourse table created/verified successfully.");
             }
         } catch (SQLException e) {
-           // System.out.println("Error creating teachercourse table: " + e.getMessage());
+            // System.out.println("Error creating teachercourse table: " + e.getMessage());
         } finally {
             closeResources(conn, stmt, null);
         }
@@ -41,18 +41,58 @@ public class TeacherCourseManager {
         try {
             conn = DatabaseManager.connectDB();
             if (conn != null) {
-                String sql = "INSERT INTO teachercourse (teacherID, course_id) VALUES (?, ?)";
+                // Check if course is already assigned to this teacher
+                if (isTeacherCourseAssigned(teacherID, courseId)) {
+                    System.out.println("Course already joined by this teacher.");
+                    return false;
+                }
+
+                String sql = "INSERT INTO teacher_course (teacherID, course_id) VALUES (?, ?)";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, teacherID);
                 pstmt.setString(2, courseId);
 
                 int rowsAffected = pstmt.executeUpdate();
-                return rowsAffected > 0;
+
+                if (rowsAffected > 0) {
+                    // Update course count after successful insertion
+                    getTeacherCourseCount(teacherID);
+                    return true;
+                }
             }
         } catch (SQLException e) {
             System.out.println("Error adding teacher-course assignment: " + e.getMessage());
         } finally {
             closeResources(conn, pstmt, null);
+        }
+        return false;
+    }
+
+    /**
+     * CHECK - Verify if a teacher-course assignment already exists
+     */
+    private static boolean isTeacherCourseAssigned(String teacherID, String courseId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                String sql = "SELECT COUNT(*) as count FROM teacher_course WHERE teacherID = ? AND course_id = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, teacherID);
+                pstmt.setString(2, courseId);
+
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt("count") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checking teacher-course assignment: " + e.getMessage());
+        } finally {
+            closeResources(conn, pstmt, rs);
         }
         return false;
     }
@@ -68,7 +108,7 @@ public class TeacherCourseManager {
         try {
             conn = DatabaseManager.connectDB();
             if (conn != null) {
-                String sql = "SELECT id, teacherID, course_id FROM teachercourse WHERE teacherID = ? ORDER BY id";
+                String sql = "SELECT id, teacherID, course_id FROM teacher_course WHERE teacherID = ? ORDER BY id";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, teacherID);
 
@@ -112,7 +152,7 @@ public class TeacherCourseManager {
         try {
             conn = DatabaseManager.connectDB();
             if (conn != null) {
-                String sql = "SELECT id, teacherID, course_id FROM teachercourse WHERE id = ? LIMIT 1";
+                String sql = "SELECT id, teacherID, course_id FROM teacher_course WHERE id = ? LIMIT 1";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, id);
 
@@ -144,7 +184,7 @@ public class TeacherCourseManager {
         try {
             conn = DatabaseManager.connectDB();
             if (conn != null) {
-                String sql = "SELECT id, teacherID, course_id FROM teachercourse ORDER BY id";
+                String sql = "SELECT id, teacherID, course_id FROM teacher_course ORDER BY id";
                 stmt = conn.createStatement();
                 rs = stmt.executeQuery(sql);
 
@@ -211,7 +251,7 @@ public class TeacherCourseManager {
         try {
             conn = DatabaseManager.connectDB();
             if (conn != null) {
-                String sql = "DELETE FROM teachercourse WHERE id = ?";
+                String sql = "DELETE FROM teacher_course WHERE id = ?";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, id);
 
@@ -236,7 +276,7 @@ public class TeacherCourseManager {
         try {
             conn = DatabaseManager.connectDB();
             if (conn != null) {
-                String sql = "DELETE FROM teachercourse WHERE teacherID = ?";
+                String sql = "DELETE FROM teacher_course WHERE teacherID = ?";
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, teacherID);
 
@@ -249,6 +289,36 @@ public class TeacherCourseManager {
             closeResources(conn, pstmt, null);
         }
         return false;
+    }
+
+    /**
+     * COUNT - Get the number of courses assigned to a teacher and update
+     * course_count in teacherinfo
+     */
+    public static int getTeacherCourseCount(String teacherID) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DatabaseManager.connectDB();
+            if (conn != null) {
+                String sql = "SELECT COUNT(*) as course_count FROM teacher_course WHERE teacherID = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, teacherID);
+
+                rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    int count = rs.getInt("course_count");
+                    return count;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error counting teacher courses: " + e.getMessage());
+        } finally {
+            closeResources(conn, pstmt, rs);
+        }
+        return 0;
     }
 
     /**
