@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class CourseSchedule extends JFrame {
+public class CourseScheduleTeacher extends JFrame {
     
     // Modern color scheme matching MainpageTeacher
     private static final Color CARD_BG = Color.WHITE;
@@ -16,7 +16,7 @@ public class CourseSchedule extends JFrame {
     private static final Color ACCENT_PURPLE = new Color(168, 85, 247);
     private static final Color ACCENT_RED = new Color(239, 68, 68);
     
-    public CourseSchedule() {
+    public CourseScheduleTeacher() {
         initializeUI();
     }
     
@@ -200,7 +200,7 @@ public class CourseSchedule extends JFrame {
         button.addActionListener(e -> {
             this.dispose();
             SwingUtilities.invokeLater(() -> {
-                MainPageStudentGUI mainFrame = new MainPageStudentGUI();
+                MainpageTeacher mainFrame = new MainpageTeacher ();
                 mainFrame.setVisible(true);
             });
         });
@@ -223,37 +223,37 @@ public class CourseSchedule extends JFrame {
         
         // Monday - 4 hours
         container.add(createDayCard("MONDAY", "📘", ACCENT_BLUE, new String[][]{
-            {"Mathematics 101", "9:00 AM - 11:00 AM", "Room 201", "2 hours"},
-            {"English Literature", "1:00 PM - 3:00 PM", "Room 150", "2 hours"}
+            {"Linear Algebra", "9:00 AM - 11:00 AM", "Room 402", "2 hours"},
+            {"Project and seminar", "1:00 PM - 3:00 PM", "Room 402", "2 hours"}
         }));
         
         container.add(Box.createRigidArea(new Dimension(0, 12)));
         
         // Tuesday - 2 hours
         container.add(createDayCard("TUESDAY", "💻", ACCENT_PURPLE, new String[][]{
-            {"Computer Science Lab", "2:00 PM - 4:00 PM", "Lab 305", "2 hours"}
+            {"Computer Science Lab", "2:00 PM - 4:00 PM", "Room J420", "2 hours"}
         }));
         
         container.add(Box.createRigidArea(new Dimension(0, 12)));
         
         // Wednesday - 4 hours
         container.add(createDayCard("WEDNESDAY", "🔬", ACCENT_GREEN, new String[][]{
-            {"Physics", "10:00 AM - 12:00 PM", "Room 180", "2 hours"},
-            {"Chemistry", "2:00 PM - 4:00 PM", "Lab Building A", "2 hours"}
+            {"Programming with C++", "10:00 AM - 12:00 PM", "Room A420", "2 hours"},
+            {"Programming with java", "2:00 PM - 4:00 PM", "Room A20", "2 hours"}
         }));
         
         container.add(Box.createRigidArea(new Dimension(0, 12)));
         
         // Thursday - 1 hour
         container.add(createDayCard("THURSDAY", "📜", ACCENT_ORANGE, new String[][]{
-            {"History", "11:00 AM - 12:00 PM", "Room 220", "1 hour"}
+            {"programming with java", "11:00 AM - 12:00 PM", "Room A420", "1 hour"}
         }));
         
         container.add(Box.createRigidArea(new Dimension(0, 12)));
         
         // Friday - 2 hours
         container.add(createDayCard("FRIDAY", "🧬", ACCENT_RED, new String[][]{
-            {"Biology Lab", "9:00 AM - 11:00 AM", "Lab 102", "2 hours"}
+            {"Computer Science Lab", "9:00 AM - 11:00 AM", "Room J602", "2 hours"}
         }));
         
         return container;

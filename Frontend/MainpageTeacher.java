@@ -228,6 +228,14 @@
                     "🔍",
                     6
             ), gbc);
+            gbc.gridx = 0; gbc.gridy = 2;
+            container.add(createOptionCard(
+                    "Schedule",
+                    "Find and view student details",
+                    ACCENT_GREEN,
+                    "📅",
+                    7
+            ), gbc);
 
             return container;
         }
@@ -653,6 +661,11 @@
                     System.out.println("Searching Students...");
                     this.dispose();
                     StudentSearchGUI.main(null);
+                    break;
+                    case 7:
+                    System.out.println("Searching for Schedule");
+                    this.dispose();
+                    CourseScheduleTeacher.main(null);
                     break;
                 default:
                     JOptionPane.showMessageDialog(this, "Invalid option selected.", "Error", JOptionPane.ERROR_MESSAGE);
