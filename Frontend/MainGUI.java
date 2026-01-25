@@ -90,7 +90,7 @@ public class MainGUI extends JFrame {
             }
         };
         card.setLayout(null);
-        card.setBounds(250, 100, 500, 500);
+        card.setBounds(250, 80, 500, 540);
         card.setOpaque(false);
         
         // Logo/Icon area
@@ -104,6 +104,7 @@ public class MainGUI extends JFrame {
                 // Draw circle background
                 GradientPaint gp = new GradientPaint(0, 0, new Color(52, 152, 219), 
                                                      getWidth(), getHeight(), new Color(41, 128, 185));
+
                 g2.setPaint(gp);
                 g2.fillOval(10, 10, 80, 80);
                 
@@ -152,9 +153,14 @@ public class MainGUI extends JFrame {
         registerBtn.setBounds(100, 340, 300, 55);
         card.add(registerBtn);
         
+        // About Us Button
+        JButton aboutUsBtn = createStyledButton("About Us", accentColor, new Color(39, 174, 96), 4);
+        aboutUsBtn.setBounds(100, 410, 300, 55);
+        card.add(aboutUsBtn);
+        
         // Exit Button
         JButton exitBtn = createStyledButton("Exit", dangerColor, new Color(192, 57, 43), 3);
-        exitBtn.setBounds(100, 410, 300, 55);
+        exitBtn.setBounds(100, 480, 300, 55);
         card.add(exitBtn);
         
         return card;
@@ -200,6 +206,7 @@ public class MainGUI extends JFrame {
         // Add hover effect
         button.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
+
                 button.repaint();
             }
             public void mouseExited(MouseEvent e) {
@@ -221,6 +228,9 @@ public class MainGUI extends JFrame {
             case 3:
                 handleExit();
                 break;
+            case 4:
+                handleAboutUs();
+                break;
         }
     }
     
@@ -240,6 +250,17 @@ public class MainGUI extends JFrame {
         });
     }
     
+    private void handleAboutUs() {
+      
+        // Description
+        this.dispose(); // Close the main menu
+        SwingUtilities.invokeLater(() -> {
+            AboutMePage aboutFrame = new AboutMePage();
+            aboutFrame.setVisible(true);
+        }); 
+             
+    }
+    
     private void handleExit() {
         // Create custom dialog
         JDialog dialog = new JDialog(this, "Confirm Exit", true);
@@ -253,6 +274,7 @@ public class MainGUI extends JFrame {
         messageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         messageLabel.setForeground(primaryColor);
         messageLabel.setBounds(0, 40, 400, 30);
+
         messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         dialog.add(messageLabel);
         

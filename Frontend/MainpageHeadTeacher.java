@@ -1,6 +1,5 @@
 package Frontend;
 
-import Backend.src.department.LogHeadTeacher;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -653,7 +652,7 @@ public class MainpageHeadTeacher extends JFrame {
                 break;
             case 5:
                 System.out.println("Managing Department...");
-                LogHeadTeacher.main(null);
+                TeacherCourseAssignmentGUI.main(null);
                 break;
             case 6:
                 System.out.println("Searching Students...");

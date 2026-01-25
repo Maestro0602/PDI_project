@@ -2,6 +2,9 @@ package Frontend;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class AboutMePage extends JFrame {
@@ -28,7 +31,15 @@ public class AboutMePage extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1400, 700);
         setLocationRelativeTo(null);
-        setResizable(false);
+        setResizable(true);
+        
+        // Set icon
+        try {
+            ImageIcon icon = new ImageIcon("src/Calculator/360_F_557111711_9aQFvZG2aM5o8G6jWr5BvN0FyzPlC3Cf.jpg");
+            setIconImage(icon.getImage());
+        } catch (Exception e) {
+            System.out.println("Icon image not found: " + e.getMessage());
+        }
         
         // Main background panel with gradient
         JPanel backgroundPanel = new JPanel(new BorderLayout()) {
@@ -54,13 +65,22 @@ public class AboutMePage extends JFrame {
         // Header panel
         JPanel headerPanel = createHeaderPanel();
         
-        // Content panel with cards
-        JPanel contentPanel = new JPanel(new GridBagLayout());
+        // Content panel with scroll for cards
+        JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setOpaque(false);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(5, 20, 30, 20));
 
         JPanel cardsContainer = createCardsContainer();
-        contentPanel.add(cardsContainer);
+        
+        // Wrap in scroll pane
+        JScrollPane scrollPane = new JScrollPane(cardsContainer);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(null);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
 
         backgroundPanel.add(headerPanel, BorderLayout.NORTH);
         backgroundPanel.add(contentPanel, BorderLayout.CENTER);
@@ -163,70 +183,64 @@ public class AboutMePage extends JFrame {
     }
     
     private JPanel createCardsContainer() {
-        JPanel container = new JPanel(new GridBagLayout());
+        JPanel container = new JPanel();
+        container.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 10));
         container.setOpaque(false);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.weightx = 1;
-        gbc.weighty = 1;
-        gbc.gridy = 0; // Single row
-
         // Person 1
-        gbc.gridx = 0;
         container.add(createProfileCard(
-            "Person 1 Name",
+            "Hen Chhordavattey",
             "Software Developer",
-            "person1@example.com",
-            "+1 234 567 890",
-            "New York, USA",
+            "hen.chhordavattey@gmail.com",
+            "6767",
+            "ITC",
             ACCENT_PURPLE,
-            new String[]{"Java", "Python", "Design"}
-        ), gbc);
+            new String[]{"Java", "Python", "Design"},
+            "D:/java project/Pulll/Frontend/vattey.jpg"  // Use forward slashes
+        ));
 
         // Person 2
-        gbc.gridx = 1;
         container.add(createProfileCard(
-            "Person 2 Name",
+            "Theng Van Heng",
             "UI/UX Designer",
-            "person2@example.com",
-            "+1 234 567 891",
-            "Los Angeles, USA",
+            "thengvanheng@gmail.com",
+            "6767",
+            "ITC",
             ACCENT_BLUE,
-            new String[]{"Figma", "Adobe XD", "Design"}
-        ), gbc);
+            new String[]{"Figma", "C++", "Design"},
+            "D:/java project/Pulll/Frontend/heng.jpg"
+        ));
 
         // Person 3
-        gbc.gridx = 2;
         container.add(createProfileCard(
-            "Person 3 Name",
+            "Pi sereyvathanak",
             "Project Manager",
-            "person3@example.com",
-            "+1 234 567 892",
-            "Chicago, USA",
+            "pi.sereyvathanak@gmail.com",
+            "6767",
+            "ITC",
             ACCENT_TEAL,
-            new String[]{"Leadership", "Agile", "Strategy"}
-        ), gbc);
+            new String[]{"Leadership", "coding", "Strategy"},
+            "D:/java project/Pulll/Frontend/nak.jpg"
+        ));
 
         // Person 4
-        gbc.gridx = 3;
         container.add(createProfileCard(
-            "Person 4 Name",
+            "Chu, kimchun",
             "Data Analyst",
-            "person4@example.com",
-            "+1 234 567 893",
-            "Boston, USA",
+            "chu.kimchun@gmail.com",
+            "6767",
+            "ITC    ",
             ACCENT_ORANGE,
-            new String[]{"Python", "SQL", "Analytics"}
-        ), gbc);
+            new String[]{"Python", "SQL", "Analytics"},
+            "D:/java project/Pulll/Frontend/aura.jpg"
+        ));
 
         return container;
     }
     
     private JPanel createProfileCard(String name, String role, String email, 
                                      String phone, String location, 
-                                     Color accentColor, String[] skills) {
+                                     Color accentColor, String[] skills, String imagePath) {
         JPanel card = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -263,16 +277,44 @@ public class AboutMePage extends JFrame {
         };
 
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBorder(BorderFactory.createEmptyBorder(25, 18, 25, 18));
+        card.setBorder(BorderFactory.createEmptyBorder(25, 20, 25, 20));
         card.setOpaque(false);
+        card.setPreferredSize(new Dimension(300, 480));
 
         // Profile Photo Container
         JPanel photoContainer = new JPanel() {
+            private BufferedImage profileImage = null;
+            
+            {
+                // Load image in constructor block
+                try {
+                    File imageFile = new File(imagePath);
+                    System.out.println("Attempting to load image from: " + imageFile.getAbsolutePath());
+                    System.out.println("File exists: " + imageFile.exists());
+                    
+                    if (imageFile.exists()) {
+                        profileImage = ImageIO.read(imageFile);
+                        if (profileImage != null) {
+                            System.out.println("✓ Image loaded successfully: " + imagePath);
+                            System.out.println("  Image size: " + profileImage.getWidth() + "x" + profileImage.getHeight());
+                        } else {
+                            System.out.println("✗ Failed to read image (null): " + imagePath);
+                        }
+                    } else {
+                        System.out.println("✗ File not found: " + imagePath);
+                    }
+                } catch (Exception e) {
+                    System.out.println("✗ Error loading image: " + imagePath);
+                    e.printStackTrace();
+                }
+            }
+            
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 
                 // Outer colored ring
                 g2d.setColor(accentColor);
@@ -286,26 +328,28 @@ public class AboutMePage extends JFrame {
                 g2d.setColor(new Color(241, 245, 249));
                 g2d.fillOval(8, 8, getWidth() - 16, getHeight() - 16);
                 
-                // ========================================
-                // TODO: ADD PROFILE PHOTO HERE FOR: name
-                // ========================================
-                // Option 1: Load image from file
-                // ImageIcon profileImg = new ImageIcon("path/to/" + name.replace(" ", "_") + ".jpg");
-                // Image scaledImg = profileImg.getImage().getScaledInstance(getWidth() - 16, getHeight() - 16, Image.SCALE_SMOOTH);
-                // g2d.setClip(new Ellipse2D.Float(8, 8, getWidth() - 16, getHeight() - 16));
-                // g2d.drawImage(scaledImg, 8, 8, null);
-                //
-                // Option 2: Use ImageIO for better control
-                // try {
-                //     BufferedImage img = ImageIO.read(new File("images/" + name.replace(" ", "_") + ".jpg"));
-                //     g2d.setClip(new Ellipse2D.Float(8, 8, getWidth() - 16, getHeight() - 16));
-                //     g2d.drawImage(img, 8, 8, getWidth() - 16, getHeight() - 16, null);
-                // } catch (IOException e) { e.printStackTrace(); }
-                // ========================================
-                
-                // Placeholder icon (remove this when you add photos)
+                // Display profile photo if loaded
+                if (profileImage != null) {
+                    try {
+                        // Create circular clip
+                        g2d.setClip(new java.awt.geom.Ellipse2D.Float(8, 8, getWidth() - 16, getHeight() - 16));
+                        
+                        // Draw the image scaled to fit
+                        g2d.drawImage(profileImage, 8, 8, getWidth() - 16, getHeight() - 16, null);
+                    } catch (Exception e) {
+                        System.out.println("Error drawing image: " + e.getMessage());
+                        drawPlaceholder(g2d);
+                    }
+                } else {
+                    // Fallback to placeholder icon if image not loaded
+                    drawPlaceholder(g2d);
+                }
+            }
+            
+            private void drawPlaceholder(Graphics2D g2d) {
+                g2d.setClip(null); // Reset clip
                 g2d.setColor(TEXT_SECONDARY);
-                g2d.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 45));
+                g2d.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 50));
                 String emoji = "👤";
                 FontMetrics fm = g2d.getFontMetrics();
                 int x = (getWidth() - fm.stringWidth(emoji)) / 2;
@@ -314,29 +358,29 @@ public class AboutMePage extends JFrame {
             }
         };
         photoContainer.setOpaque(false);
-        photoContainer.setPreferredSize(new Dimension(100, 100));
-        photoContainer.setMaximumSize(new Dimension(100, 100));
+        photoContainer.setPreferredSize(new Dimension(120, 120));
+        photoContainer.setMaximumSize(new Dimension(120, 120));
         photoContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         card.add(photoContainer);
-        card.add(Box.createRigidArea(new Dimension(0, 15)));
+        card.add(Box.createRigidArea(new Dimension(0, 18)));
 
         // Name
         JLabel nameLabel = new JLabel(name);
-        nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
         nameLabel.setForeground(TEXT_PRIMARY);
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Role
         JLabel roleLabel = new JLabel(role);
-        roleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        roleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         roleLabel.setForeground(TEXT_SECONDARY);
         roleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         card.add(nameLabel);
-        card.add(Box.createRigidArea(new Dimension(0, 4)));
+        card.add(Box.createRigidArea(new Dimension(0, 5)));
         card.add(roleLabel);
-        card.add(Box.createRigidArea(new Dimension(0, 15)));
+        card.add(Box.createRigidArea(new Dimension(0, 18)));
 
         // Divider line
         JPanel divider = new JPanel() {
@@ -348,23 +392,25 @@ public class AboutMePage extends JFrame {
             }
         };
         divider.setOpaque(false);
-        divider.setPreferredSize(new Dimension(Integer.MAX_VALUE, 1));
-        divider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        divider.setPreferredSize(new Dimension(260, 1));
+        divider.setMaximumSize(new Dimension(260, 1));
+        divider.setAlignmentX(Component.CENTER_ALIGNMENT);
         card.add(divider);
-        card.add(Box.createRigidArea(new Dimension(0, 12)));
+        card.add(Box.createRigidArea(new Dimension(0, 15)));
 
         // Contact Info
         card.add(createCompactInfoRow("📧", email));
-        card.add(Box.createRigidArea(new Dimension(0, 7)));
+        card.add(Box.createRigidArea(new Dimension(0, 10)));
         card.add(createCompactInfoRow("📱", phone));
-        card.add(Box.createRigidArea(new Dimension(0, 7)));
+        card.add(Box.createRigidArea(new Dimension(0, 10)));
         card.add(createCompactInfoRow("📍", location));
-        card.add(Box.createRigidArea(new Dimension(0, 12)));
+        card.add(Box.createRigidArea(new Dimension(0, 18)));
 
         // Skills tags
-        JPanel skillsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 4));
+        JPanel skillsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 6));
         skillsPanel.setOpaque(false);
         skillsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        skillsPanel.setMaximumSize(new Dimension(260, 100));
         
         for (String skill : skills) {
             skillsPanel.add(createSmallSkillTag(skill, accentColor));
@@ -376,16 +422,16 @@ public class AboutMePage extends JFrame {
     }
     
     private JPanel createCompactInfoRow(String emoji, String text) {
-        JPanel row = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 0));
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 0));
         row.setOpaque(false);
         row.setAlignmentX(Component.CENTER_ALIGNMENT);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 22));
+        row.setMaximumSize(new Dimension(260, 25));
 
         JLabel iconLabel = new JLabel(emoji);
-        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 11));
+        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 13));
 
         JLabel textLabel = new JLabel(text);
-        textLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        textLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         textLabel.setForeground(TEXT_SECONDARY);
 
         row.add(iconLabel);
@@ -404,19 +450,19 @@ public class AboutMePage extends JFrame {
                 
                 g2d.setColor(new Color(accentColor.getRed(), accentColor.getGreen(), 
                                      accentColor.getBlue(), 25));
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
                 
                 g2d.setColor(new Color(accentColor.getRed(), accentColor.getGreen(), 
                                      accentColor.getBlue(), 80));
-                g2d.setStroke(new BasicStroke(1.0f));
-                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
+                g2d.setStroke(new BasicStroke(1.2f));
+                g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 15, 15);
             }
         };
         tag.setOpaque(false);
-        tag.setLayout(new FlowLayout(FlowLayout.CENTER, 6, 3));
+        tag.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
 
         JLabel label = new JLabel(skill);
-        label.setFont(new Font("Segoe UI", Font.BOLD, 9));
+        label.setFont(new Font("Segoe UI", Font.BOLD, 11));
         label.setForeground(accentColor);
 
         tag.add(label);

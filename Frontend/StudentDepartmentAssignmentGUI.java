@@ -978,7 +978,9 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
         
         if (confirm == JOptionPane.YES_OPTION) {
             this.dispose();
-            // Add navigation to previous window if needed
+            SwingUtilities.invokeLater(() -> {
+            new MainpageTeacher().setVisible(true);
+        });
         }
     }
     
