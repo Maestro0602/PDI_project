@@ -191,6 +191,14 @@ public class MainPageStudentGUI extends JFrame {
                 "📢",
                 3
         ), gbc);
+        gbc.gridx = 1; gbc.gridy = 1;
+            container.add(createOptionCard(
+                    "Schedule",
+                    "Find and view student details",
+                    ACCENT_GREEN,
+                    "📅",
+                    4
+            ), gbc);
 
         return container;
     }
@@ -375,6 +383,13 @@ public class MainPageStudentGUI extends JFrame {
                 this.dispose(); // Close the main menu
                 SwingUtilities.invokeLater(() -> {
                     AnnouncementPageStu announcementPage = new AnnouncementPageStu();
+                    announcementPage.setVisible(true);
+                });
+                case 4:
+                System.out.println("Viewing Announcements...");
+                this.dispose(); // Close the main menu
+                SwingUtilities.invokeLater(() -> {
+                    CourseSchedule announcementPage = new CourseSchedule();
                     announcementPage.setVisible(true);
                 });
                 break;
