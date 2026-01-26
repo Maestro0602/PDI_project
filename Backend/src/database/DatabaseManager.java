@@ -57,8 +57,6 @@ public class DatabaseManager {
             }
         }
 
-<<<<<<< HEAD
-=======
         /**
          * Create users table if it doesn't exist
          */
@@ -90,7 +88,6 @@ public class DatabaseManager {
                 closeResources(conn, stmt, null);
             }
         }
->>>>>>> login/register
 
         /**
          * Close database resources safely
@@ -105,32 +102,6 @@ public class DatabaseManager {
                     conn.close();
             } catch (SQLException e) {
                 System.out.println("Error closing resources: " + e.getMessage());
-            }
-        }
-
-        /**
-         * Create the `users` table if it does not exist
-         */
-        public static void createUserTable() {
-            Connection conn = null;
-            Statement stmt = null;
-            try {
-                conn = connectDB();
-                if (conn != null) {
-                    stmt = conn.createStatement();
-                    String sql = "CREATE TABLE IF NOT EXISTS users ("
-                            + "id INT AUTO_INCREMENT PRIMARY KEY, "
-                            + "EmailName VARCHAR(100) NOT NULL, "
-                            + "email VARCHAR(150) NOT NULL UNIQUE, "
-                            + "password VARCHAR(256) NOT NULL, "
-                            + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
-                            + ") ENGINE=InnoDB;";
-                    stmt.executeUpdate(sql);
-                }
-            } catch (SQLException e) {
-                System.out.println("Error creating users table: " + e.getMessage());
-            } finally {
-                closeResources(conn, stmt, null);
             }
         }
     }

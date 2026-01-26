@@ -1,9 +1,9 @@
 package Backend.src.studentassign;
 
-import java.util.Scanner;
-import Backend.src.database.StudentInfoManager;
 import Backend.main.MainPageTeacher;
 import Backend.src.database.DatabaseManager;
+import Backend.src.database.StudentInfoManager;
+import java.util.Scanner;
 
 public class studentassign {
     public static void main(String[] args) {

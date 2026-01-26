@@ -1,12 +1,11 @@
 package Backend.src.attendance;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Scanner;
-
 import Backend.main.MainPageTeacher;
 import Backend.src.database.Attendance;
 import Backend.src.department.Student;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Scanner;
 public class AttendanceUI {
     private Scanner scanner;
     private Attendance database;

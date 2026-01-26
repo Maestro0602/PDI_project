@@ -1,9 +1,9 @@
 package Backend.src.searching;
 
-import java.util.Scanner;
-import Backend.src.database.StudentInfoManager;
 import Backend.main.MainPageTeacher;
 import Backend.src.database.MajorManager;
+import Backend.src.database.StudentInfoManager;
+import java.util.Scanner;
 
 public class SearchingTeacher {
 

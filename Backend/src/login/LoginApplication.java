@@ -1,11 +1,11 @@
 package Backend.src.login;
 
-import java.util.Scanner;
-import Backend.src.utils.PasswordUtils;
+import Backend.main.*;
 import Backend.src.database.DatabaseManager;
 import Backend.src.database.MajorManager;
 import Backend.src.register.RegistrationManager;
-import Backend.main.*;
+import Backend.src.utils.PasswordUtils;
+import java.util.Scanner;
 
 public class LoginApplication {
 

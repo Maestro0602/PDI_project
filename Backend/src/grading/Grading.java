@@ -1,11 +1,11 @@
 package Backend.src.grading;
 
+import Backend.main.MainPageTeacher;
+import Backend.src.database.GradingManagement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Scanner;
-import Backend.main.MainPageTeacher;
-import Backend.src.database.GradingManagement;
 
 public class Grading {
 

@@ -1,3 +1,4 @@
+package Backend.main;
 import Backend.src.database.DatabaseManager;
 import java.util.Scanner;
 public class AuthService {
