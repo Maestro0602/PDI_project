@@ -190,13 +190,13 @@ public class AboutMePage extends JFrame {
         // Person 1
         container.add(createProfileCard(
             "Hen Chhordavattey",
-            "Software Developer",
-            "hen.chhordavattey@gmail.com",
-            "6767",
+            "Software Developer&Team leader",
+            "chhordavatteyh@gmail.com",
+            "je_suis_lui",
             "ITC",
             ACCENT_PURPLE,
             new String[]{"Java", "Python", "Design"},
-            "D:/java project/Pulll/Frontend/vattey.jpg"  // Use forward slashes
+            "D:\\java project\\final code\\something\\PDI_project\\Frontend\\vattey.jpg"  // Use forward slashes
         ));
 
         // Person 2
@@ -204,35 +204,35 @@ public class AboutMePage extends JFrame {
             "Theng Van Heng",
             "UI/UX Designer",
             "thengvanheng@gmail.com",
-            "6767",
+            "thengvanheng@gmail.com",
             "ITC",
             ACCENT_BLUE,
             new String[]{"Figma", "C++", "Design"},
-            "D:/java project/Pulll/Frontend/heng.jpg"
+            "D:\\java project\\final code\\something\\PDI_project\\Frontend\\heng.jpg"
         ));
 
         // Person 3
         container.add(createProfileCard(
             "Pi sereyvathanak",
-            "Project Manager",
-            "pi.sereyvathanak@gmail.com",
-            "6767",
+            "Project Manager& CO Leader",
+            "pisereyvathanak@gmail.com",
+            "Nakk Shifu",
             "ITC",
             ACCENT_TEAL,
             new String[]{"Leadership", "coding", "Strategy"},
-            "D:/java project/Pulll/Frontend/nak.jpg"
+            "D:\\java project\\final code\\something\\PDI_project\\Frontend\\nak.jpg"
         ));
 
         // Person 4
         container.add(createProfileCard(
-            "Chu, kimchun",
+            "Chum kimchun",
             "Data Analyst",
-            "chu.kimchun@gmail.com",
-            "6767",
+            "chumkimchun@gmail.com",
+            "pros_show",
             "ITC    ",
             ACCENT_ORANGE,
             new String[]{"Python", "SQL", "Analytics"},
-            "D:/java project/Pulll/Frontend/aura.jpg"
+            "D:\\java project\\final code\\something\\PDI_project\\Frontend\\aura.jpg"
         ));
 
         return container;

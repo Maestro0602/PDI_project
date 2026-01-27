@@ -1,7 +1,7 @@
 package Backend.src.major;
 
-import java.util.Scanner;
 import Backend.src.database.MajorManager;
+import java.util.Scanner;
 
 public class major {
 

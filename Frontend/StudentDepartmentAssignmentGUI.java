@@ -2,7 +2,6 @@ package Frontend;
 
 import Backend.src.database.MajorManager;
 import Backend.src.database.StudentInfoManager;
-import Backend.src.department.Department;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -19,6 +18,7 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
     private static final Color ACCENT_ORANGE = new Color(249, 115, 22);
     private static final Color ACCENT_BLUE = new Color(59, 130, 246);
     private static final Color ACCENT_PURPLE = new Color(168, 85, 247);
+    public static final Color ACCENT_RED = new Color(239, 68, 68);
     
     private JTextField searchField;
     private JComboBox<String> searchTypeCombo;
@@ -29,12 +29,11 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
     private JTable studentTable;
     private DefaultTableModel tableModel;
     private JComboBox<String> departmentCombo;
+    private JComboBox<String> majorCombo;
     private JLabel statusLabel;
     private JPanel detailsPanel;
     private JScrollPane detailsScrollPane;
-    
 
-    public static final Color ACCENT_RED = new Color(239, 68, 68);
     public StudentDepartmentAssignmentGUI() {
         // Initialize database tables
         StudentInfoManager.createStudentInfoTable();
@@ -45,7 +44,7 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
     }
     
     private void initializeUI() {
-        setTitle("Student Department Assignment");
+        setTitle("Student Department & Major Assignment");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1100, 750);
         setLocationRelativeTo(null);
@@ -163,7 +162,7 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
         titlePanel.setOpaque(false);
 
-        JLabel titleLabel = new JLabel("Student Department Assignment");
+        JLabel titleLabel = new JLabel("Student Department & Major Assignment");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         titleLabel.setForeground(TEXT_PRIMARY);
 
@@ -476,30 +475,44 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
         actionPanel.setOpaque(false);
         actionPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        // Left side - Department selection
+        // Left side - Department and Major selection
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         leftPanel.setOpaque(false);
         
-        JLabel deptLabel = new JLabel("Select Department:");
+        JLabel deptLabel = new JLabel("Department:");
         deptLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
         deptLabel.setForeground(TEXT_PRIMARY);
         
         departmentCombo = new JComboBox<>(new String[]{
             "-- Select Department --",
-            Department.GIC.getDisplayName() + " - General IT & Computing",
-            Department.GIM.getDisplayName() + " - General IT & Management",
-            Department.GEE.getDisplayName() + " - General Electrical & Engineering"
+            "GIC",
+            "GIM",
+            "GEE"
         });
         departmentCombo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        departmentCombo.setPreferredSize(new Dimension(380, 40));
+        departmentCombo.setPreferredSize(new Dimension(200, 40));
         departmentCombo.setBackground(Color.WHITE);
         departmentCombo.setForeground(TEXT_PRIMARY);
+        departmentCombo.addActionListener(e -> updateMajorOptions());
         
-        assignButton = createStyledButton("✓ Assign to Department", ACCENT_GREEN, 200, 45);
-        assignButton.addActionListener(e -> assignDepartment());
+        JLabel majorLabel = new JLabel("Major:");
+        majorLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        majorLabel.setForeground(TEXT_PRIMARY);
+        
+        majorCombo = new JComboBox<>(new String[]{"Select Department First"});
+        majorCombo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        majorCombo.setPreferredSize(new Dimension(280, 40));
+        majorCombo.setBackground(Color.WHITE);
+        majorCombo.setForeground(TEXT_PRIMARY);
+        majorCombo.setEnabled(false);
+        
+        assignButton = createStyledButton("✓ Assign to Department", ACCENT_GREEN, 220, 45);
+        assignButton.addActionListener(e -> assignDepartmentAndMajor());
         
         leftPanel.add(deptLabel);
         leftPanel.add(departmentCombo);
+        leftPanel.add(majorLabel);
+        leftPanel.add(majorCombo);
         leftPanel.add(assignButton);
         
         // Right side - Status label
@@ -515,6 +528,31 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
         actionPanel.add(rightPanel, BorderLayout.EAST);
         
         return actionPanel;
+    }
+    
+    private void updateMajorOptions() {
+        String selectedDept = (String) departmentCombo.getSelectedItem();
+        majorCombo.removeAllItems();
+        
+        if ("GIC".equals(selectedDept)) {
+            majorCombo.addItem("Software Engineering");
+            majorCombo.addItem("Cyber Security");
+            majorCombo.addItem("Artificial Intelligence");
+            majorCombo.setEnabled(true);
+        } else if ("GIM".equals(selectedDept)) {
+            majorCombo.addItem("Mechanical Engineering");
+            majorCombo.addItem("Manufacturing Engineering");
+            majorCombo.addItem("Industrial Engineering");
+            majorCombo.setEnabled(true);
+        } else if ("GEE".equals(selectedDept)) {
+            majorCombo.addItem("Electrical Engineering");
+            majorCombo.addItem("Electronics Engineering");
+            majorCombo.addItem("Automation Engineering");
+            majorCombo.setEnabled(true);
+        } else {
+            majorCombo.addItem("Select Department First");
+            majorCombo.setEnabled(false);
+        }
     }
     
     private JButton createStyledButton(String text, Color color, int width, int height) {
@@ -610,7 +648,6 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
         tableModel.setRowCount(0);
         clearDetailsPanel();
         
-        // Use searchStudentByName with empty string to get all students
         String[][] allStudents = StudentInfoManager.searchStudentByName("");
         
         if (allStudents == null || allStudents.length == 0) {
@@ -619,15 +656,13 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
             return;
         }
         
-        // Populate table with all students
-        // searchStudentByName returns: [studentName, studentID, gender, year]
         for (int i = 0; i < allStudents.length; i++) {
             Object[] row = {
                 (i + 1),
-                allStudents[i][0], // studentName
-                allStudents[i][1], // studentID
-                allStudents[i][2], // gender
-                allStudents[i][3]  // year
+                allStudents[i][0],
+                allStudents[i][1],
+                allStudents[i][2],
+                allStudents[i][3]
             };
             tableModel.addRow(row);
         }
@@ -668,14 +703,13 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
             return;
         }
         
-        // Populate table - results format: [studentName, studentID, gender, year]
         for (int i = 0; i < results.length; i++) {
             Object[] row = {
                 (i + 1),
-                results[i][0], // studentName
-                results[i][1], // studentID
-                results[i][2], // gender
-                results[i][3]  // year
+                results[i][0],
+                results[i][1],
+                results[i][2],
+                results[i][3]
             };
             tableModel.addRow(row);
         }
@@ -683,7 +717,6 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
         statusLabel.setText("Found " + results.length + " student(s)");
         statusLabel.setForeground(ACCENT_GREEN);
         
-        // Auto-select first row
         if (results.length > 0) {
             studentTable.setRowSelectionInterval(0, 0);
         }
@@ -698,26 +731,27 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
             return;
         }
         
-        // Add to table - result format: [Name, StudentID, Gender, Year]
         Object[] row = {
             1,
-            result[0], // Name
-            result[1], // StudentID
-            result[2], // Gender
-            result[3]  // Year
+            result[0],
+            result[1],
+            result[2],
+            result[3]
         };
         tableModel.addRow(row);
         
         statusLabel.setText("Student found: " + result[0]);
         statusLabel.setForeground(ACCENT_GREEN);
         
-        // Auto-select the row
         studentTable.setRowSelectionInterval(0, 0);
     }
     
     private void clearSearch() {
         searchField.setText("");
         departmentCombo.setSelectedIndex(0);
+        majorCombo.removeAllItems();
+        majorCombo.addItem("Select Department First");
+        majorCombo.setEnabled(false);
         loadAllStudents();
         statusLabel.setText("");
     }
@@ -746,7 +780,6 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
         
         detailsPanel.add(Box.createVerticalStrut(15));
         
-        // Student basic info card
         JPanel basicInfoCard = createInfoCard("👤 Basic Information", ACCENT_BLUE);
         basicInfoCard.setLayout(new GridLayout(4, 1, 0, 12));
         
@@ -758,11 +791,9 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
         detailsPanel.add(basicInfoCard);
         detailsPanel.add(Box.createVerticalStrut(15));
         
-        // Department and Major
         String[] deptMajorCourses = MajorManager.getFullDepartmentMajorCourse(studentInfo[1]);
         
         if (deptMajorCourses != null && deptMajorCourses.length >= 6) {
-            // Department/Major card
             JPanel academicCard = createInfoCard("🎓 Academic Information", ACCENT_PURPLE);
             academicCard.setLayout(new GridLayout(2, 1, 0, 12));
             
@@ -772,7 +803,6 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
             detailsPanel.add(academicCard);
             detailsPanel.add(Box.createVerticalStrut(15));
             
-            // Courses card
             JPanel coursesCard = createInfoCard("📚 Enrolled Courses", ACCENT_GREEN);
             coursesCard.setLayout(new BoxLayout(coursesCard, BoxLayout.Y_AXIS));
             
@@ -794,7 +824,6 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
             
             detailsPanel.add(coursesCard);
         } else {
-            // No data card
             JPanel noDataCard = createInfoCard("⚠️ Department Assignment", ACCENT_ORANGE);
             
             JLabel noDataLabel = new JLabel("Department and Major not assigned yet");
@@ -820,11 +849,9 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Background
                 g2d.setColor(new Color(248, 250, 252));
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
                 
-                // Left accent border
                 g2d.setColor(accentColor);
                 g2d.fillRoundRect(0, 0, 4, getHeight(), 12, 12);
             }
@@ -834,7 +861,6 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
         card.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         card.setMaximumSize(new Dimension(450, 1000));
         
-        // Title
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 15));
         titleLabel.setForeground(TEXT_PRIMARY);
@@ -885,7 +911,7 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
         detailsPanel.repaint();
     }
     
-    private void assignDepartment() {
+    private void assignDepartmentAndMajor() {
         int selectedRow = studentTable.getSelectedRow();
         
         if (selectedRow == -1) {
@@ -904,69 +930,56 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
             return;
         }
         
+        String major = (String) majorCombo.getSelectedItem();
+        if ("Select Department First".equals(major) || major == null) {
+            JOptionPane.showMessageDialog(this,
+                "Please select a major",
+                "Major Required",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
         String studentName = (String) tableModel.getValueAt(selectedRow, 1);
         String studentID = (String) tableModel.getValueAt(selectedRow, 2);
-        String selectedDept = (String) departmentCombo.getSelectedItem();
-        String department = selectedDept.substring(0, 3); // Extract GIC, GIM, or GEE
+        String department = (String) departmentCombo.getSelectedItem();
         
         int confirm = JOptionPane.showConfirmDialog(this,
-            "Assign " + studentName + " (" + studentID + ") to " + department + "?\n\n" +
-            "This will open the major selection dialog.",
+            "Assign " + studentName + " (" + studentID + ") to:\n\n" +
+            "Department: " + department + "\n" +
+            "Major: " + major,
             "Confirm Assignment",
             JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE);
         
         if (confirm == JOptionPane.YES_OPTION) {
-            // Get major selection based on department
-            String selectedMajor = null;
-            
-            switch (department) {
-                case "GIC":
-                    selectedMajor = Backend.src.major.major.getGICMajor();
-                    break;
-                case "GIM":
-                    selectedMajor = Backend.src.major.major.getGIMMajor();
-                    break;
-                case "GEE":
-                    selectedMajor = Backend.src.major.major.getGEEMajor();
-                    break;
-            }
-            
-            if (selectedMajor == null) {
-                statusLabel.setText("❌ Major selection cancelled");
-                statusLabel.setForeground(ACCENT_ORANGE);
-                return;
-            }
-            
-            // Save to database using MajorManager
-            boolean success = MajorManager.saveDepartmentMajor(studentID, department, selectedMajor);
+            boolean success = MajorManager.updateDepartmentMajor(studentID, department, major);
             
             if (success) {
-                statusLabel.setText("✓ " + studentName + " assigned to " + department + " - " + selectedMajor);
+                statusLabel.setText("✓ " + studentName + " assigned to " + department + " - " + major);
                 statusLabel.setForeground(ACCENT_GREEN);
                 
                 JOptionPane.showMessageDialog(this,
                     "Student successfully assigned!\n\n" +
                     "Department: " + department + "\n" +
-                    "Major: " + selectedMajor,
+                    "Major: " + major,
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
                 
-                // Refresh details to show updated information
                 displaySelectedStudentDetails();
             } else {
-                statusLabel.setText("❌ Failed to assign department");
+                statusLabel.setText("❌ Failed to assign");
                 statusLabel.setForeground(ACCENT_RED);
                 
                 JOptionPane.showMessageDialog(this,
-                    "Failed to assign student to department.\n" +
-                    "Please check if the student is already assigned.",
+                    "Failed to assign student.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
             }
             
-            // Reset selection
             departmentCombo.setSelectedIndex(0);
+            majorCombo.removeAllItems();
+            majorCombo.addItem("Select Department First");
+            majorCombo.setEnabled(false);
         }
     }
     
@@ -979,8 +992,8 @@ public class StudentDepartmentAssignmentGUI extends JFrame {
         if (confirm == JOptionPane.YES_OPTION) {
             this.dispose();
             SwingUtilities.invokeLater(() -> {
-            new MainpageTeacher().setVisible(true);
-        });
+                new MainpageTeacher().setVisible(true);
+            });
         }
     }
     
